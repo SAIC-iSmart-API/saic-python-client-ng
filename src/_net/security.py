@@ -1,9 +1,7 @@
 import hashlib
 import hmac
 
-import httpx
 from httpx import Response
-from requests import Response
 
 from crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding, decrypt_aes_cbc_pkcs5_padding
 
@@ -45,25 +43,7 @@ def get_app_verification_string(
     return ""
 
 
-def decrypt_response(resp: Response):
-    app_send_date = resp.headers.get("APP-SEND-DATE")
-    original_content_type = resp.headers.get("ORIGINAL-CONTENT-TYPE")
-    charset = "UTF-8"  # FIXME: Check it from the content type
-    resp_content = resp.content.strip()
-    if resp_content:
-        original_response_key = app_send_date + "1" + original_content_type
-        key = md5_hex_digest(original_response_key, False) if len(original_response_key) > 0 else ""
-        iv = md5_hex_digest(app_send_date, False)
-        decrypted = decrypt_aes_cbc_pkcs5_padding(resp_content, key, iv)
-        if decrypted:
-            resp._content = decrypted.encode(charset)
-            resp.headers["Content-Length"] = str(len(resp._content))
-            resp.headers["Content-Type"] = original_content_type
-            return resp
-    return resp
-
-
-async def httpx_decrypt_response(resp: httpx.Response):
+async def decrypt_response(resp: Response):
     if resp.is_success:
         app_send_date = resp.headers.get("APP-SEND-DATE")
         original_content_type = resp.headers.get("ORIGINAL-CONTENT-TYPE")

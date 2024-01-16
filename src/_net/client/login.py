@@ -3,24 +3,25 @@ from datetime import datetime
 import httpx
 
 from crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding
-from net.security import get_app_verification_string, httpx_decrypt_response
-from net.utils import update_request_with_content
+from model import SaicApiConfiguration
+from src._net.security import get_app_verification_string, decrypt_response
+from src._net.utils import update_request_with_content
 
 
 class SaicLoginClient():
-    def __init__(self):
+    def __init__(self, configuration: SaicApiConfiguration):
         super().__init__()
         self.__user_token = ""
-        self.__base_url = "https://gateway-mg-eu.soimt.com/api.app/v1/"
-        self.__tenant_id = "459771"
         self.__class_name = ""
+        self.__configuration = configuration
         self.__client = httpx.AsyncClient(
             event_hooks={
                 "request": [self.__encrypt_request],
-                "response": [httpx_decrypt_response]
+                "response": [decrypt_response]
             }
         )
 
+    @property
     def client(self):
         return self.__client
 
@@ -29,9 +30,9 @@ class SaicLoginClient():
         original_content_type = modified_request.headers.get("Content-Type")
         request_content = ""
         current_ts = str(int(datetime.now().timestamp() * 1000))
-        tenant_id = self.__tenant_id
+        tenant_id = self.__configuration.tenant_id
         user_token = self.__user_token
-        request_path = str(original_request_url).replace(self.__base_url, "/")
+        request_path = str(original_request_url).replace(self.__configuration.base_uri, "/")
         request_body = modified_request.content.decode("utf-8")
         if request_body:
             request_content = request_body.strip()

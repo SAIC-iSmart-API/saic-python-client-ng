@@ -3,34 +3,10 @@ import logging
 
 import httpx
 
-from crypto_utils import sha1_hex_digest, sha256_hex_digest
-from net.session.api import SaicApiClient
-from net.session.login import SaicLoginClient
-
-
-async def login(username, password):
-    # Example usage
-    url = "https://gateway-mg-eu.soimt.com/api.app/v1/oauth/token"
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "application/json",
-    }
-    firebase_device_id = "cqSHOMG1SmK4k-fzAeK6hr:APA91bGtGihOG5SEQ9hPx3Dtr9o9mQguNiKZrQzboa-1C_UBlRZYdFcMmdfLvh9Q_xA8A0dGFIjkMhZbdIXOYnKfHCeWafAfLXOrxBS3N18T4Slr-x9qpV6FHLMhE9s7I6s89k9lU7DD"
-    form_body = {
-        "grant_type": "password",
-        "username": username,
-        "password": sha1_hex_digest(password),
-        "scope": "all",
-        "deviceId": f"{firebase_device_id}###europecar",
-        "deviceType": "1",  # 2 for huawei
-        "loginType": "2",  # 1 for phone number
-        "countryCode": "",  # e.g 39 for italy if we have a phone number
-    }
-    # Create an instance of your custom session
-    async with SaicLoginClient().client() as s:
-        req = httpx.Request("POST", url, data=form_body, headers=headers)
-        response = await s.send(req)
-        return response.json()
+from _net.client.api import SaicApiClient
+from crypto_utils import sha256_hex_digest
+from model import SaicApiConfiguration
+from saic_api import SaicApi
 
 
 async def get_user_info(login_resp):
@@ -39,7 +15,7 @@ async def get_user_info(login_resp):
     headers = {
         "Content-Type": "application/json; charset=UTF-8",
     }
-    # Create an instance of your custom session
+    # Create an instance of your custom client
     s = SaicApiClient(login_resp.get("access_token"))
 
     async with s.client() as client:
@@ -54,7 +30,7 @@ async def vehicle_list(login_resp):
     headers = {
         "Content-Type": "application/json; charset=UTF-8",
     }
-    # Create an instance of your custom session
+    # Create an instance of your custom client
     s = SaicApiClient(login_resp.get("access_token"))
 
     async with s.client() as client:
@@ -73,7 +49,7 @@ async def fota_list(login_resp, vin):
         "User-Agent": "okhttp/3.14.9",
         "event-id": '0',
     }
-    # Create an instance of your custom session
+    # Create an instance of your custom client
     s = SaicApiClient(login_resp.get("access_token"))
     async with s.client() as client:
         req = httpx.Request("GET", url, headers=headers, params={"vin": sha256_hex_digest(vin)})
@@ -82,7 +58,13 @@ async def fota_list(login_resp, vin):
 
 
 async def main():
-    login_resp = await login('xxxxx@gmail.com', 'XXXXXX')
+    saic_api = SaicApi(
+        SaicApiConfiguration(
+            username="xxxx@gmail.com",
+            password="XXXXXX",
+        )
+    )
+    login_resp = await saic_api.login()
     vehicle_list_rest = await vehicle_list(login_resp['data'])
     cars = vehicle_list_rest['data']['vinList']
     for car in cars:

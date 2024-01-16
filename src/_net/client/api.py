@@ -1,35 +1,36 @@
 from datetime import datetime
 
 import httpx
-from httpx._client import USER_AGENT
-from requests import Session, PreparedRequest
 
 from crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding
-from net.security import get_app_verification_string, decrypt_response, httpx_decrypt_response
-from net.utils import update_request_with_content
+from model import SaicApiConfiguration
+from src._net.security import get_app_verification_string, decrypt_response
+from src._net.utils import update_request_with_content
 
 
-class SaicApiClient(Session):
-    def __init__(self, user_token):
+class SaicApiClient():
+    def __init__(self, user_token, configuration: SaicApiConfiguration):
         super().__init__()
         self.__user_token = user_token
-        self.__base_url = "https://gateway-mg-eu.soimt.com/api.app/v1/"
-        self.__tenant_id = "459771"
+        self.__configuration = configuration
         self.__class_name = ""
         self.__client = httpx.AsyncClient(
             event_hooks={
                 "request": [self.__encrypt_request],
-                "response": [httpx_decrypt_response]
+                "response": [decrypt_response]
             }
         )
 
+    @property
     def client(self):
         return self.__client
 
-    def get_user_token(self):
+    @property
+    def user_token(self):
         return self.__user_token
 
-    def set_user_token(self, user_token):
+    @user_token.setter
+    def user_token(self, user_token):
         self.__user_token = user_token
 
     async def __encrypt_request(self, modified_request: httpx.Request):
@@ -41,9 +42,9 @@ class SaicApiClient(Session):
             modified_content_type = original_content_type
         request_content = ""
         current_ts = str(int(datetime.now().timestamp() * 1000))
-        tenant_id = self.__tenant_id
-        user_token = self.get_user_token()
-        request_path = str(original_request_url).replace(self.__base_url, "/")
+        tenant_id = self.__configuration.tenant_id
+        user_token = self.user_token
+        request_path = str(original_request_url).replace(self.__configuration.base_uri, "/")
         request_body = modified_request.content.decode("utf-8")
         if request_body:
             modified_content_type = "multipart/form-data" if "multipart" in original_content_type else "application/json"
@@ -66,7 +67,7 @@ class SaicApiClient(Session):
         modified_request.headers["Accept"] = "application/json"
         modified_request.headers["Accept-Encoding"] = "gzip"
 
-        modified_request.headers["REGION"] = "eu"
+        modified_request.headers["REGION"] = self.__configuration.region
         modified_request.headers["APP-SEND-DATE"] = current_ts
         modified_request.headers["APP-CONTENT-ENCRYPTED"] = "1"
         modified_request.headers["tenant-id"] = tenant_id

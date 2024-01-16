@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "saic_ismart_client_ng"
+version = "0.0.1"
+authors = [
+    { name = "Giovanni Condello", email = "saic-python-client@nanomad.net" },
+]
+dependencies = [
+    "pycryptodome>=3.20.0",
+    "httpx>=0.26.0",
+    "tenacity>=8.2.3",
+]
+description = "SAIC next gen client library (MG iSMART)"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/SAIC-iSmart-API/saic-python-client-ng"
+"Bug Tracker" = "https://github.com/SAIC-iSmart-API/saic-python-client-ng/issues"
