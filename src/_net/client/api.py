@@ -9,9 +9,9 @@ from src._net.utils import update_request_with_content
 
 
 class SaicApiClient():
-    def __init__(self, user_token, configuration: SaicApiConfiguration):
+    def __init__(self, configuration: SaicApiConfiguration):
         super().__init__()
-        self.__user_token = user_token
+        self.__user_token = None
         self.__configuration = configuration
         self.__class_name = ""
         self.__client = httpx.AsyncClient(

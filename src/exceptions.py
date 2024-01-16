@@ -1,3 +1,6 @@
+from tenacity import RetryError
+
+
 class SaicApiException(Exception):
     def __init__(self, msg: str, return_code: int = None):
         if return_code is not None:
@@ -7,3 +10,7 @@ class SaicApiException(Exception):
 
     def __str__(self):
         return self.message
+
+
+class SaicApiRetryException(RetryError, SaicApiException):
+    pass

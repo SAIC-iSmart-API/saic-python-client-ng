@@ -12,6 +12,7 @@ dependencies = [
     "pycryptodome>=3.20.0",
     "httpx>=0.26.0",
     "tenacity>=8.2.3",
+    "dacite>=1.8.1",
 ]
 description = "SAIC next gen client library (MG iSMART)"
 readme = "README.md"
