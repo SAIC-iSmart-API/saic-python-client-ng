@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import List
 
 
@@ -71,3 +72,27 @@ class VehicleListResp:
         vehicleModelConfiguration: List[VehicleModelConfigurationDTO] = field(default_factory=list)
 
     vinList: List[VinListDTO] = field(default_factory=list)
+
+
+class AlarmType(Enum):
+    ALARM_TYPE_VEHICLE_FAULT = 0
+    ALARM_TYPE_GEOFENCE = 2
+    ALARM_TYPE_VEHICLE_START = 3
+
+
+@dataclass
+class AlarmSwitchDTO:
+    alarmType: int
+    functionSwitch: int
+    alarmSwitch: int
+
+
+@dataclass
+class AlarmSwitchResp:
+    alarmSwitchList: List[AlarmSwitchDTO] = field(default_factory=list)
+
+
+@dataclass
+class AlarmSwitchReq:
+    vin: str
+    alarmSwitchList: List[AlarmSwitchDTO] = field(default_factory=list)

@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Type, T
 
 import dacite
@@ -6,10 +7,10 @@ import tenacity
 
 from _net.client.api import SaicApiClient
 from _net.client.login import SaicLoginClient
-from crypto_utils import sha1_hex_digest
+from crypto_utils import sha1_hex_digest, sha256_hex_digest
 from exceptions import SaicApiException
 from model import SaicApiConfiguration
-from schema import LoginResp, VehicleListResp
+from schema import LoginResp, VehicleListResp, AlarmSwitchResp, AlarmSwitchReq
 
 
 class SaicApi:
@@ -44,13 +45,12 @@ class SaicApi:
             "countryCode": "" if self.__configuration.username_is_email else self.__configuration.phone_country_code,
         }
 
-        async with self.__login_client.client as s:
-            req = httpx.Request("POST", url, data=form_body, headers=headers)
-            response = await s.send(req)
-            result = self.__deserialize(response, LoginResp)
-            # Update the user token
-            self.__api_client.user_token = result.access_token
-            return result
+        req = httpx.Request("POST", url, data=form_body, headers=headers)
+        response = await self.__login_client.client.send(req)
+        result = self.__deserialize(response, LoginResp)
+        # Update the user token
+        self.__api_client.user_token = result.access_token
+        return result
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(1),
@@ -64,10 +64,38 @@ class SaicApi:
         }
         # Create an instance of your custom client
 
-        async with self.__api_client.client as client:
-            req = httpx.Request("GET", url, headers=headers)
-            response = await client.send(req)
-            return self.__deserialize(response, VehicleListResp)
+        req = httpx.Request("GET", url, headers=headers)
+        response = await self.__api_client.client.send(req)
+        return self.__deserialize(response, VehicleListResp)
+
+    @tenacity.retry(
+        stop=tenacity.stop_after_attempt(1),
+        retry=tenacity.retry_if_not_exception_type(SaicApiException),
+    )
+    async def get_alarm_switch(self, vin) -> AlarmSwitchResp:
+        url = f"{self.__configuration.base_uri}vehicle/alarmSwitch"
+        headers = {
+            "Content-Type": "application/json; charset=UTF-8",
+        }
+
+        req = httpx.Request("GET", url, headers=headers, params={"vin": sha256_hex_digest(vin)})
+        response = await self.__api_client.client.send(req)
+        return self.__deserialize(response, AlarmSwitchResp)
+
+    @tenacity.retry(
+        stop=tenacity.stop_after_attempt(1),
+        retry=tenacity.retry_if_not_exception_type(SaicApiException),
+    )
+    async def set_alarm_switch(self, body: AlarmSwitchReq, vin: str) -> None:
+        url = f"{self.__configuration.base_uri}vehicle/alarmSwitch"
+        headers = {
+            "Content-Type": "application/json; charset=UTF-8",
+        }
+        body.vin = sha256_hex_digest(vin)
+
+        req = httpx.Request("PUT", url, json=asdict(body), headers=headers)
+        response = await self.__api_client.client.send(req)
+        return self.__deserialize(response, None)
 
     @staticmethod
     def __deserialize(response: httpx.Response, data_class: Type[T]) -> T:
@@ -78,10 +106,13 @@ class SaicApi:
             if return_code != 0:
                 raise SaicApiException(json_data.get('message', 'Unknown error'), return_code=return_code)
 
-            if 'data' in json_data:
+            if data_class is None:
+                return None
+            elif 'data' in json_data:
                 return dacite.from_dict(data_class, json_data['data'])
+            else:
+                raise SaicApiException(f"Failed to deserialize response, missing data field: {json_data}")
 
-            raise SaicApiException("No data field in response")
         except SaicApiException as se:
             raise se
         except Exception as e:
