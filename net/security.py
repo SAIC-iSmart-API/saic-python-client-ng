@@ -1,6 +1,8 @@
 import hashlib
 import hmac
 
+import httpx
+from httpx import Response
 from requests import Response
 
 from crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding, decrypt_aes_cbc_pkcs5_padding
@@ -16,30 +18,30 @@ def get_app_verification_string(
         user_token
 ):
     api_name = request_path if (len(request_path) > 0 or "?" not in request_path) else request_path.split("?")[0]
-    originKeyPartOne = request_path + tenant_id + user_token + "app"
-    encryptKeyPartOne = md5_hex_digest(originKeyPartOne, False)
-    originKeyPartTwo = current_ts + "1" + content_type
-    encryptKey = md5_hex_digest(encryptKeyPartOne + originKeyPartTwo, False)
-    encryptIV = md5_hex_digest(current_ts, False)
-    encryptReq = encrypt_aes_cbc_pkcs5_padding(request_content, encryptKey,
-                                               encryptIV) if len(request_content) > 0 else ""
-    hmacSha256Value = request_path + tenant_id + user_token + "app" + current_ts + "1" + content_type + encryptReq
-    hmacSha256Key = md5_hex_digest(encryptKey + current_ts, False)
+    origin_key_part_one = request_path + tenant_id + user_token + "app"
+    encrypt_key_part_one = md5_hex_digest(origin_key_part_one, False)
+    origin_key_part_two = current_ts + "1" + content_type
+    encrypt_key = md5_hex_digest(encrypt_key_part_one + origin_key_part_two, False)
+    encrypt_iv = md5_hex_digest(current_ts, False)
+    encrypt_req = encrypt_aes_cbc_pkcs5_padding(request_content, encrypt_key,
+                                                encrypt_iv) if len(request_content) > 0 else ""
+    hmac_sha256_value = request_path + tenant_id + user_token + "app" + current_ts + "1" + content_type + encrypt_req
+    hmac_sha256_key = md5_hex_digest(encrypt_key + current_ts, False)
 
-    if len(hmacSha256Key) > 0 and len(hmacSha256Value) > 0:
+    if len(hmac_sha256_key) > 0 and len(hmac_sha256_value) > 0:
         app_verification_string = hmac.new(
-            hmacSha256Key.encode(),
-            msg=hmacSha256Value.encode(),
+            hmac_sha256_key.encode(),
+            msg=hmac_sha256_value.encode(),
             digestmod=hashlib.sha256
         ).hexdigest()
 
         print(
-            f"{clazz_simple_name}  headerInterceptor apiName--->>>  {api_name}  \n encryptURI --->>>  {request_path}  \n originKeyPartOne --->>>  {originKeyPartOne}  \n encryptKeyPartOne --->>>  {encryptKeyPartOne}  \n originKeyPartTwo --->>>  {originKeyPartTwo}  \n 完整的加密Key  encryptKey --->>>  {encryptKey}  \n 加密IV  encryptIV --->>>  {encryptIV}  \n 原始params  paramsStr --->>>  {request_content}  \n 加密params  encryptReq --->>>  {encryptReq}  \n hmacSha256Value --->>>  {hmacSha256Value}  \n origin hmacKey --->>>  {encryptKey + current_ts}  \n hmacSha256Key --->>>  {hmacSha256Key}  \n APP-VERIFICATION-STRING --->>>  {app_verification_string}"
+            f"{clazz_simple_name}  headerInterceptor apiName--->>>  {api_name}  \n encryptURI --->>>  {request_path}  \n origin_key_part_one --->>>  {origin_key_part_one}  \n encrypt_key_part_one --->>>  {encrypt_key_part_one}  \n origin_key_part_two --->>>  {origin_key_part_two}  \n 完整的加密Key  encrypt_key --->>>  {encrypt_key}  \n 加密IV  encrypt_iv --->>>  {encrypt_iv}  \n 原始params  paramsStr --->>>  {request_content}  \n 加密params  encrypt_req --->>>  {encrypt_req}  \n hmac_sha256_value --->>>  {hmac_sha256_value}  \n origin hmacKey --->>>  {encrypt_key + current_ts}  \n hmacSha256Key --->>>  {hmac_sha256_key}  \n APP-VERIFICATION-STRING --->>>  {app_verification_string}"
         )
         return app_verification_string
 
     print(
-        f"{clazz_simple_name}  headerInterceptor apiName--->>>  {api_name}  \n encryptURI --->>>  {request_path}  \n originKeyPartOne --->>>  {originKeyPartOne}  \n encryptKeyPartOne --->>>  {encryptKeyPartOne}  \n originKeyPartTwo --->>>  {originKeyPartTwo}  \n 完整的加密Key  encryptKey --->>>  {encryptKey}  \n 加密IV  encryptIV --->>>  {encryptIV}  \n 原始params  paramsStr --->>>  {request_content}  \n 加密params  encryptReq --->>>  {encryptReq}  \n hmacSha256Value --->>>  {hmacSha256Value}  \n origin hmacKey --->>>  {encryptKey + current_ts}  \n hmacSha256Key --->>>  {hmacSha256Key}")
+        f"{clazz_simple_name}  headerInterceptor apiName--->>>  {api_name}  \n encryptURI --->>>  {request_path}  \n origin_key_part_one --->>>  {origin_key_part_one}  \n encrypt_key_part_one --->>>  {encrypt_key_part_one}  \n origin_key_part_two --->>>  {origin_key_part_two}  \n 完整的加密Key  encrypt_key --->>>  {encrypt_key}  \n 加密IV  encrypt_iv --->>>  {encrypt_iv}  \n 原始params  paramsStr --->>>  {request_content}  \n 加密params  encrypt_req --->>>  {encrypt_req}  \n hmac_sha256_value --->>>  {hmac_sha256_value}  \n origin hmacKey --->>>  {encrypt_key + current_ts}  \n hmacSha256Key --->>>  {hmac_sha256_key}")
     return ""
 
 
@@ -58,4 +60,23 @@ def decrypt_response(resp: Response):
             resp.headers["Content-Length"] = str(len(resp._content))
             resp.headers["Content-Type"] = original_content_type
             return resp
+    return resp
+
+
+async def httpx_decrypt_response(resp: httpx.Response):
+    if resp.is_success:
+        app_send_date = resp.headers.get("APP-SEND-DATE")
+        original_content_type = resp.headers.get("ORIGINAL-CONTENT-TYPE")
+        charset = "UTF-8"  # FIXME: Check it from the content type
+        resp_content = (await resp.aread()).decode(charset).strip()
+        if resp_content:
+            original_response_key = app_send_date + "1" + original_content_type
+            key = md5_hex_digest(original_response_key, False) if len(original_response_key) > 0 else ""
+            iv = md5_hex_digest(app_send_date, False)
+            decrypted = decrypt_aes_cbc_pkcs5_padding(resp_content, key, iv)
+            if decrypted:
+                resp._content = decrypted.encode(charset)
+                resp.headers["Content-Length"] = str(len(resp._content))
+                resp.headers["Content-Type"] = original_content_type
+                return resp
     return resp
