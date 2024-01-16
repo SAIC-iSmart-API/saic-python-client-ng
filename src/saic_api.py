@@ -1,9 +1,10 @@
 from dataclasses import asdict
-from typing import Type, T
+from typing import Type, T, Optional, Any
 
 import dacite
 import httpx
 import tenacity
+from httpx._types import QueryParamTypes, HeaderTypes
 
 from _net.client.api import SaicApiClient
 from _net.client.login import SaicLoginClient
@@ -57,48 +58,45 @@ class SaicApi:
         retry=tenacity.retry_if_not_exception_type(SaicApiException),
     )
     async def vehicle_list(self) -> VehicleListResp:
-        # Example usage
-        url = f"{self.__configuration.base_uri}vehicle/list"
-        headers = {
-            "Content-Type": "application/json; charset=UTF-8",
-        }
-        # Create an instance of your custom client
-
-        req = httpx.Request("GET", url, headers=headers)
-        response = await self.__api_client.client.send(req)
-        return self.__deserialize(response, VehicleListResp)
+        return await self.__api_call("GET", "/vehicle/list", out_type=VehicleListResp)
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(1),
         retry=tenacity.retry_if_not_exception_type(SaicApiException),
     )
     async def get_alarm_switch(self, vin) -> AlarmSwitchResp:
-        url = f"{self.__configuration.base_uri}vehicle/alarmSwitch"
-        headers = {
-            "Content-Type": "application/json; charset=UTF-8",
-        }
-
-        req = httpx.Request("GET", url, headers=headers, params={"vin": sha256_hex_digest(vin)})
-        response = await self.__api_client.client.send(req)
-        return self.__deserialize(response, AlarmSwitchResp)
+        return await self.__api_call(
+            "GET",
+            "/vehicle/alarmSwitch",
+            out_type=AlarmSwitchResp,
+            params={"vin": sha256_hex_digest(vin)}
+        )
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(1),
         retry=tenacity.retry_if_not_exception_type(SaicApiException),
     )
     async def set_alarm_switch(self, body: AlarmSwitchReq, vin: str) -> None:
-        url = f"{self.__configuration.base_uri}vehicle/alarmSwitch"
-        headers = {
-            "Content-Type": "application/json; charset=UTF-8",
-        }
         body.vin = sha256_hex_digest(vin)
+        return await self.__api_call("PUT", "/vehicle/alarmSwitch", body=body)
 
-        req = httpx.Request("PUT", url, json=asdict(body), headers=headers)
+    async def __api_call(
+            self,
+            method: str,
+            path: str,
+            body: Optional[Any] = None,
+            out_type: Optional[Type[T]] = None,
+            params: Optional[QueryParamTypes] = None,
+            headers: Optional[HeaderTypes] = None,
+    ) -> Optional[T]:
+        url = f"{self.__configuration.base_uri}{path[1:] if path.startswith('/') else path}"
+        json_body = asdict(body) if body else None
+        req = httpx.Request(method, url, params=params, headers=headers, json=json_body)
         response = await self.__api_client.client.send(req)
-        return self.__deserialize(response, None)
+        return self.__deserialize(response, out_type)
 
     @staticmethod
-    def __deserialize(response: httpx.Response, data_class: Type[T]) -> T:
+    def __deserialize(response: httpx.Response, data_class: Optional[Type[T]]) -> Optional[T]:
         try:
             json_data = response.json()
             return_code = json_data.get('code', -1)
