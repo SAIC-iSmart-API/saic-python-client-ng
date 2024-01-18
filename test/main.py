@@ -3,11 +3,11 @@ import logging
 
 import httpx
 
-from _net.client.api import SaicApiClient
 from crypto_utils import sha256_hex_digest
-from model import SaicApiConfiguration
-from saic_api import SaicApi
-from schema import LoginResp, AlarmType, AlarmSwitchReq, AlarmSwitchDTO
+from saic_ismart_client import SaicApi
+from saic_ismart_client.net.client.api import SaicApiClient
+from saic_ismart_client.model import SaicApiConfiguration
+from saic_ismart_client.api.login.schema import LoginResp
 
 
 async def fota_list(login_resp: LoginResp, vin: str, config: SaicApiConfiguration):
@@ -29,7 +29,7 @@ async def fota_list(login_resp: LoginResp, vin: str, config: SaicApiConfiguratio
 
 
 async def main():
-    config = SaicApiConfiguration(username="***REMOVED***", password="***REMOVED***", )
+    config = SaicApiConfiguration(username="XXXX@gmail.com", password="XXXXXX", )
     saic_api = SaicApi(
         config
     )
@@ -38,26 +38,8 @@ async def main():
     cars = vehicle_list_rest.vinList
     for car in cars:
         vin_num = car.vin
-        alarm_config = await saic_api.get_alarm_switch(vin_num)
-        for alarm in alarm_config.alarmSwitchList:
-            alarm_type = alarm.alarmType
-            try:
-                out = AlarmType(alarm_type)
-                alarm_desc = f"{out.name} ({out.value})"
-            except ValueError:
-                alarm_desc = f"Generic Alarm ({alarm_type})"
-            print(f"{alarm_desc} -> {alarm.alarmSwitch}")
-        # fota_list_resp = await fota_list(login_resp, vin_num, config)
-        req = AlarmSwitchReq(
-            vin=vin_num,
-            alarmSwitchList=[AlarmSwitchDTO(
-                alarmType=AlarmType.ALARM_TYPE_VEHICLE_FAULT.value,
-                functionSwitch=1,
-                alarmSwitch=1
-            )]
-        )
-        await saic_api.set_alarm_switch(req, vin_num)
-        print(vin_num)
+        status = await saic_api.get_vehicle_status(vin_num)
+        print(str(status))
     print(login_resp)
 
 

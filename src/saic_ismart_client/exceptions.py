@@ -13,4 +13,9 @@ class SaicApiException(Exception):
 
 
 class SaicApiRetryException(RetryError, SaicApiException):
-    pass
+    def __init__(self, event_id: str):
+        self.__event_id = event_id
+
+    @property
+    def event_id(self) -> str:
+        return self.__event_id
