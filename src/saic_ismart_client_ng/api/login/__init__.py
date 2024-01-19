@@ -1,8 +1,8 @@
 import httpx
 
 from crypto_utils import sha1_hex_digest
-from saic_ismart_client.api.base import AbstractSaicApi
-from saic_ismart_client.api.login.schema import LoginResp
+from saic_ismart_client_ng.api.base import AbstractSaicApi
+from saic_ismart_client_ng.api.login.schema import LoginResp
 
 
 class SaicLoginApi(AbstractSaicApi):

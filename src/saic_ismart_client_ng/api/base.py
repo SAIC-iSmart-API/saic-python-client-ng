@@ -7,10 +7,10 @@ import dacite
 import httpx
 from httpx._types import QueryParamTypes, HeaderTypes
 
-from saic_ismart_client.exceptions import SaicApiException, SaicApiRetryException
-from saic_ismart_client.model import SaicApiConfiguration
-from saic_ismart_client.net.client.api import SaicApiClient
-from saic_ismart_client.net.client.login import SaicLoginClient
+from saic_ismart_client_ng.exceptions import SaicApiException, SaicApiRetryException
+from saic_ismart_client_ng.model import SaicApiConfiguration
+from saic_ismart_client_ng.net.client.api import SaicApiClient
+from saic_ismart_client_ng.net.client.login import SaicLoginClient
 
 
 def saic_api_after_retry(retry_state):
@@ -23,8 +23,10 @@ def saic_api_retry_policy(retry_state):
     is_failed = retry_state.outcome.failed
     if is_failed:
         if isinstance(retry_state.outcome.exception(), SaicApiRetryException):
+            logging.debug("Retrying since we got SaicApiRetryException")
             return True
         elif isinstance(retry_state.outcome.exception(), SaicApiException):
+            logging.error("NOT Retrying since we got a generic exception")
             return False
         else:
             logging.error(f"Not retrying {retry_state.args} {retry_state.outcome.exception()}")
@@ -76,12 +78,20 @@ class AbstractSaicApi(ABC):
             logging.debug(f"Response code: {return_code} {response.text}")
 
             if return_code in (2, 3, 7):
+                logging.error(f"API call return code is not acceptable: {return_code}: {response.text}")
                 raise SaicApiException(json_data.get('message', 'Unknown error'), return_code=return_code)
 
             if 'event-id' in response.headers and 'data' not in json_data:
-                raise SaicApiRetryException(response.headers['event-id'])
+                event_id = response.headers['event-id']
+                logging.error(f"Retrying since we got even-id in headers: {event_id}, but no data")
+                raise SaicApiRetryException(event_id)
+
+            if return_code == 4:
+                logging.error(f"API call asked us to retry: {return_code}: {response.text}")
+                raise SaicApiRetryException('0')
 
             if return_code != 0:
+                logging.error(f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}")
                 raise SaicApiException(json_data.get('message', 'Unknown error'), return_code=return_code)
 
             if data_class is None:

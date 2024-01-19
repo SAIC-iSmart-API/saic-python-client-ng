@@ -6,9 +6,9 @@ from typing import List
 @dataclass
 class VehicleListResp:
     @dataclass
-    class VinListDTO:
+    class VinList:
         @dataclass
-        class SubAccountListDTO:
+        class SubAccount:
             authorizationCardType: int = field(init=False),
             btKeyStatus: int = field(init=False),
             locationAuthorization: int = field(init=False),
@@ -24,7 +24,7 @@ class VehicleListResp:
             vin: str = field(init=False),
 
         @dataclass
-        class VehicleModelConfigurationDTO:
+        class VehicleModelConfiguration:
             itemCode: str = field(init=False),
             itemName: str = field(init=False),
             itemValue: str = field(init=False),
@@ -40,10 +40,10 @@ class VehicleListResp:
         name: str = field(init=False),
         series: str = field(init=False),
         vin: str = field(init=False),
-        subAccountList: List[SubAccountListDTO] = field(default_factory=list)
-        vehicleModelConfiguration: List[VehicleModelConfigurationDTO] = field(default_factory=list)
+        subAccountList: List[SubAccount] = field(default_factory=list)
+        vehicleModelConfiguration: List[VehicleModelConfiguration] = field(default_factory=list)
 
-    vinList: List[VinListDTO] = field(default_factory=list)
+    vinList: List[VinList] = field(default_factory=list)
 
 
 class AlarmType(Enum):
@@ -53,7 +53,7 @@ class AlarmType(Enum):
 
 
 @dataclass
-class AlarmSwitchDTO:
+class AlarmSwitch:
     alarmType: int = field(init=False),
     functionSwitch: int = field(init=False),
     alarmSwitch: int = field(init=False),
@@ -61,17 +61,17 @@ class AlarmSwitchDTO:
 
 @dataclass
 class AlarmSwitchResp:
-    alarmSwitchList: List[AlarmSwitchDTO] = field(default_factory=list)
+    alarmSwitchList: List[AlarmSwitch] = field(default_factory=list)
 
 
 @dataclass
 class AlarmSwitchReq:
     vin: str
-    alarmSwitchList: List[AlarmSwitchDTO] = field(default_factory=list)
+    alarmSwitchList: List[AlarmSwitch] = field(default_factory=list)
 
 
 @dataclass
-class BasicVehicleStatusBean:
+class BasicVehicleStatus:
     batteryVoltage: int = field(init=False),
     bonnetStatus: int = field(init=False),
     bootStatus: int = field(init=False),
@@ -119,32 +119,49 @@ class BasicVehicleStatusBean:
 
 
 @dataclass
+class GpsPosition:
+    @dataclass
+    class WayPoint:
+        @dataclass
+        class Position:
+            altitude: int = field(init=False),
+            latitude: int = field(init=False),
+            longitude: int = field(init=False),
+
+        hdop: int = field(init=False),
+        heading: int = field(init=False),
+        position: Position = field(init=False),
+        satellites: int = field(init=False),
+        speed: int = field(init=False),
+
+    gpsStatus: int = field(init=False),
+    timeStamp: int = field(init=False),
+    wayPoint: WayPoint = field(init=False),
+
+
+@dataclass
 class VehicleStatusResp:
     @dataclass
-    class ExtendedVehicleStatusDTO:
+    class ExtendedVehicleStatus:
         alertDataSum: list = field(default_factory=list)
 
-    @dataclass
-    class GpsPositionDTO:
-        @dataclass
-        class WayPointDTO:
-            @dataclass
-            class PositionDTO:
-                altitude: int = field(init=False),
-                latitude: int = field(init=False),
-                longitude: int = field(init=False),
-
-            hdop: int = field(init=False),
-            heading: int = field(init=False),
-            position: PositionDTO = field(init=False),
-            satellites: int = field(init=False),
-            speed: int = field(init=False),
-
-        gpsStatus: int = field(init=False),
-        timeStamp: int = field(init=False),
-        wayPoint: WayPointDTO = field(init=False),
-
-    basicVehicleStatus: BasicVehicleStatusBean = field(init=False),
-    extendedVehicleStatus: ExtendedVehicleStatusDTO = field(init=False),
-    gpsPosition: GpsPositionDTO = field(init=False),
+    basicVehicleStatus: BasicVehicleStatus = field(init=False),
+    extendedVehicleStatus: ExtendedVehicleStatus = field(init=False),
+    gpsPosition: GpsPosition = field(init=False),
     statusTime: int = field(init=False),
+
+
+@dataclass
+class VehicleControlReq:
+    rvcParams: List[int]
+    rvcReqType: str
+    vin: str
+
+
+@dataclass
+class VehicleControlResp:
+    basicVehicleStatus: BasicVehicleStatus = field(init=False),
+    failureType: int = field(init=False),
+    gpsPosition: GpsPosition = field(init=False),
+    rvcReqSts: int = field(init=False),
+    rvcReqType: int = field(init=False),
