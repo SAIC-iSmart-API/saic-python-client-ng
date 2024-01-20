@@ -108,9 +108,9 @@ class AbstractSaicApi(ABC):
             return await self.execute_api_call(
                 method,
                 path,
-                body,
-                out_type,
-                params,
+                body=body,
+                out_type=out_type,
+                params=params,
                 headers=actual_headers
             )
 
