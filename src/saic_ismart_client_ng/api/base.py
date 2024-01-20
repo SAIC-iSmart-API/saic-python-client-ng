@@ -88,7 +88,7 @@ class AbstractSaicApi(ABC):
             headers: Optional[HeaderTypes] = None,
     ) -> Optional[T]:
         @tenacity.retry(
-            stop=tenacity.stop_after_delay(5),
+            stop=tenacity.stop_after_delay(30),
             wait=tenacity.wait_fixed(3),
             retry=saic_api_retry_policy,
             after=saic_api_after_retry,
