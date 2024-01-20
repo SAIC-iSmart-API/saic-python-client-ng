@@ -17,7 +17,7 @@ from saic_ismart_client_ng.net.client.login import SaicLoginClient
 def saic_api_after_retry(retry_state):
     wrapped_exception = retry_state.outcome.exception()
     if isinstance(wrapped_exception, SaicApiRetryException):
-        if 'event-id' in retry_state.kwargs:
+        if 'event_id' in retry_state.kwargs:
             logging.debug(f"Updating event_id to the newly obtained value {wrapped_exception.event_id}")
             retry_state.kwargs['event_id'] = wrapped_exception.event_id
         else:
@@ -91,7 +91,7 @@ class AbstractSaicApi(ABC):
             retry=saic_api_retry_policy,
             after=saic_api_after_retry,
         )
-        async def execute_api_call_with_event_id_innner(event_id: str = '0'):
+        async def execute_api_call_with_event_id_inner(*, event_id: str):
             actual_headers = headers or dict()
             actual_headers.update({'event-id': event_id})
             return await self.execute_api_call(
@@ -103,39 +103,41 @@ class AbstractSaicApi(ABC):
                 headers=actual_headers
             )
 
-        return await execute_api_call_with_event_id_innner(event_id='0')
+        return await execute_api_call_with_event_id_inner(event_id='0')
 
     @staticmethod
     def deserialize(response: httpx.Response, data_class: Optional[Type[T]]) -> Optional[T]:
         try:
             json_data = response.json()
             return_code = json_data.get('code', -1)
+            error_message = json_data.get('message', 'Unknown error')
             logging.debug(f"Response code: {return_code} {response.text}")
 
             if return_code in (2, 3, 7):
                 logging.error(f"API call return code is not acceptable: {return_code}: {response.text}")
-                raise SaicApiException(json_data.get('message', 'Unknown error'), return_code=return_code)
+                raise SaicApiException(error_message, return_code=return_code)
 
             if 'event-id' in response.headers and 'data' not in json_data:
                 event_id = response.headers['event-id']
                 logging.error(f"Retrying since we got even-id in headers: {event_id}, but no data")
-                raise SaicApiRetryException(event_id)
+                raise SaicApiRetryException(error_message, event_id=event_id, return_code=return_code)
 
             if return_code == 4:
                 logging.error(f"API call asked us to retry: {return_code}: {response.text}")
-                raise SaicApiRetryException('0')
+                raise SaicApiRetryException(error_message, event_id='0', return_code=return_code)
 
             if return_code != 0:
                 logging.error(
-                    f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}")
-                raise SaicApiException(json_data.get('message', 'Unknown error'), return_code=return_code)
+                    f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}"
+                )
+                raise SaicApiException(error_message, return_code=return_code)
 
             if data_class is None:
                 return None
             elif 'data' in json_data:
                 return dacite.from_dict(data_class, json_data['data'])
             else:
-                raise SaicApiException(f"Failed to deserialize response, missing data field: {json_data}")
+                raise SaicApiException(f"Failed to deserialize response, missing 'data' field: {response.text}")
 
         except SaicApiException as se:
             raise se
