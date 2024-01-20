@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
+from saic_ismart_client_ng.api.schema import GpsPosition
+
 
 @dataclass
 class VehicleListResp:
@@ -9,37 +11,37 @@ class VehicleListResp:
     class VinList:
         @dataclass
         class SubAccount:
-            authorizationCardType: int = field(init=False),
-            btKeyStatus: int = field(init=False),
-            locationAuthorization: int = field(init=False),
-            modelName: str = field(init=False),
-            operationType: int = field(init=False),
-            status: int = field(init=False),
-            subaccountId: int = field(init=False),
-            subscriberId: int = field(init=False),
-            userAccount: str = field(init=False),
-            userName: str = field(init=False),
-            validityEndTime: int = field(init=False),
-            validityStartTime: int = field(init=False),
-            vin: str = field(init=False),
+            authorizationCardType: int = None
+            btKeyStatus: int = None
+            locationAuthorization: int = None
+            modelName: str = None
+            operationType: int = None
+            status: int = None
+            subaccountId: int = None
+            subscriberId: int = None
+            userAccount: str = None
+            userName: str = None
+            validityEndTime: int = None
+            validityStartTime: int = None
+            vin: str = None
 
         @dataclass
         class VehicleModelConfiguration:
-            itemCode: str = field(init=False),
-            itemName: str = field(init=False),
-            itemValue: str = field(init=False),
+            itemCode: str = None
+            itemName: str = None
+            itemValue: str = None
 
-        bindTime: int = field(init=False),
-        brandName: str = field(init=False),
-        colorName: str = field(init=False),
-        isActivate: bool = field(init=False),
-        isCurrentVehicle: bool = field(init=False),
-        isSubaccount: bool = field(init=False),
-        modelName: str = field(init=False),
-        modelYear: str = field(init=False),
-        name: str = field(init=False),
-        series: str = field(init=False),
-        vin: str = field(init=False),
+        bindTime: int = None
+        brandName: str = None
+        colorName: str = None
+        isActivate: bool = None
+        isCurrentVehicle: bool = None
+        isSubaccount: bool = None
+        modelName: str = None
+        modelYear: str = None
+        name: str = None
+        series: str = None
+        vin: str = None
         subAccountList: List[SubAccount] = field(default_factory=list)
         vehicleModelConfiguration: List[VehicleModelConfiguration] = field(default_factory=list)
 
@@ -54,9 +56,9 @@ class AlarmType(Enum):
 
 @dataclass
 class AlarmSwitch:
-    alarmType: int = field(init=False),
-    functionSwitch: int = field(init=False),
-    alarmSwitch: int = field(init=False),
+    alarmType: int = None
+    functionSwitch: int = None
+    alarmSwitch: int = None
 
 
 @dataclass
@@ -72,71 +74,50 @@ class AlarmSwitchReq:
 
 @dataclass
 class BasicVehicleStatus:
-    batteryVoltage: int = field(init=False),
-    bonnetStatus: int = field(init=False),
-    bootStatus: int = field(init=False),
-    canBusActive: int = field(init=False),
-    clstrDspdFuelLvlSgmt: int = field(init=False),
-    currentJourneyID: int = field(init=False),
-    currentjourneyDistance: int = field(init=False),
-    dippedBeamStatus: int = field(init=False),
-    driverDoor: int = field(init=False),
-    driverWindow: int = field(init=False),
-    engineStatus: int = field(init=False),
-    extendedData1: int = field(init=False),
-    extendedData2: int = field(init=False),
-    exteriorTemperature: int = field(init=False),
-    frontLeftSeatHeatLevel: int = field(init=False),
-    frontLeftTyrePressure: int = field(init=False),
-    frontRightSeatHeatLevel: int = field(init=False),
-    frontRightTyrePressure: int = field(init=False),
-    fuelLevelPrc: int = field(init=False),
-    fuelRange: int = field(init=False),
-    fuelRangeElec: int = field(init=False),
-    handbrake: int = field(init=False),
-    interiorTemperature: int = field(init=False),
-    lastKeySeen: int = field(init=False),
-    lockStatus: int = field(init=False),
-    mainBeamStatus: int = field(init=False),
-    mileage: int = field(init=False),
-    passengerDoor: int = field(init=False),
-    passengerWindow: int = field(init=False),
-    powerMode: int = field(init=False),
-    rearLeftDoor: int = field(init=False),
-    rearLeftTyrePressure: int = field(init=False),
-    rearLeftWindow: int = field(init=False),
-    rearRightDoor: int = field(init=False),
-    rearRightTyrePressure: int = field(init=False),
-    rearRightWindow: int = field(init=False),
-    remoteClimateStatus: int = field(init=False),
-    rmtHtdRrWndSt: int = field(init=False),
-    sideLightStatus: int = field(init=False),
-    sunroofStatus: int = field(init=False),
-    timeOfLastCANBUSActivity: int = field(init=False),
-    vehElecRngDsp: int = field(init=False),
-    vehicleAlarmStatus: int = field(init=False),
-    wheelTyreMonitorStatus: int = field(init=False),
-
-
-@dataclass
-class GpsPosition:
-    @dataclass
-    class WayPoint:
-        @dataclass
-        class Position:
-            altitude: int = field(init=False),
-            latitude: int = field(init=False),
-            longitude: int = field(init=False),
-
-        hdop: int = field(init=False),
-        heading: int = field(init=False),
-        position: Position = field(init=False),
-        satellites: int = field(init=False),
-        speed: int = field(init=False),
-
-    gpsStatus: int = field(init=False),
-    timeStamp: int = field(init=False),
-    wayPoint: WayPoint = field(init=False),
+    batteryVoltage: int = None
+    bonnetStatus: int = None
+    bootStatus: int = None
+    canBusActive: int = None
+    clstrDspdFuelLvlSgmt: int = None
+    currentJourneyID: int = None
+    currentjourneyDistance: int = None
+    dippedBeamStatus: int = None
+    driverDoor: int = None
+    driverWindow: int = None
+    engineStatus: int = None
+    extendedData1: int = None
+    extendedData2: int = None
+    exteriorTemperature: int = None
+    frontLeftSeatHeatLevel: int = None
+    frontLeftTyrePressure: int = None
+    frontRightSeatHeatLevel: int = None
+    frontRightTyrePressure: int = None
+    fuelLevelPrc: int = None
+    fuelRange: int = None
+    fuelRangeElec: int = None
+    handbrake: int = None
+    interiorTemperature: int = None
+    lastKeySeen: int = None
+    lockStatus: int = None
+    mainBeamStatus: int = None
+    mileage: int = None
+    passengerDoor: int = None
+    passengerWindow: int = None
+    powerMode: int = None
+    rearLeftDoor: int = None
+    rearLeftTyrePressure: int = None
+    rearLeftWindow: int = None
+    rearRightDoor: int = None
+    rearRightTyrePressure: int = None
+    rearRightWindow: int = None
+    remoteClimateStatus: int = None
+    rmtHtdRrWndSt: int = None
+    sideLightStatus: int = None
+    sunroofStatus: int = None
+    timeOfLastCANBUSActivity: int = None
+    vehElecRngDsp: int = None
+    vehicleAlarmStatus: int = None
+    wheelTyreMonitorStatus: int = None
 
 
 @dataclass
@@ -145,10 +126,10 @@ class VehicleStatusResp:
     class ExtendedVehicleStatus:
         alertDataSum: list = field(default_factory=list)
 
-    basicVehicleStatus: BasicVehicleStatus = field(init=False),
-    extendedVehicleStatus: ExtendedVehicleStatus = field(init=False),
-    gpsPosition: GpsPosition = field(init=False),
-    statusTime: int = field(init=False),
+    basicVehicleStatus: BasicVehicleStatus = None
+    extendedVehicleStatus: ExtendedVehicleStatus = None
+    gpsPosition: GpsPosition = None
+    statusTime: int = None
 
 
 @dataclass
@@ -160,8 +141,8 @@ class VehicleControlReq:
 
 @dataclass
 class VehicleControlResp:
-    basicVehicleStatus: BasicVehicleStatus = field(init=False),
-    failureType: int = field(init=False),
-    gpsPosition: GpsPosition = field(init=False),
-    rvcReqSts: int = field(init=False),
-    rvcReqType: int = field(init=False),
+    basicVehicleStatus: BasicVehicleStatus = None
+    failureType: int = None
+    gpsPosition: GpsPosition = None
+    rvcReqSts: int = None
+    rvcReqType: int = None

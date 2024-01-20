@@ -1,29 +1,29 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
 class LoginResp():
     @dataclass
     class LoginRespDetail():
-        languageType: str = field(init=False),
+        languageType: str = None,
 
-    access_token: str = field(init=False),
-    account: str = field(init=False),
-    avatar: str = field(init=False)
-    client_id: str = field(init=False),
-    dept_id: str = field(init=False),
-    detail: LoginRespDetail = field(init=False),
-    expires_in: int = field(init=False),
-    jti: str = field(init=False),
-    languageType: str = field(init=False),
-    license: str = field(init=False),
-    oauth_id: str = field(init=False),
-    post_id: str = field(init=False),
-    refresh_token: str = field(init=False),
-    role_id: str = field(init=False),
-    role_name: str = field(init=False),
-    scope: str = field(init=False),
-    tenant_id: str = field(init=False),
-    token_type: str = field(init=False),
-    user_id: str = field(init=False),
-    user_name: str = field(init=False),
+    access_token: str = None,
+    account: str = None,
+    avatar: str = None
+    client_id: str = None,
+    dept_id: str = None,
+    detail: LoginRespDetail = None,
+    expires_in: int = None,
+    jti: str = None,
+    languageType: str = None,
+    license: str = None,
+    oauth_id: str = None,
+    post_id: str = None,
+    refresh_token: str = None,
+    role_id: str = None,
+    role_name: str = None,
+    scope: str = None,
+    tenant_id: str = None,
+    token_type: str = None,
+    user_id: str = None,
+    user_name: str = None,

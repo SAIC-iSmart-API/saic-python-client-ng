@@ -15,7 +15,7 @@ async def main():
     cars = vehicle_list_rest.vinList
     for car in cars:
         vin_num = car.vin
-        status = await saic_api.get_vehicle_charging_management_data(vin_num)
+        status = await saic_api.get_vehicle_charging_status(vin_num)
         print(str(status))
 
 
