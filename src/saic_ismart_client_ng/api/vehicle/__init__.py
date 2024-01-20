@@ -1,8 +1,9 @@
 import tenacity
 
 from crypto_utils import sha256_hex_digest
-from saic_ismart_client_ng.api.base import AbstractSaicApi, saic_api_after_retry, saic_api_retry_policy
-from saic_ismart_client_ng.api.vehicle.schema import VehicleListResp, AlarmSwitchResp, AlarmSwitchReq, VehicleStatusResp, \
+from saic_ismart_client_ng.api.base import AbstractSaicApi
+from saic_ismart_client_ng.api.vehicle.schema import VehicleListResp, AlarmSwitchResp, AlarmSwitchReq, \
+    VehicleStatusResp, \
     VehicleControlReq, VehicleControlResp
 from saic_ismart_client_ng.exceptions import SaicApiException
 
@@ -32,45 +33,21 @@ class SaicVehicleApi(AbstractSaicApi):
         return await self.execute_api_call("PUT", "/vehicle/alarmSwitch", body=body)
 
     async def get_vehicle_status(self, vin: str) -> VehicleStatusResp:
-        @tenacity.retry(
-            stop=tenacity.stop_after_attempt(5),
-            wait=tenacity.wait_fixed(3),
-            retry=saic_api_retry_policy,
-            after=saic_api_after_retry,
+        return await self.execute_api_call_with_event_id(
+            "GET",
+            "/vehicle/status",
+            params={
+                "vin": sha256_hex_digest(vin),
+                "vehStatusReqType": "2",
+            },
+            out_type=VehicleStatusResp,
         )
-        async def get_vehicle_status_inner(event_id: str) -> VehicleStatusResp:
-            return await self.execute_api_call(
-                "GET",
-                "/vehicle/status",
-                headers={
-                    "event-id": event_id,
-                },
-                params={
-                    "vin": sha256_hex_digest(vin),
-                    "vehStatusReqType": "2",
-                },
-                out_type=VehicleStatusResp,
-            )
-
-        return await get_vehicle_status_inner(event_id="0")
 
     async def send_vehicle_control_command(self, body: VehicleControlReq, vin: str) -> VehicleControlResp:
-        @tenacity.retry(
-            stop=tenacity.stop_after_attempt(5),
-            wait=tenacity.wait_fixed(3),
-            retry=saic_api_retry_policy,
-            after=saic_api_after_retry,
-        )
-        async def send_vehicle_control_command_inner(event_id: str) -> VehicleControlResp:
-            return await self.execute_api_call(
-                "POST",
-                "/vehicle/control",
-                headers={
-                    "event-id": event_id,
-                },
-                body=body,
-                out_type=VehicleControlResp,
-            )
-
         body.vin = sha256_hex_digest(vin)
-        return await send_vehicle_control_command_inner(event_id="0")
+        return await self.execute_api_call_with_event_id(
+            "POST",
+            "/vehicle/control",
+            body=body,
+            out_type=VehicleControlResp,
+        )

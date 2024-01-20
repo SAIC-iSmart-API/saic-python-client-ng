@@ -5,6 +5,7 @@ from typing import Type, T, Optional, Any
 
 import dacite
 import httpx
+import tenacity
 from httpx._types import QueryParamTypes, HeaderTypes
 
 from saic_ismart_client_ng.exceptions import SaicApiException, SaicApiRetryException
@@ -16,20 +17,25 @@ from saic_ismart_client_ng.net.client.login import SaicLoginClient
 def saic_api_after_retry(retry_state):
     wrapped_exception = retry_state.outcome.exception()
     if isinstance(wrapped_exception, SaicApiRetryException):
-        retry_state.kwargs['event_id'] = wrapped_exception.event_id
+        if 'event-id' in retry_state.kwargs:
+            logging.debug(f"Updating event_id to the newly obtained value {wrapped_exception.event_id}")
+            retry_state.kwargs['event_id'] = wrapped_exception.event_id
+        else:
+            logging.debug(f"Retrying without an event_id")
 
 
 def saic_api_retry_policy(retry_state):
     is_failed = retry_state.outcome.failed
     if is_failed:
-        if isinstance(retry_state.outcome.exception(), SaicApiRetryException):
+        wrapped_exception = retry_state.outcome.exception()
+        if isinstance(wrapped_exception, SaicApiRetryException):
             logging.debug("Retrying since we got SaicApiRetryException")
             return True
-        elif isinstance(retry_state.outcome.exception(), SaicApiException):
+        elif isinstance(wrapped_exception, SaicApiException):
             logging.error("NOT Retrying since we got a generic exception")
             return False
         else:
-            logging.error(f"Not retrying {retry_state.args} {retry_state.outcome.exception()}")
+            logging.error(f"Not retrying {retry_state.args} {wrapped_exception}")
             return False
     return False
 
@@ -70,6 +76,35 @@ class AbstractSaicApi(ABC):
         response = await self.api_client.client.send(req)
         return self.deserialize(response, out_type)
 
+    async def execute_api_call_with_event_id(
+            self,
+            method: str,
+            path: str,
+            body: Optional[Any] = None,
+            out_type: Optional[Type[T]] = None,
+            params: Optional[QueryParamTypes] = None,
+            headers: Optional[HeaderTypes] = None,
+    ) -> Optional[T]:
+        @tenacity.retry(
+            stop=tenacity.stop_after_attempt(5),
+            wait=tenacity.wait_fixed(3),
+            retry=saic_api_retry_policy,
+            after=saic_api_after_retry,
+        )
+        async def execute_api_call_with_event_id_innner(event_id: str = '0'):
+            actual_headers = headers or dict()
+            actual_headers.update({'event-id': event_id})
+            return await self.execute_api_call(
+                method,
+                path,
+                body,
+                out_type,
+                params,
+                headers=actual_headers
+            )
+
+        return await execute_api_call_with_event_id_innner(event_id='0')
+
     @staticmethod
     def deserialize(response: httpx.Response, data_class: Optional[Type[T]]) -> Optional[T]:
         try:
@@ -91,7 +126,8 @@ class AbstractSaicApi(ABC):
                 raise SaicApiRetryException('0')
 
             if return_code != 0:
-                logging.error(f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}")
+                logging.error(
+                    f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}")
                 raise SaicApiException(json_data.get('message', 'Unknown error'), return_code=return_code)
 
             if data_class is None:
