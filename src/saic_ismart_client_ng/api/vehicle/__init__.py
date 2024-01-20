@@ -1,10 +1,10 @@
 import tenacity
 
-from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle.schema import VehicleListResp, AlarmSwitchResp, AlarmSwitchReq, \
     VehicleStatusResp, \
-    VehicleControlReq, VehicleControlResp
+    VehicleControlReq, VehicleControlResp, RvcParams, VehicleLockId, RvcReqType, RvcParamsId
+from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 from saic_ismart_client_ng.exceptions import SaicApiException
 
 
@@ -51,3 +51,28 @@ class SaicVehicleApi(AbstractSaicApi):
             body=body,
             out_type=VehicleControlResp,
         )
+
+    async def control_find_my_car(
+            self,
+            vin: str,
+            *,
+            should_stop: bool = False,
+            with_horn: bool = True,
+            with_lights: bool = True
+    ) -> VehicleControlResp:
+        if should_stop:
+            with_horn = False
+            with_lights = False
+        request_type = RvcReqType.FIND_MY_CAR
+        params = [
+            RvcParams(RvcParamsId.FIND_MY_CAR_ENABLE, b'\x00' if should_stop else b'\x01'),
+            RvcParams(RvcParamsId.FIND_MY_CAR_HORN, b'\x01' if with_horn else b'\x00'),
+            RvcParams(RvcParamsId.FIND_MY_CAR_LIGHTS, b'\x01' if with_lights else b'\x00'),
+            RvcParams(RvcParamsId.PARAMS_MAX, b'\x00\x00\x00\x00'),
+        ]
+        command = VehicleControlReq(
+            rvc_req_type=request_type,
+            rvc_params=params,
+            vin=sha256_hex_digest(vin),
+        )
+        return await self.send_vehicle_control_command(command, vin)

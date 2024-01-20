@@ -132,11 +132,65 @@ class VehicleStatusResp:
     statusTime: int = None
 
 
+class RvcParamsId(Enum):
+    FIND_MY_CAR_ENABLE = 1
+    FIND_MY_CAR_HORN = 2
+    FIND_MY_CAR_LIGHTS = 3
+    UNK_4 = 4
+    UNK_5 = 5
+    UNK_6 = 6
+    LOCK_ID = 7
+    WINDOW_SUNROOF = 8
+    WINDOW_DRIVER = 9
+    WINDOW_2 = 10
+    WINDOW_3 = 11
+    WINDOW_4 = 12
+    WINDOW_OPEN_CLOSE = 13
+    HEATED_SEAT_DRIVER = 17
+    HEATED_SEAT_PASSENGER = 18
+    FAN_SPEED = 19
+    TEMPERATURE = 20
+    AC_ON_OFF = 22
+    REMOTE_HEAT_REAR_WINDOW = 23
+    PARAMS_MAX = 0xFF
+
+
+@dataclass
+class RvcParams:
+    paramId: int
+    paramValue: bytes
+
+    def __init__(self, param_id: RvcParamsId, param_value: bytes):
+        self.paramId = param_id.value
+        self.paramValue = param_value
+
+
+class RvcReqType(Enum):
+    FIND_MY_CAR = "0"
+    CLOSE_LOCKS = "1"
+    OPEN_LOCKS = "2"
+    WINDOWS = "3"
+    KEY_MANAGEMENT = "4"
+    HEATED_SEATS = "5"
+    CLIMATE = "6"
+    AIR_CLEAN = "7"
+    ENGINE_CONTROL = "17"
+    REMOTE_REFRESH = "18"
+    REMOTE_IMMOBILIZER = "19"
+    REMOTE_HEAT_REAR_WINDOW = "32"
+    MAX_VALUE = "597"
+
+
 @dataclass
 class VehicleControlReq:
-    rvcParams: List[int]
+    rvcParams: List[RvcParams]
     rvcReqType: str
     vin: str
+
+    def __init__(self, rvc_params: List[RvcParams], rvc_req_type: RvcReqType, vin: str):
+        self.rvcParams = rvc_params
+        self.rvcReqType = rvc_req_type.value
+        self.vin = vin
 
 
 @dataclass

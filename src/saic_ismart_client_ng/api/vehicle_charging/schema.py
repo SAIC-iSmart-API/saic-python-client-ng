@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 
 from saic_ismart_client_ng.api.schema import GpsPosition
 
@@ -218,3 +219,93 @@ class ChargingControlResp:
     onBdChrgrAltrCrntInptCrnt: int = None
     onBdChrgrAltrCrntInptVol: int = None
     rvcReqSts: int = None
+
+
+class ScheduledChargingMode(Enum):
+    DISABLED = 2
+    UNTIL_CONFIGURED_SOC = 3
+    UNTIL_CONFIGURED_TIME = 1
+
+
+class ChargeCurrentLimitCode(Enum):
+    C_IGNORE = 0
+    C_6A = 1
+    C_8A = 2
+    C_16A = 3
+    C_MAX = 4
+
+    @staticmethod
+    def to_code(limit: str):
+        match limit.upper():
+            case "6A":
+                return ChargeCurrentLimitCode.C_6A
+            case "8A":
+                return ChargeCurrentLimitCode.C_8A
+            case "16A":
+                return ChargeCurrentLimitCode.C_16A
+            case "MAX":
+                return ChargeCurrentLimitCode.C_MAX
+            case _:
+                raise ValueError(f'Unknown charge current limit: {limit}')
+
+    def get_limit(self) -> str:
+        match self:
+            case ChargeCurrentLimitCode.C_6A:
+                return "6A"
+            case ChargeCurrentLimitCode.C_8A:
+                return "8A"
+            case ChargeCurrentLimitCode.C_16A:
+                return "16A"
+            case ChargeCurrentLimitCode.C_MAX:
+                return "Max"
+            case _:
+                raise ValueError(f'Unknown charge current limit code: {self}')
+
+
+class TargetBatteryCode(Enum):
+    P_40 = 1
+    P_50 = 2
+    P_60 = 3
+    P_70 = 4
+    P_80 = 5
+    P_90 = 6
+    P_100 = 7
+
+    def get_percentage(self) -> int:
+        match self:
+            case TargetBatteryCode.P_40:
+                return 40
+            case TargetBatteryCode.P_50:
+                return 50
+            case TargetBatteryCode.P_60:
+                return 60
+            case TargetBatteryCode.P_70:
+                return 70
+            case TargetBatteryCode.P_80:
+                return 80
+            case TargetBatteryCode.P_90:
+                return 90
+            case TargetBatteryCode.P_100:
+                return 100
+            case _:
+                raise ValueError(f'Unknown target battery code: {self}')
+
+    @staticmethod
+    def from_percentage(percentage: int):
+        match percentage:
+            case 40:
+                return TargetBatteryCode.P_40
+            case 50:
+                return TargetBatteryCode.P_50
+            case 60:
+                return TargetBatteryCode.P_60
+            case 70:
+                return TargetBatteryCode.P_70
+            case 80:
+                return TargetBatteryCode.P_80
+            case 90:
+                return TargetBatteryCode.P_90
+            case 100:
+                return TargetBatteryCode.P_100
+            case _:  # default
+                raise ValueError(f'Unknown target battery percentage: {percentage}')
