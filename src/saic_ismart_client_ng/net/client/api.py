@@ -3,6 +3,7 @@ from datetime import datetime
 import httpx
 
 from saic_ismart_client_ng.crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding
+from saic_ismart_client_ng.exceptions import SaicApiException
 from saic_ismart_client_ng.model import SaicApiConfiguration
 from saic_ismart_client_ng.net.security import get_app_verification_string, decrypt_response
 from saic_ismart_client_ng.net.utils import update_request_with_content
@@ -34,6 +35,9 @@ class SaicApiClient():
         self.__user_token = user_token
 
     async def __encrypt_request(self, modified_request: httpx.Request):
+        if not self.user_token:
+            raise SaicApiException("Client not authenticated, please call login first")
+
         original_request_url = modified_request.url
         original_content_type = modified_request.headers.get("Content-Type")
         if not original_content_type:

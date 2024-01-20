@@ -13,6 +13,7 @@ async def main():
     )
     await saic_api.login()
     while True:
+        logging.info("Auth token expires at %s", saic_api.token_expiration)
         vehicle_list_rest = await saic_api.vehicle_list()
         cars = vehicle_list_rest.vinList
         for car in cars:

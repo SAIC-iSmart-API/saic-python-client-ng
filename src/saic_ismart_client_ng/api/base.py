@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 from abc import ABC
 from dataclasses import asdict
@@ -27,6 +28,7 @@ class AbstractSaicApi(ABC):
         self.__configuration = configuration
         self.__login_client = SaicLoginClient(configuration)
         self.__api_client = SaicApiClient(configuration)
+        self.__token_expiration = None
 
     @property
     def configuration(self) -> SaicApiConfiguration:
@@ -39,6 +41,10 @@ class AbstractSaicApi(ABC):
     @property
     def api_client(self) -> SaicApiClient:
         return self.__api_client
+
+    @property
+    def token_expiration(self) -> Optional[datetime.datetime]:
+        return self.__token_expiration
 
     async def login(self) -> LoginResp:
         url = f"{self.configuration.base_uri}oauth/token"
@@ -63,6 +69,7 @@ class AbstractSaicApi(ABC):
         result = await self.deserialize(response, LoginResp)
         # Update the user token
         self.api_client.user_token = result.access_token
+        self.__token_expiration = datetime.datetime.now() + datetime.timedelta(seconds=result.expires_in)
         return result
 
     async def execute_api_call(
@@ -118,6 +125,7 @@ class AbstractSaicApi(ABC):
 
             if return_code == 401:
                 logger.error(f"API call return code is not acceptable: {return_code}: {response.text}")
+                self.logout()
                 if self.__configuration.relogin_delay:
                     logger.warning(f"Waiting since we got logged out: {return_code}: {response.text}")
                     await asyncio.sleep(self.__configuration.relogin_delay)
@@ -155,6 +163,10 @@ class AbstractSaicApi(ABC):
             raise se
         except Exception as e:
             raise SaicApiException(f"Failed to deserialize response: {e}. Original json was {response.text}") from e
+
+    def logout(self):
+        self.api_client.user_token = None
+        self.__token_expiration = None
 
 
 def saic_api_after_retry(retry_state):
