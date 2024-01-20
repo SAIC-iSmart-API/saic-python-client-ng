@@ -121,11 +121,11 @@ class AbstractSaicApi(ABC):
 
             if 'event-id' in response.headers and 'data' not in json_data:
                 event_id = response.headers['event-id']
-                logger.error(f"Retrying since we got even-id in headers: {event_id}, but no data")
+                logger.info(f"Retrying since we got even-id in headers: {event_id}, but no data")
                 raise SaicApiRetryException(error_message, event_id=event_id, return_code=return_code)
 
             if return_code == 4:
-                logger.error(f"API call asked us to retry: {return_code}: {response.text}")
+                logger.info(f"API call asked us to retry: {return_code}: {response.text}")
                 raise SaicApiRetryException(error_message, event_id='0', return_code=return_code)
 
             if return_code != 0:
