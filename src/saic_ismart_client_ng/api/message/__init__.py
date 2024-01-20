@@ -1,4 +1,4 @@
-Mesfrom saic_ismart_client_ng.api.base import AbstractSaicApi
+from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.message.schema import MessageResp, UpateMessageRequest
 
 
