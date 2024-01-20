@@ -1,8 +1,11 @@
 import hashlib
+import logging
 from binascii import unhexlify, hexlify
 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+
+logger = logging.getLogger(__name__)
 
 
 def md5_hex_digest(content, do_padding):
@@ -25,7 +28,7 @@ def md5_hex_digest(content, do_padding):
 
         return hex_string
     except Exception as e:
-        print(e)
+        logger.error("Could not compute md5 hex digest for input string=%s", content, exc_info=e)
         return None
 
 
@@ -35,8 +38,8 @@ def sha1_hex_digest(content):
         message_digest.update(content.encode())
         return message_digest.hexdigest()
     except Exception as e:
-        print(e)
-        return None
+        logger.error("Could not compute sha1 hex digest for input string=%s", content, exc_info=e)
+        raise RuntimeError(e)
 
 
 def sha256_hex_digest(content):
@@ -45,8 +48,8 @@ def sha256_hex_digest(content):
         message_digest.update(content.encode())
         return message_digest.hexdigest()
     except Exception as e:
-        print(e)
-        return None
+        logger.error("Could not compute sha256 hex digest for input string=%s", content, exc_info=e)
+        raise RuntimeError(e)
 
 
 def encrypt_aes_cbc_pkcs5_padding(content, key, iv):
@@ -59,8 +62,8 @@ def encrypt_aes_cbc_pkcs5_padding(content, key, iv):
             encrypted_content = cipher.encrypt(padded_content)
             return hexlify(encrypted_content).decode('utf-8')
         except Exception as e:
+            logger.error("Could not encrypt content=%s", content, exc_info=e)
             raise RuntimeError(e)
-
     return None
 
 
