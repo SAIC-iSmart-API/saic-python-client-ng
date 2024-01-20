@@ -4,7 +4,7 @@ import logging
 
 from httpx import Response
 
-from crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding, decrypt_aes_cbc_pkcs5_padding
+from saic_ismart_client_ng.crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding, decrypt_aes_cbc_pkcs5_padding
 
 
 def get_app_verification_string(

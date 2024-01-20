@@ -2,7 +2,7 @@ from datetime import datetime
 
 import httpx
 
-from crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding
+from saic_ismart_client_ng.crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding
 from saic_ismart_client_ng.model import SaicApiConfiguration
 from saic_ismart_client_ng.net.security import get_app_verification_string, decrypt_response
 from saic_ismart_client_ng.net.utils import update_request_with_content

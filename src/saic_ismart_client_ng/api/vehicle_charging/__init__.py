@@ -1,4 +1,4 @@
-from crypto_utils import sha256_hex_digest
+from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle_charging.schema import ChargeInfoResp, ChargeStatusResp, ChargingControlRequest, \
     ChargingControlResp, ScheduledChargingRequest, ChargingPtcHeatRequest, ChargingSettingRequest, ChrgPtcHeatResp, \
