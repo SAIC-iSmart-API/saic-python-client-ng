@@ -13,6 +13,7 @@ from httpx._types import QueryParamTypes, HeaderTypes
 from saic_ismart_client_ng.api.schema import LoginResp
 from saic_ismart_client_ng.crypto_utils import sha1_hex_digest
 from saic_ismart_client_ng.exceptions import SaicApiException, SaicApiRetryException, SaicLogoutException
+from saic_ismart_client_ng.listener import SaicApiListener
 from saic_ismart_client_ng.model import SaicApiConfiguration
 from saic_ismart_client_ng.net.client.api import SaicApiClient
 from saic_ismart_client_ng.net.client.login import SaicLoginClient
@@ -24,10 +25,11 @@ class AbstractSaicApi(ABC):
     def __init__(
             self,
             configuration: SaicApiConfiguration,
+            listener: SaicApiListener = None,
     ):
         self.__configuration = configuration
-        self.__login_client = SaicLoginClient(configuration)
-        self.__api_client = SaicApiClient(configuration)
+        self.__login_client = SaicLoginClient(configuration, listener=listener)
+        self.__api_client = SaicApiClient(configuration, listener=listener)
         self.__token_expiration = None
 
     @property

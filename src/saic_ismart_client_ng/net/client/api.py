@@ -1,24 +1,32 @@
+import logging
 from datetime import datetime
 
 import httpx
 
 from saic_ismart_client_ng.crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding
 from saic_ismart_client_ng.exceptions import SaicApiException
+from saic_ismart_client_ng.listener import SaicApiListener
 from saic_ismart_client_ng.model import SaicApiConfiguration
+from saic_ismart_client_ng.net.client import AbstractSaicClient
 from saic_ismart_client_ng.net.security import get_app_verification_string, decrypt_response
 from saic_ismart_client_ng.net.utils import update_request_with_content
 
+LOG = logging.getLogger(__name__)
 
-class SaicApiClient():
-    def __init__(self, configuration: SaicApiConfiguration):
-        super().__init__()
+
+class SaicApiClient(AbstractSaicClient):
+    def __init__(
+            self,
+            configuration: SaicApiConfiguration,
+            listener: SaicApiListener = None
+    ):
+        super().__init__(configuration, listener, LOG)
         self.__user_token = None
-        self.__configuration = configuration
         self.__class_name = ""
         self.__client = httpx.AsyncClient(
             event_hooks={
-                "request": [self.__encrypt_request],
-                "response": [decrypt_response]
+                "request": [self.invoke_request_listener, self.__encrypt_request],
+                "response": [decrypt_response, self.invoke_response_listener]
             }
         )
 
@@ -46,9 +54,9 @@ class SaicApiClient():
             modified_content_type = original_content_type
         request_content = ""
         current_ts = str(int(datetime.now().timestamp() * 1000))
-        tenant_id = self.__configuration.tenant_id
+        tenant_id = self.configuration.tenant_id
         user_token = self.user_token
-        request_path = str(original_request_url).replace(self.__configuration.base_uri, "/")
+        request_path = str(original_request_url).replace(self.configuration.base_uri, "/")
         request_body = modified_request.content.decode("utf-8")
         if request_body:
             modified_content_type = "multipart/form-data" if "multipart" in original_content_type else "application/json"
@@ -71,7 +79,7 @@ class SaicApiClient():
         modified_request.headers["Accept"] = "application/json"
         modified_request.headers["Accept-Encoding"] = "gzip"
 
-        modified_request.headers["REGION"] = self.__configuration.region
+        modified_request.headers["REGION"] = self.configuration.region
         modified_request.headers["APP-SEND-DATE"] = current_ts
         modified_request.headers["APP-CONTENT-ENCRYPTED"] = "1"
         modified_request.headers["tenant-id"] = tenant_id
