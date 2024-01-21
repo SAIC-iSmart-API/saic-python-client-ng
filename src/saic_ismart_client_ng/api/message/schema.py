@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -17,6 +18,24 @@ class MessageEntity:
     title: str = None
     vin: str = None
 
+    @property
+    def message_time(self) -> datetime.datetime:
+        return datetime.datetime.strptime(self.messageTime, '%Y-%m-%d %H:%M:%S')  # FIXME
+
+    @property
+    def read_status(self) -> str:
+        if self.readStatus is None:
+            return 'unknown'
+        elif self.readStatus == 0:
+            return 'unread'
+        else:
+            return 'read'
+
+    @property
+    def details(self) -> str:
+        return f'ID: {self.messageId}, Time: {self.message_time}, Type: {self.messageType}, Title: {self.title}, ' \
+            + f'Content: {self.content}, Status: {self.read_status}, Sender: {self.sender}, VIN: {self.vin}'
+
 
 @dataclass
 class MessageResp:
@@ -27,6 +46,7 @@ class MessageResp:
     # notifications: List[Any] = None
     recordsNumber: int = None
     totalNumber: int = None
+
 
 @dataclass
 class UpateMessageRequest:
