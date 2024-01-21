@@ -35,10 +35,10 @@ class SaicMessageApi(AbstractSaicApi):
     async def delete_all_news(self):
         return await self.__change_message_status(action='DELETE_NEWS')
 
-    async def read_message(self, *, message_id: str):
+    async def read_message(self, *, message_id: Union[str, int]):
         return await self.__change_message_status(message_id=message_id, action='READ')
 
-    async def delete_message(self, *, message_id: str):
+    async def delete_message(self, *, message_id: Union[str, int]):
         return await self.__change_message_status(message_id=message_id, action='DELETE')
 
     async def __change_message_status(self, *, action: str, message_id: Optional[Union[str, int]] = None):
