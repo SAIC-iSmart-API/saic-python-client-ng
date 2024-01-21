@@ -1,6 +1,16 @@
 import datetime
+import logging
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+
+LOGGER = logging.getLogger(__name__)
+
+# FIXME: The API returns date-times inconsistently. This is terrible a workaround.
+MESSAGE_DATE_TIME_FORMATS = [
+    '%Y-%m-%d %H:%M:%S',
+    '%d-%m-%Y %H:%M:%S',
+    '%d/%m/%Y %H:%M:%S',
+]
 
 
 @dataclass
@@ -19,8 +29,16 @@ class MessageEntity:
     vin: str = None
 
     @property
-    def message_time(self) -> datetime.datetime:
-        return datetime.datetime.strptime(self.messageTime, '%Y-%m-%d %H:%M:%S')  # FIXME
+    def message_time(self) -> Optional[datetime.datetime]:
+        if self.messageTime:
+            for date_format in MESSAGE_DATE_TIME_FORMATS:
+                try:
+                    parsed_date = datetime.datetime.strptime(self.messageTime, date_format)
+                    return parsed_date
+                except ValueError:
+                    pass
+            LOGGER.error('Could not parse messageTime \'%s\'. This is a bug. Please file a ticket', self.messageTime)
+        return None
 
     @property
     def read_status(self) -> str:
