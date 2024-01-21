@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.message.schema import MessageResp, UpateMessageRequest
@@ -41,7 +41,7 @@ class SaicMessageApi(AbstractSaicApi):
     async def delete_message(self, *, message_id: str):
         return await self.__change_message_status(message_id=message_id, action='DELETE')
 
-    async def __change_message_status(self, *, action: str, message_id: Optional[str] = None):
+    async def __change_message_status(self, *, action: str, message_id: Optional[Union[str, int]] = None):
         request = UpateMessageRequest(
             actionType=action,
             messageId=message_id,

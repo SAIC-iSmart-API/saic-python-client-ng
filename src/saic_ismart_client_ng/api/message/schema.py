@@ -1,6 +1,6 @@
 import datetime
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 @dataclass
@@ -9,7 +9,7 @@ class MessageEntity:
     contentId: str = None
     contentIdList: list = field(default_factory=list)
     createTime: int = None
-    messageId: str = None
+    messageId: Union[str, int] = None
     messageTime: str = None
     messageType: str = None
     readStatus: int = None
@@ -53,7 +53,7 @@ class UpateMessageRequest:
     actionType: Optional[str] = None
     deviceId: Optional[str] = None
     messageGroup: Optional[str] = None
-    messageId: Optional[str] = None
+    messageId: Optional[Union[str, int]] = None
     notificationCount: Optional[int] = None
     pageNum: Optional[int] = None
     pageSize: Optional[int] = None
