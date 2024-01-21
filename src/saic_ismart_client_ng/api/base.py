@@ -103,6 +103,7 @@ class AbstractSaicApi(ABC):
             wait=tenacity.wait_fixed(self.__configuration.sms_delivery_delay),
             retry=saic_api_retry_policy,
             after=saic_api_after_retry,
+            reraise=True,
         )
         async def execute_api_call_with_event_id_inner(*, event_id: str):
             actual_headers = headers or dict()

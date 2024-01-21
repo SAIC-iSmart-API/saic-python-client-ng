@@ -1,18 +1,11 @@
-import tenacity
-
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle.schema import VehicleListResp, \
     VehicleStatusResp, \
     VehicleControlReq, VehicleControlResp, RvcParams, RvcReqType, RvcParamsId
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
-from saic_ismart_client_ng.exceptions import SaicApiException
 
 
 class SaicVehicleApi(AbstractSaicApi):
-    @tenacity.retry(
-        stop=tenacity.stop_after_attempt(1),
-        retry=tenacity.retry_if_not_exception_type(SaicApiException),
-    )
     async def vehicle_list(self) -> VehicleListResp:
         return await self.execute_api_call("GET", "/vehicle/list", out_type=VehicleListResp)
 

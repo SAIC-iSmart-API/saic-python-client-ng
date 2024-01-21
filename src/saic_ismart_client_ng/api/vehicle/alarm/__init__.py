@@ -1,16 +1,9 @@
-import tenacity
-
 from saic_ismart_client_ng import SaicVehicleApi
 from saic_ismart_client_ng.api.vehicle.alarm.schema import AlarmSwitchReq, AlarmSwitchResp, AlarmType, AlarmSwitch
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
-from saic_ismart_client_ng.exceptions import SaicApiException
 
 
 class SaicVehicleAlarmApi(SaicVehicleApi):
-    @tenacity.retry(
-        stop=tenacity.stop_after_attempt(1),
-        retry=tenacity.retry_if_not_exception_type(SaicApiException),
-    )
     async def get_alarm_switch(self, vin) -> AlarmSwitchResp:
         return await self.execute_api_call(
             "GET",
@@ -21,10 +14,6 @@ class SaicVehicleAlarmApi(SaicVehicleApi):
             }
         )
 
-    @tenacity.retry(
-        stop=tenacity.stop_after_attempt(1),
-        retry=tenacity.retry_if_not_exception_type(SaicApiException),
-    )
     async def set_alarm_switches(self, alarm_switches: [AlarmType], vin: str) -> None:
         actual_switches = [
             AlarmSwitch(alarmType=alarm_type.value, alarmSwitch=1, functionSwitch=1)
