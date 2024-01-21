@@ -29,7 +29,7 @@ class MessageEntity:
     vin: str = None
 
     @property
-    def message_time(self) -> Optional[datetime.datetime]:
+    def message_time(self) -> datetime.datetime:
         if self.messageTime:
             for date_format in MESSAGE_DATE_TIME_FORMATS:
                 try:
@@ -38,7 +38,7 @@ class MessageEntity:
                 except ValueError:
                     pass
             LOGGER.error('Could not parse messageTime \'%s\'. This is a bug. Please file a ticket', self.messageTime)
-        return None
+        return datetime.datetime.now()
 
     @property
     def read_status(self) -> str:
