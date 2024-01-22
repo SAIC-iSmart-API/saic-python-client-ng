@@ -68,7 +68,7 @@ class AbstractSaicApi(ABC):
 
         req = httpx.Request("POST", url, data=form_body, headers=headers)
         response = await self.login_client.client.send(req)
-        result = await self.deserialize(response, LoginResp)
+        result = await self.deserialize(req, response, LoginResp)
         # Update the user token
         self.api_client.user_token = result.access_token
         self.__token_expiration = datetime.datetime.now() + datetime.timedelta(seconds=result.expires_in)
@@ -87,7 +87,7 @@ class AbstractSaicApi(ABC):
         json_body = asdict(body) if body else None
         req = httpx.Request(method, url, params=params, headers=headers, json=json_body)
         response = await self.api_client.client.send(req)
-        return await self.deserialize(response, out_type)
+        return await self.deserialize(req, response, out_type)
 
     async def execute_api_call_with_event_id(
             self,
@@ -119,8 +119,14 @@ class AbstractSaicApi(ABC):
 
         return await execute_api_call_with_event_id_inner(event_id='0')
 
-    async def deserialize(self, response: httpx.Response, data_class: Optional[Type[T]]) -> Optional[T]:
+    async def deserialize(
+            self,
+            request: httpx.Request,
+            response: httpx.Response,
+            data_class: Optional[Type[T]]
+    ) -> Optional[T]:
         try:
+            request_event_id = request.headers.get('event-id')
             json_data = response.json()
             return_code = json_data.get('code', -1)
             error_message = json_data.get('message', 'Unknown error')
@@ -145,15 +151,20 @@ class AbstractSaicApi(ABC):
                 logger.info(f"Retrying since we got even-id in headers: {event_id}, but no data")
                 raise SaicApiRetryException(error_message, event_id=event_id, return_code=return_code)
 
-            if return_code == 4:
-                logger.info(f"API call asked us to retry: {return_code}: {response.text}")
-                raise SaicApiRetryException(error_message, event_id='0', return_code=return_code)
-
             if return_code != 0:
-                logger.error(
-                    f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}"
-                )
-                raise SaicApiException(error_message, return_code=return_code)
+                if request_event_id is not None and request_event_id != '0':
+                    logger.info(
+                        f"API call asked us to retry: {return_code}: {response.text}. Event id was: {request_event_id}")
+                    raise SaicApiRetryException(
+                        error_message,
+                        event_id=request_event_id,
+                        return_code=return_code
+                    )
+                else:
+                    logger.error(
+                        f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}"
+                    )
+                    raise SaicApiException(error_message, return_code=return_code)
 
             if data_class is None:
                 return None
