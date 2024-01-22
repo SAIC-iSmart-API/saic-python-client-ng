@@ -1,3 +1,4 @@
+import base64
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
@@ -157,11 +158,11 @@ class RvcParamsId(Enum):
 @dataclass
 class RvcParams:
     paramId: int
-    paramValue: bytes
+    paramValue: str
 
     def __init__(self, param_id: RvcParamsId, param_value: bytes):
         self.paramId = param_id.value
-        self.paramValue = param_value
+        self.paramValue = base64.b64encode(param_value).decode('utf-8')
 
 
 class RvcReqType(Enum):
