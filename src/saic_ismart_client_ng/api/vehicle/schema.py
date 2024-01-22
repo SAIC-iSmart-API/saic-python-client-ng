@@ -1,12 +1,10 @@
 import base64
-import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
 
 from saic_ismart_client_ng.api.schema import GpsPosition
-
-LOGGER = logging.getLogger(__name__)
+from saic_ismart_client_ng.api.serialization_utils import decode_bytes
 
 
 @dataclass
@@ -187,7 +185,7 @@ class RvcReqType(Enum):
 @dataclass
 class VehicleControlReq:
     rvcParams: List[RvcParams]
-    rvcReqType: str
+    rvcReqType: Optional[str | int]
     vin: str
 
     def __init__(self, rvc_params: List[RvcParams], rvc_req_type: RvcReqType, vin: str):
@@ -197,12 +195,7 @@ class VehicleControlReq:
 
     @property
     def rvc_req_type_decoded(self) -> Optional[bytes]:
-        try:
-            if self.rvcReqType:
-                return base64.b64decode(self.rvcReqType)
-        except Exception as e:
-            LOGGER.error("Failed to decode rvcReqType: %s", self.rvcReqType, exc_info=e)
-        return None
+        return decode_bytes(input_value=self.rvcReqType, field_name='rvcReqType')
 
 
 @dataclass
@@ -210,23 +203,13 @@ class VehicleControlResp:
     basicVehicleStatus: BasicVehicleStatus = None
     failureType: int = None
     gpsPosition: GpsPosition = None
-    rvcReqSts: str = None
-    rvcReqType: str = None
+    rvcReqSts: Optional[str | int] = None
+    rvcReqType: Optional[str | int] = None
 
     @property
     def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        try:
-            if self.rvcReqSts:
-                return base64.b64decode(self.rvcReqSts)
-        except Exception as e:
-            LOGGER.error("Failed to decode rvcReqSts: %s", self.rvcReqSts, exc_info=e)
-        return None
+        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
 
     @property
     def rvc_req_type_decoded(self) -> Optional[bytes]:
-        try:
-            if self.rvcReqType:
-                return base64.b64decode(self.rvcReqType)
-        except Exception as e:
-            LOGGER.error("Failed to decode rvcReqType: %s", self.rvcReqType, exc_info=e)
-        return None
+        return decode_bytes(input_value=self.rvcReqType, field_name='rvcReqType')
