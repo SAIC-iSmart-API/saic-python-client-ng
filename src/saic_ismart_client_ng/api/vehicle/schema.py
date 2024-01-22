@@ -1,9 +1,12 @@
 import base64
+import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 from saic_ismart_client_ng.api.schema import GpsPosition
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -192,11 +195,38 @@ class VehicleControlReq:
         self.rvcReqType = rvc_req_type.value
         self.vin = vin
 
+    @property
+    def rvc_req_type_decoded(self) -> Optional[bytes]:
+        try:
+            if self.rvcReqType:
+                return base64.b64decode(self.rvcReqType)
+        except Exception as e:
+            LOGGER.error("Failed to decode rvcReqType: %s", self.rvcReqType, exc_info=e)
+        return None
+
 
 @dataclass
 class VehicleControlResp:
     basicVehicleStatus: BasicVehicleStatus = None
     failureType: int = None
     gpsPosition: GpsPosition = None
-    rvcReqSts: int = None
-    rvcReqType: int = None
+    rvcReqSts: str = None
+    rvcReqType: str = None
+
+    @property
+    def rvc_req_sts_decoded(self) -> Optional[bytes]:
+        try:
+            if self.rvcReqSts:
+                return base64.b64decode(self.rvcReqSts)
+        except Exception as e:
+            LOGGER.error("Failed to decode rvcReqSts: %s", self.rvcReqSts, exc_info=e)
+        return None
+
+    @property
+    def rvc_req_type_decoded(self) -> Optional[bytes]:
+        try:
+            if self.rvcReqType:
+                return base64.b64decode(self.rvcReqType)
+        except Exception as e:
+            LOGGER.error("Failed to decode rvcReqType: %s", self.rvcReqType, exc_info=e)
+        return None

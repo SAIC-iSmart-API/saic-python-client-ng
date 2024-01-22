@@ -1,8 +1,12 @@
+import base64
+import logging
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
 from saic_ismart_client_ng.api.schema import GpsPosition
+
+LOGGER = logging.getLogger(__name__)
 
 
 class ScheduledChargingMode(Enum):
@@ -229,7 +233,16 @@ class ChargingSettingResp:
     bmsPackCrnt: int = None
     imcuDschrgTrgtSOCDspCmd: int = None
     imcuDschrgTrgtSOCResp: int = None
-    rvcReqSts: int = None
+    rvcReqSts: str = None
+
+    @property
+    def rvc_req_sts_decoded(self) -> Optional[bytes]:
+        try:
+            if self.rvcReqSts:
+                return base64.b64decode(self.rvcReqSts)
+        except Exception as e:
+            LOGGER.error("Failed to decode rvcReqSts: %s", self.rvcReqSts, exc_info=e)
+        return None
 
 
 @dataclass
@@ -252,7 +265,16 @@ class ScheduledChargingResp:
     bmsReserSpMintueDspCmd: int = None
     bmsReserStHourDspCmd: int = None
     bmsReserStMintueDspCmd: int = None
-    rvcReqSts: int = None
+    rvcReqSts: str = None
+
+    @property
+    def rvc_req_sts_decoded(self) -> Optional[bytes]:
+        try:
+            if self.rvcReqSts:
+                return base64.b64decode(self.rvcReqSts)
+        except Exception as e:
+            LOGGER.error("Failed to decode rvcReqSts: %s", self.rvcReqSts, exc_info=e)
+        return None
 
 
 @dataclass
@@ -265,7 +287,16 @@ class ChargingPtcHeatRequest:
 class ChrgPtcHeatResp:
     ptcHeatReqDspCmd: int = None
     ptcHeatResp: int = None
-    rvcReqSts: int = None
+    rvcReqSts: str = None
+
+    @property
+    def rvc_req_sts_decoded(self) -> Optional[bytes]:
+        try:
+            if self.rvcReqSts:
+                return base64.b64decode(self.rvcReqSts)
+        except Exception as e:
+            LOGGER.error("Failed to decode rvcReqSts: %s", self.rvcReqSts, exc_info=e)
+        return None
 
 
 @dataclass
@@ -332,4 +363,13 @@ class ChargingControlResp:
     imcuVehElecRngV: int = None
     onBdChrgrAltrCrntInptCrnt: int = None
     onBdChrgrAltrCrntInptVol: int = None
-    rvcReqSts: int = None
+    rvcReqSts: str = None
+
+    @property
+    def rvc_req_sts_decoded(self) -> Optional[bytes]:
+        try:
+            if self.rvcReqSts:
+                return base64.b64decode(self.rvcReqSts)
+        except Exception as e:
+            LOGGER.error("Failed to decode rvcReqSts: %s", self.rvcReqSts, exc_info=e)
+        return None
