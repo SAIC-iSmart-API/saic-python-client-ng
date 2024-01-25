@@ -49,18 +49,18 @@ def get_app_verification_string(
 
 async def decrypt_response(resp: Response):
     if resp.is_success:
-        app_send_date = resp.headers.get("APP-SEND-DATE")
-        original_content_type = resp.headers.get("ORIGINAL-CONTENT-TYPE")
         charset = "UTF-8"  # FIXME: Check it from the content type
         resp_content = (await resp.aread()).decode(charset).strip()
         if resp_content:
-            original_response_key = app_send_date + "1" + original_content_type
-            key = md5_hex_digest(original_response_key, False) if len(original_response_key) > 0 else ""
-            iv = md5_hex_digest(app_send_date, False)
-            decrypted = decrypt_aes_cbc_pkcs5_padding(resp_content, key, iv)
-            if decrypted:
-                resp._content = decrypted.encode(charset)
-                resp.headers["Content-Length"] = str(len(resp._content))
-                resp.headers["Content-Type"] = original_content_type
-                return resp
+            app_send_date = resp.headers.get("APP-SEND-DATE")
+            original_content_type = resp.headers.get("ORIGINAL-CONTENT-TYPE")
+            if app_send_date and original_content_type:
+                original_response_key = app_send_date + "1" + original_content_type
+                key = md5_hex_digest(original_response_key, False) if len(original_response_key) > 0 else ""
+                iv = md5_hex_digest(app_send_date, False)
+                decrypted = decrypt_aes_cbc_pkcs5_padding(resp_content, key, iv)
+                if decrypted:
+                    resp._content = decrypted.encode(charset)
+                    resp.headers["Content-Length"] = str(len(resp._content))
+                    resp.headers["Content-Type"] = original_content_type
     return resp

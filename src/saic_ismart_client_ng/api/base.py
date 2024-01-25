@@ -125,6 +125,11 @@ class AbstractSaicApi(ABC):
             response: httpx.Response,
             data_class: Optional[Type[T]]
     ) -> Optional[T]:
+
+        if response.is_error:
+            logger.error(f"API call failed: {response.text}")
+            raise SaicApiException(f"API call failed with status code {response.status_code}: {response.text}")
+
         try:
             request_event_id = request.headers.get('event-id')
             json_data = response.json()
