@@ -126,10 +126,6 @@ class AbstractSaicApi(ABC):
             data_class: Optional[Type[T]]
     ) -> Optional[T]:
 
-        if response.is_error:
-            logger.error(f"API call failed: {response.text}")
-            raise SaicApiException(f"API call failed with status code {response.status_code}: {response.text}")
-
         try:
             request_event_id = request.headers.get('event-id')
             json_data = response.json()
@@ -138,14 +134,11 @@ class AbstractSaicApi(ABC):
             logger.debug(f"Response code: {return_code} {response.text}")
 
             if return_code == 401:
-                logger.error(f"API call return code is not acceptable: {return_code}: {response.text}")
-                self.logout()
-                if self.__configuration.relogin_delay:
-                    logger.warning(f"Waiting since we got logged out: {return_code}: {response.text}")
-                    await asyncio.sleep(self.__configuration.relogin_delay)
-                logger.warning(f"Logging in since we got logged out")
-                await self.login()
-                raise SaicApiException(error_message, return_code=return_code)
+                await self._handle_logout(
+                    error_message=error_message,
+                    return_code=return_code,
+                    response=response,
+                )
 
             if return_code in (2, 3, 7):
                 logger.error(f"API call return code is not acceptable: {return_code}: {response.text}")
@@ -159,7 +152,8 @@ class AbstractSaicApi(ABC):
             if return_code != 0:
                 if request_event_id is not None and request_event_id != '0':
                     logger.info(
-                        f"API call asked us to retry: {return_code}: {response.text}. Event id was: {request_event_id}")
+                        f"API call asked us to retry: {return_code}: {response.text}. Event id was: {request_event_id}"
+                    )
                     raise SaicApiRetryException(
                         error_message,
                         event_id=request_event_id,
@@ -181,7 +175,29 @@ class AbstractSaicApi(ABC):
         except SaicApiException as se:
             raise se
         except Exception as e:
-            raise SaicApiException(f"Failed to deserialize response: {e}. Original json was {response.text}") from e
+            if response.is_error:
+                if response.status_code == 401:
+                    await self._handle_logout(
+                        error_message=response.text,
+                        return_code=response.status_code,
+                        response=response,
+                    )
+                else:
+                    logger.error(f"API call failed: {response.text}")
+                    raise SaicApiException(f"API call failed with status code {response.status_code}: {response.text}")
+            else:
+                raise SaicApiException(f"Failed to deserialize response: {e}. Original json was {response.text}") from e
+
+    async def _handle_logout(self, *, error_message: str, return_code: int, response: httpx.Response):
+        logger.error(f"API client got de-authenticated. {return_code}: {response.text}")
+        self.logout()
+        relogin_delay = self.__configuration.relogin_delay
+        if relogin_delay:
+            logger.warning(f"Waiting {relogin_delay}s since we got logged out.")
+            await asyncio.sleep(relogin_delay)
+        logger.warning(f"Logging in since we got logged out")
+        await self.login()
+        raise SaicApiException(error_message, return_code=return_code)
 
     def logout(self):
         self.api_client.user_token = None
