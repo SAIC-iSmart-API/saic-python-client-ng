@@ -9,6 +9,7 @@ import dacite
 import httpx
 import tenacity
 from httpx._types import QueryParamTypes, HeaderTypes
+from tenacity import WaitBaseT
 
 from saic_ismart_client_ng.api.schema import LoginResp
 from saic_ismart_client_ng.crypto_utils import sha1_hex_digest
@@ -78,6 +79,7 @@ class AbstractSaicApi(ABC):
             self,
             method: str,
             path: str,
+            *,
             body: Optional[Any] = None,
             out_type: Optional[Type[T]] = None,
             params: Optional[QueryParamTypes] = None,
@@ -93,14 +95,16 @@ class AbstractSaicApi(ABC):
             self,
             method: str,
             path: str,
+            *,
             body: Optional[Any] = None,
             out_type: Optional[Type[T]] = None,
             params: Optional[QueryParamTypes] = None,
             headers: Optional[HeaderTypes] = None,
+            delay: Optional[WaitBaseT] = None,
     ) -> Optional[T]:
         @tenacity.retry(
             stop=tenacity.stop_after_delay(30),
-            wait=tenacity.wait_fixed(self.__configuration.sms_delivery_delay),
+            wait=delay or tenacity.wait_fixed(self.__configuration.sms_delivery_delay),
             retry=saic_api_retry_policy,
             after=saic_api_after_retry,
             reraise=True,

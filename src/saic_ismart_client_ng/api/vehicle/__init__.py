@@ -1,3 +1,5 @@
+import tenacity
+
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle.schema import VehicleListResp, \
     VehicleStatusResp, \
@@ -27,6 +29,7 @@ class SaicVehicleApi(AbstractSaicApi):
             "/vehicle/control",
             body=body,
             out_type=VehicleControlResp,
+            delay=tenacity.wait_chain(tenacity.wait_fixed(1) + tenacity.wait_none()),
         )
 
     async def control_find_my_car(

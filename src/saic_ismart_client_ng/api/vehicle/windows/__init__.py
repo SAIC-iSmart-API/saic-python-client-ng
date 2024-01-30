@@ -27,7 +27,7 @@ class SaicVehicleWindowsApi(SaicVehicleApi):
             else:
                 rcv_params.append(RvcParams(i.value, b'\x00'))
 
-        param = RvcParams(RvcParamsId.WINDOW_OPEN_CLOSE, b'\x01' if should_open else b'\x00')
+        param = RvcParams(RvcParamsId.WINDOW_OPEN_CLOSE, b'\x03' if should_open else b'\x00')
         rcv_params.append(param)
 
         request = VehicleControlReq(

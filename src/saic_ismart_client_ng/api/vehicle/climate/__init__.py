@@ -67,7 +67,7 @@ class SaicVehicleClimateApi(SaicVehicleApi):
             param_ac_on_off = RvcParams(RvcParamsId.AC_ON_OFF, b'\x01' if ac_on else b'\x00')
             rvc_params.append(param_ac_on_off)
 
-        rvc_params.append(RvcParams(RvcParamsId.PARAMS_MAX, b'\x00'))
+        rvc_params.append(RvcParams(RvcParamsId.PARAMS_MAX, b'\x00\x00\x00\x00'))
 
         body = VehicleControlReq(
             rvc_req_type=RvcReqType.CLIMATE,
@@ -81,7 +81,7 @@ class SaicVehicleClimateApi(SaicVehicleApi):
         rcv_params = [
             RvcParams(RvcParamsId.HEATED_SEAT_DRIVER, b'\x01' if driver_side else b'\x00'),
             RvcParams(RvcParamsId.HEATED_SEAT_PASSENGER, b'\x01' if passenger_side else b'\x00'),
-            RvcParams(RvcParamsId.PARAMS_MAX, b'\x00')
+            RvcParams(RvcParamsId.PARAMS_MAX, b'\x00\x00\x00\x00')
         ]
         body = VehicleControlReq(
             rvc_req_type=RvcReqType.HEATED_SEATS,
@@ -93,7 +93,7 @@ class SaicVehicleClimateApi(SaicVehicleApi):
     async def control_rear_window_heat(self, vin: str, *, enable: bool) -> VehicleControlResp:
         rvc_params = [
             RvcParams(RvcParamsId.REMOTE_HEAT_REAR_WINDOW, b'\x01' if enable else b'\x00'),
-            RvcParams(RvcParamsId.PARAMS_MAX, b'\x00')
+            RvcParams(RvcParamsId.PARAMS_MAX, b'\x00\x00\x00\x00')
         ]
         body = VehicleControlReq(
             rvc_req_type=RvcReqType.REMOTE_HEAT_REAR_WINDOW,
