@@ -98,7 +98,7 @@ class SaicVehicleChargingApi(AbstractSaicApi):
 
     async def control_battery_heating(self, vin: str, *, enable: bool) -> ChrgPtcHeatResp:
         body = ChargingPtcHeatRequest(
-            ptcHeatReq=1 if enable else 0,
+            ptcHeatReq=1 if enable else 2,
             vin=sha256_hex_digest(vin)
         )
         return await self.send_vehicle_charging_ptc_heat(vin, body)

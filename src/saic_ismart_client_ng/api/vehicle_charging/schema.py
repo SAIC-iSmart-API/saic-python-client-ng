@@ -181,6 +181,10 @@ class ChrgMgmtData:
         except ValueError:
             return None
 
+    @property
+    def is_battery_heating(self) -> bool:
+        return self.bmsPTCHeatReqDspCmd == 1
+
 
 @dataclass
 class RvsChargeStatus:
@@ -350,3 +354,7 @@ class ChargingControlResp:
     @property
     def rvc_req_sts_decoded(self) -> Optional[bytes]:
         return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+
+    @property
+    def is_battery_heating(self) -> bool:
+        return self.bmsPTCHeatReqDspCmd == 1
