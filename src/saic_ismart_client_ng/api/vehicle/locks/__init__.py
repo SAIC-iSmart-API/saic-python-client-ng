@@ -27,7 +27,7 @@ class SaicVehicleLocksApi(SaicVehicleApi):
     ) -> VehicleControlResp:
         if should_lock:
             request_type = RvcReqType.CLOSE_LOCKS
-            params = []
+            params = None
         else:
             request_type = RvcReqType.OPEN_LOCKS
             params = [
