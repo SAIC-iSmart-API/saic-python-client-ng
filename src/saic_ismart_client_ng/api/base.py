@@ -9,7 +9,6 @@ import dacite
 import httpx
 import tenacity
 from httpx._types import QueryParamTypes, HeaderTypes
-from tenacity import WaitBaseT
 
 from saic_ismart_client_ng.api.schema import LoginResp
 from saic_ismart_client_ng.crypto_utils import sha1_hex_digest
@@ -100,7 +99,7 @@ class AbstractSaicApi(ABC):
             out_type: Optional[Type[T]] = None,
             params: Optional[QueryParamTypes] = None,
             headers: Optional[HeaderTypes] = None,
-            delay: Optional[WaitBaseT] = None,
+            delay: Optional[tenacity.wait.WaitBaseT] = None,
     ) -> Optional[T]:
         @tenacity.retry(
             stop=tenacity.stop_after_delay(30),
