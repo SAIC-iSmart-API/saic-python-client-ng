@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle_charging.schema import ChargeInfoResp, ChargeStatusResp, ChargingControlRequest, \
     ChargingControlResp, ScheduledChargingRequest, ChargingPtcHeatRequest, ChargingSettingRequest, ChrgPtcHeatResp, \
-    ScheduledChargingResp, ChargingSettingResp, TargetBatteryCode, ChargeCurrentLimitCode, ScheduledChargingMode
+    ScheduledChargingResp, ChargingSettingResp, TargetBatteryCode, ChargeCurrentLimitCode, ScheduledChargingMode, \
+    ScheduledBatteryHeatingRequest, ScheduledBatteryHeatingResp
+from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 
 
 class SaicVehicleChargingApi(AbstractSaicApi):
@@ -54,8 +55,11 @@ class SaicVehicleChargingApi(AbstractSaicApi):
         )
         return await self.send_vehicle_charging_control(vin, body)
 
-    async def send_vehicle_charging_reservation(self, vin: str,
-                                                body: ScheduledChargingRequest) -> ScheduledChargingResp:
+    async def send_vehicle_charging_reservation(
+            self,
+            vin: str,
+            body: ScheduledChargingRequest
+    ) -> ScheduledChargingResp:
         body.vin = sha256_hex_digest(vin)
         return await self.execute_api_call_with_event_id(
             "POST",
@@ -86,6 +90,60 @@ class SaicVehicleChargingApi(AbstractSaicApi):
             tboxReserCtrlReq=mode_value,
         )
         return await self.send_vehicle_charging_reservation(vin, body)
+
+    async def get_vehicle_battery_heating_schedule(self, vin: str) -> ScheduledBatteryHeatingResp:
+        return await self.execute_api_call(
+            "GET",
+            "/charging/batteryHeating",
+            params={
+                "vin": sha256_hex_digest(vin),
+            },
+            out_type=ScheduledBatteryHeatingResp
+        )
+
+    async def send_vehicle_battery_heating_schedule(
+            self,
+            vin: str,
+            body: ScheduledBatteryHeatingRequest
+    ) -> None:
+        body.vin = sha256_hex_digest(vin)
+        return await self.execute_api_call(
+            "POST",
+            "/charging/batteryHeating",
+            body=body,
+        )
+
+    async def disable_schedule_battery_heating(
+            self,
+            vin: str,
+    ) -> None:
+        body = ScheduledBatteryHeatingRequest(
+            vin=sha256_hex_digest(vin),
+            startTime=0,
+            status=0,
+        )
+        return await self.send_vehicle_battery_heating_schedule(vin, body)
+
+    async def enable_schedule_battery_heating(
+            self,
+            vin: str,
+            *,
+            start_time: datetime.time,
+    ) -> None:
+        start_date = datetime.now().replace(
+            hour=start_time.hour,
+            minute=start_time.minute,
+            second=0,
+            microsecond=0
+        )
+        if start_date < datetime.now():
+            start_date = start_date.replace(day=start_date.day + 1)
+        body = ScheduledBatteryHeatingRequest(
+            vin=sha256_hex_digest(vin),
+            startTime=int(start_date.timestamp()) * 1000,
+            status=1,
+        )
+        return await self.send_vehicle_battery_heating_schedule(vin, body)
 
     async def send_vehicle_charging_ptc_heat(self, vin: str, body: ChargingPtcHeatRequest) -> ChrgPtcHeatResp:
         body.vin = sha256_hex_digest(vin)

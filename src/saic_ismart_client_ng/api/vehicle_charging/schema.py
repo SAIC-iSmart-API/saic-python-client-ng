@@ -358,3 +358,26 @@ class ChargingControlResp:
     @property
     def is_battery_heating(self) -> bool:
         return self.bmsPTCHeatReqDspCmd == 1
+
+
+@dataclass
+class ScheduledBatteryHeatingRequest:
+    startTime: int = None
+    status: int = None
+    vin: str = None
+
+
+@dataclass
+class ScheduledBatteryHeatingResp:
+    startTime: int = None
+    status: int = None
+
+    @property
+    def is_enabled(self) -> bool:
+        return self.status == 1
+
+    @property
+    def decoded_start_time(self) -> Optional[datetime.time]:
+        if self.startTime is None:
+            return None
+        return datetime.datetime.fromtimestamp(self.startTime / 1000).time()
