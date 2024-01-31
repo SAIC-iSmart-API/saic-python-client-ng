@@ -77,10 +77,16 @@ class SaicVehicleClimateApi(SaicVehicleApi):
 
         return await self.send_vehicle_control_command(body, vin)
 
-    async def control_heated_seats(self, vin: str, *, driver_side=True, passenger_side=True) -> VehicleControlResp:
+    async def control_heated_seats(
+            self,
+            vin: str,
+            *,
+            left_side_level: int = 0,
+            right_side_level: int = 0
+    ) -> VehicleControlResp:
         rcv_params = [
-            RvcParams(RvcParamsId.HEATED_SEAT_DRIVER, b'\x01' if driver_side else b'\x00'),
-            RvcParams(RvcParamsId.HEATED_SEAT_PASSENGER, b'\x01' if passenger_side else b'\x00'),
+            RvcParams(RvcParamsId.HEATED_SEAT_DRIVER, left_side_level.to_bytes(1, 'big')),
+            RvcParams(RvcParamsId.HEATED_SEAT_PASSENGER, right_side_level.to_bytes(1, 'big')),
             RvcParams(RvcParamsId.PARAMS_MAX, b'\x00\x00\x00\x00')
         ]
         body = VehicleControlReq(
