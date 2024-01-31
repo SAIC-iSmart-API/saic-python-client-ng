@@ -94,6 +94,8 @@ class BasicVehicleStatus:
     remoteClimateStatus: int = None
     rmtHtdRrWndSt: int = None
     sideLightStatus: int = None
+    steeringHeatLevel: int = None
+    steeringWheelHeatFailureReason: int = None
     sunroofStatus: int = None
     timeOfLastCANBUSActivity: int = None
     vehElecRngDsp: int = None
