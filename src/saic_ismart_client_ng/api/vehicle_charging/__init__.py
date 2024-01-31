@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle_charging.schema import ChargeInfoResp, ChargeStatusResp, ChargingControlRequest, \
@@ -137,7 +137,7 @@ class SaicVehicleChargingApi(AbstractSaicApi):
             microsecond=0
         )
         if start_date < datetime.now():
-            start_date = start_date.replace(day=start_date.day + 1)
+            start_date = start_date + timedelta(days=1)
         body = ScheduledBatteryHeatingRequest(
             vin=sha256_hex_digest(vin),
             startTime=int(start_date.timestamp()) * 1000,
