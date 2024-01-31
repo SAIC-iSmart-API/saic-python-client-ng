@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import json
 import logging
 from abc import ABC
 from dataclasses import asdict
@@ -171,7 +172,12 @@ class AbstractSaicApi(ABC):
             if data_class is None:
                 return None
             elif 'data' in json_data:
-                return dacite.from_dict(data_class, json_data['data'])
+                if data_class is str:
+                    return json.dumps(json_data['data'])
+                elif data_class is dict:
+                    return json_data['data']
+                else:
+                    return dacite.from_dict(data_class, json_data['data'])
             else:
                 raise SaicApiException(f"Failed to deserialize response, missing 'data' field: {response.text}")
 
