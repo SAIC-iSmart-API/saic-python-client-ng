@@ -186,6 +186,10 @@ class ChrgMgmtData:
     def is_battery_heating(self) -> bool:
         return self.bmsPTCHeatReqDspCmd == 1
 
+    @property
+    def charging_port_locked(self) -> bool:
+        return self.ccuEleccLckCtrlDspCmd == 1
+
 
 @dataclass
 class RvsChargeStatus:
