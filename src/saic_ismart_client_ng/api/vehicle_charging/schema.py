@@ -361,8 +361,20 @@ class ChargingControlResp:
         return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
 
     @property
+    def charge_target_soc(self) -> Optional[TargetBatteryCode]:
+        raw_target_soc = self.bmsOnBdChrgTrgtSOCDspCmd
+        try:
+            return TargetBatteryCode(raw_target_soc)
+        except ValueError:
+            return None
+
+    @property
     def is_battery_heating(self) -> bool:
         return self.bmsPTCHeatReqDspCmd == 1
+
+    @property
+    def charging_port_locked(self) -> bool:
+        return self.ccuEleccLckCtrlDspCmd == 1
 
 
 @dataclass
