@@ -1,6 +1,5 @@
 import json
 import unittest
-from dataclasses import asdict
 
 import dacite
 

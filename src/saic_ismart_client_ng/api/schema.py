@@ -67,6 +67,6 @@ class GpsPosition:
             return None
         try:
             return GpsStatus(value)
-        except ValueError as e:
+        except ValueError:
             logger.error(f"Could not decode {value} as GpsStatus")
             return None
