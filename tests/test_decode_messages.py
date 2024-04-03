@@ -1,6 +1,5 @@
 import datetime
 import json
-from calendar import JANUARY
 from unittest import TestCase
 
 import dacite
@@ -18,7 +17,7 @@ class TestDecodeMessages(TestCase):
         self.assertEqual(decoded.messages[0].messageId, 22233425)
         self.assertEqual(
             decoded.messages[0].message_time,
-            datetime.datetime(year=2024, month=JANUARY, day=21, hour=17, minute=42, second=14)
+            datetime.datetime(year=2024, month=1, day=21, hour=17, minute=42, second=14)
         )
 
     def test_it_should_work_with_messageId_as_string(self):

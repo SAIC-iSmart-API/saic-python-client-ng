@@ -204,7 +204,7 @@ class AbstractSaicApi(ABC):
         if relogin_delay:
             logger.warning(f"Waiting {relogin_delay}s since we got logged out.")
             await asyncio.sleep(relogin_delay)
-        logger.warning(f"Logging in since we got logged out")
+        logger.warning("Logging in since we got logged out")
         await self.login()
         raise SaicApiException(error_message, return_code=return_code)
 
@@ -220,7 +220,7 @@ def saic_api_after_retry(retry_state):
             logger.debug(f"Updating event_id to the newly obtained value {wrapped_exception.event_id}")
             retry_state.kwargs['event_id'] = wrapped_exception.event_id
         else:
-            logger.debug(f"Retrying without an event_id")
+            logger.debug("Retrying without an event_id")
 
 
 def saic_api_retry_policy(retry_state):

@@ -1,12 +1,12 @@
 import json
-from unittest import TestCase
+import unittest
 
 import dacite
 
 from saic_ismart_client_ng.api.vehicle_charging import ChargingSettingResp
 
 
-class TestChargingSettingResp(TestCase):
+class TestChargingSettingResp(unittest.TestCase):
 
     def test_rvc_req_sts_decoded(self):
         sut = ChargingSettingResp(
@@ -22,3 +22,7 @@ class TestChargingSettingResp(TestCase):
         self.assertIsNotNone(decoded.bmsAltngChrgCrntResp)
         self.assertIsNotNone(decoded.rvcReqSts, 3)
         self.assertEqual(decoded.rvc_req_sts_decoded, b'\x03')
+
+
+if __name__ == '__main__':
+    unittest.main()

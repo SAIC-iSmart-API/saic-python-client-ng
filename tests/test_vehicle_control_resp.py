@@ -1,12 +1,11 @@
 import json
-from unittest import TestCase
-
+import unittest
 import dacite
 
 from saic_ismart_client_ng.api.vehicle import VehicleControlResp
 
 
-class TestVehicleControlResp(TestCase):
+class TestVehicleControlResp(unittest.TestCase):
     def test_rvc_req_sts_decoded(self):
         sut = VehicleControlResp(
             rvcReqSts='AQ==',
@@ -29,3 +28,7 @@ class TestVehicleControlResp(TestCase):
         self.assertEqual(decoded.rvc_req_type_decoded, b'\x06')
         self.assertIsNotNone(decoded.rvcReqSts, 'AQ==')
         self.assertEqual(decoded.rvc_req_sts_decoded, b'\x01')
+
+
+if __name__ == '__main__':
+    unittest.main()

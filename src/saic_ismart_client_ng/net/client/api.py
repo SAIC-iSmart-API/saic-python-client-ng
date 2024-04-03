@@ -61,7 +61,7 @@ class SaicApiClient(AbstractSaicClient):
         if request_body:
             modified_content_type = "multipart/form-data" if "multipart" in original_content_type else "application/json"
             request_content = request_body.strip()
-            if request_content and not "multipart" in original_content_type:
+            if request_content and "multipart" not in original_content_type:
                 key_hex = md5_hex_digest(
                     md5_hex_digest(
                         request_path + tenant_id + user_token + "app",
