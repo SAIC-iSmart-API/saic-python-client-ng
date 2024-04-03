@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi
-from saic_ismart_client_ng.api.vehicle_charging.schema import ChargeInfoResp, ChargeStatusResp, ChargingControlRequest, \
+from saic_ismart_client_ng.api.vehicle_charging.schema import ChargeStatusResp, ChargingControlRequest, \
     ChargingControlResp, ScheduledChargingRequest, ChargingPtcHeatRequest, ChargingSettingRequest, ChrgPtcHeatResp, \
     ScheduledChargingResp, ChargingSettingResp, TargetBatteryCode, ChargeCurrentLimitCode, ScheduledChargingMode, \
-    ScheduledBatteryHeatingRequest, ScheduledBatteryHeatingResp
+    ScheduledBatteryHeatingRequest, ScheduledBatteryHeatingResp, ChrgMgmtDataResp
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 
 
@@ -20,14 +20,14 @@ class SaicVehicleChargingApi(AbstractSaicApi):
             out_type=ChargeStatusResp
         )
 
-    async def get_vehicle_charging_management_data(self, vin: str) -> ChargeInfoResp:
+    async def get_vehicle_charging_management_data(self, vin: str) -> ChrgMgmtDataResp:
         return await self.execute_api_call_with_event_id(
             "GET",
             "/vehicle/charging/mgmtData",
             params={
                 "vin": sha256_hex_digest(vin),
             },
-            out_type=ChargeInfoResp
+            out_type=ChrgMgmtDataResp
         )
 
     async def send_vehicle_charging_control(self, vin: str, body: ChargingControlRequest) -> ChargingControlResp:

@@ -26,11 +26,12 @@ async def main():
         await asyncio.sleep(10)
 
 
-logging.basicConfig(
-    stream=sys.stdout,
-    format="%(levelname)s [%(asctime)s] %(name)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    level=logging.INFO,
-)
+if __name__ == '__main__':
+    logging.basicConfig(
+        stream=sys.stdout,
+        format="%(levelname)s [%(asctime)s] %(name)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        level=logging.INFO,
+    )
 
-asyncio.run(main())
+    asyncio.run(main())

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "saic_ismart_client_ng"
-version = "0.0.11"
+version = "0.1.0"
 authors = [
     { name = "Giovanni Condello", email = "saic-python-client@nanomad.net" },
 ]
@@ -16,7 +16,7 @@ dependencies = [
 ]
 description = "SAIC next gen client library (MG iSMART)"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -26,3 +26,8 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/SAIC-iSmart-API/saic-python-client-ng"
 "Bug Tracker" = "https://github.com/SAIC-iSmart-API/saic-python-client-ng/issues"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]

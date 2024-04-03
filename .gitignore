@@ -188,3 +188,4 @@ fabric.properties
 
 tests/test_saic_api_no_mock.py
 run_decoder.sh
+junit/

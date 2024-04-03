@@ -142,25 +142,46 @@ class ChrgMgmtData:
     bmsAltngChrgCrntDspCmd: int = None
     bmsChrgCtrlDspCmd: int = None
     bmsChrgOtptCrntReq: int = None
+    bmsChrgOtptCrntReqV: Optional[int] = None
     bmsChrgSpRsn: int = None
     bmsChrgSts: int = None
+    bmsDsChrgSpRsn: Optional[int] = None
     bmsEstdElecRng: int = None
     bmsOnBdChrgTrgtSOCDspCmd: int = None
-    bmsPTCHeatReqDspCmd: int = None
-    bmsPTCHeatResp: int = None
-    bmsPTCHeatSpRsn: int = None
     bmsPackCrnt: int = None
+    bmsPackCrntV: Optional[int] = None
     bmsPackSOCDsp: int = None
     bmsPackVol: int = None
+    bmsPTCHeatReqDspCmd: int = None
+    bmsPTCHeatResp: Optional[int] = None
+    bmsPTCHeatSpRsn: Optional[int] = None
     bmsReserCtrlDspCmd: int = None
     bmsReserSpHourDspCmd: int = None
     bmsReserSpMintueDspCmd: int = None
     bmsReserStHourDspCmd: int = None
     bmsReserStMintueDspCmd: int = None
-    ccuEleccLckCtrlDspCmd: int = None
+    ccuEleccLckCtrlDspCmd: Optional[int] = None
+    ccuOffBdChrgrPlugOn: Optional[int] = None
+    ccuOnbdChrgrPlugOn: Optional[int] = None
+    chrgngAddedElecRng: Optional[int] = None
+    chrgngAddedElecRngV: Optional[int] = None
+    chrgngDoorOpenCnd: Optional[int] = None
+    chrgngDoorPosSts: Optional[int] = None
     chrgngRmnngTime: int = None
     chrgngRmnngTimeV: int = None
+    chrgngSpdngTime: Optional[int] = None
+    chrgngSpdngTimeV: Optional[int] = None
     clstrElecRngToEPT: int = None
+    disChrgngRmnngTime: Optional[int] = None
+    disChrgngRmnngTimeV: Optional[int] = None
+    imcuChrgngEstdElecRng: Optional[int] = None
+    imcuChrgngEstdElecRngV: Optional[int] = None
+    imcuDschrgngEstdElecRng: Optional[int] = None
+    imcuDschrgngEstdElecRngV: Optional[int] = None
+    imcuVehElecRng: Optional[int] = None
+    imcuVehElecRngV: Optional[int] = None
+    onBdChrgrAltrCrntInptCrnt: Optional[int] = None
+    onBdChrgrAltrCrntInptVol: Optional[int] = None
 
     @property
     def decoded_current(self) -> float:
@@ -193,30 +214,35 @@ class ChrgMgmtData:
 
 @dataclass
 class RvsChargeStatus:
-    chargingDuration: int = None
-    chargingElectricityPhase: int = None
+    chargingDuration: Optional[int] = None
+    chargingElectricityPhase: Optional[int] = None
     chargingGunState: int = None
-    chargingPileSupplier: str = None
+    chargingPileID: Optional[str] = None
+    chargingPileSupplier: Optional[str] = None
     chargingType: int = None
-    endTime: int = None
-    fotaLowestVoltage: int = None
+    endTime: Optional[int] = None
+    extendedData1: Optional[int] = None
+    extendedData2: Optional[int] = None
+    extendedData3: Optional[str] = None
+    extendedData4: Optional[str] = None
+    fotaLowestVoltage: Optional[int] = None
     fuelRangeElec: int = None
-    lastChargeEndingPower: int = None
+    lastChargeEndingPower: Optional[int] = None
     mileage: int = None
-    mileageOfDay: int = None
-    mileageSinceLastCharge: int = None
-    powerUsageOfDay: int = None
-    powerUsageSinceLastCharge: int = None
+    mileageOfDay: Optional[int] = None
+    mileageSinceLastCharge: Optional[int] = None
+    powerUsageOfDay: Optional[int] = None
+    powerUsageSinceLastCharge: Optional[int] = None
     realtimePower: int = None
-    startTime: int = None
-    staticEnergyConsumption: int = None
-    totalBatteryCapacity: int = None
-    workingCurrent: int = None
-    workingVoltage: int = None
+    startTime: Optional[int] = None
+    staticEnergyConsumption: Optional[int] = None
+    totalBatteryCapacity: Optional[int] = None
+    workingCurrent: Optional[int] = None
+    workingVoltage: Optional[int] = None
 
 
 @dataclass
-class ChargeInfoResp:
+class ChrgMgmtDataResp:
     chrgMgmtData: ChrgMgmtData = None,
     rvsChargeStatus: RvsChargeStatus = None,
 

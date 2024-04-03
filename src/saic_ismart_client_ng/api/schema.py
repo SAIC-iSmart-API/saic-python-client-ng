@@ -1,4 +1,8 @@
+import logging
 from dataclasses import dataclass
+from enum import Enum
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -29,6 +33,13 @@ class LoginResp():
     user_name: str = None,
 
 
+class GpsStatus(Enum):
+    NO_SIGNAL = 0
+    TIME_FIX = 1
+    FIX_2D = 2
+    FIX_3d = 3
+
+
 @dataclass
 class GpsPosition:
     @dataclass
@@ -48,3 +59,14 @@ class GpsPosition:
     gpsStatus: int = None
     timeStamp: int = None
     wayPoint: WayPoint = None
+
+    @property
+    def gps_status_decoded(self) -> GpsStatus | None:
+        value = self.gpsStatus
+        if value is None:
+            return None
+        try:
+            return GpsStatus(value)
+        except ValueError as e:
+            logger.error(f"Could not decode {value} as GpsStatus")
+            return None

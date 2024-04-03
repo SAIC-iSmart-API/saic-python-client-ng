@@ -61,46 +61,46 @@ class BasicVehicleStatus:
     canBusActive: int = None
     clstrDspdFuelLvlSgmt: int = None
     currentJourneyID: int = None
-    currentjourneyDistance: int = None
+    currentJourneyDistance: int = None
     dippedBeamStatus: int = None
     driverDoor: int = None
-    driverWindow: int = None
+    driverWindow: Optional[int] = None
     engineStatus: int = None
-    extendedData1: int = None
-    extendedData2: int = None
+    extendedData1: Optional[int] = None
+    extendedData2: Optional[int] = None
     exteriorTemperature: int = None
-    frontLeftSeatHeatLevel: int = None
-    frontLeftTyrePressure: int = None
-    frontRightSeatHeatLevel: int = None
-    frontRightTyrePressure: int = None
+    frontLeftSeatHeatLevel: Optional[int] = None
+    frontLeftTyrePressure: Optional[int] = None
+    frontRightSeatHeatLevel: Optional[int] = None
+    frontRightTyrePressure: Optional[int] = None
     fuelLevelPrc: int = None
     fuelRange: int = None
-    fuelRangeElec: int = None
-    handbrake: int = None
+    fuelRangeElec: Optional[int] = None
+    handBrake: int = None
     interiorTemperature: int = None
     lastKeySeen: int = None
     lockStatus: int = None
     mainBeamStatus: int = None
     mileage: int = None
     passengerDoor: int = None
-    passengerWindow: int = None
+    passengerWindow: Optional[int] = None
     powerMode: int = None
     rearLeftDoor: int = None
-    rearLeftTyrePressure: int = None
-    rearLeftWindow: int = None
+    rearLeftTyrePressure: Optional[int] = None
+    rearLeftWindow: Optional[int] = None
     rearRightDoor: int = None
-    rearRightTyrePressure: int = None
-    rearRightWindow: int = None
+    rearRightTyrePressure: Optional[int] = None
+    rearRightWindow: Optional[int] = None
     remoteClimateStatus: int = None
     rmtHtdRrWndSt: int = None
     sideLightStatus: int = None
     steeringHeatLevel: int = None
     steeringWheelHeatFailureReason: int = None
-    sunroofStatus: int = None
+    sunroofStatus: Optional[int] = None
     timeOfLastCANBUSActivity: int = None
     vehElecRngDsp: int = None
-    vehicleAlarmStatus: int = None
-    wheelTyreMonitorStatus: int = None
+    vehicleAlarmStatus: Optional[int] = None
+    wheelTyreMonitorStatus: Optional[int] = None
 
 
 @dataclass
@@ -127,7 +127,7 @@ class VehicleStatusResp:
     def is_parked(self) -> bool:
         return (
                 self.basicVehicleStatus.engineStatus != 1
-                or self.basicVehicleStatus.handbrake
+                or self.basicVehicleStatus.handBrake
         )
 
     @property
