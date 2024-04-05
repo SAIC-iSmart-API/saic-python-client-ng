@@ -60,7 +60,7 @@ class BasicVehicleStatus:
     bootStatus: int = None
     canBusActive: int = None
     clstrDspdFuelLvlSgmt: int = None
-    currentJourneyID: int = None
+    currentJourneyId: int = None
     currentJourneyDistance: int = None
     dippedBeamStatus: int = None
     driverDoor: int = None
