@@ -49,6 +49,60 @@ class ChargeCurrentLimitCode(Enum):
                 raise ValueError(f'Unknown charge current limit code: {self}')
 
 
+class BmsChargingStatusCode(Enum):
+    UNPLUGGED = 0
+    CHARGING_1 = 1  # Potentially AC charging
+    CHARGE_DONE = 2
+    CHARGING_3 = 3
+    CHARGE_FAULT = 4
+    CONNECTING = 5
+    CONNECTED_NOT_RECOGNIZED = 6
+    CONNECTED_NOT_CHARGING = 7
+    CHARGING_STOPPED = 8
+    SCHEDULED_CHARGING = 9
+    CHARGING_10 = 10  # Potentially DC fast charging
+    SUPER_OFFBOARD_CHARGING = 11
+    CHARGING_12 = 12
+
+    @staticmethod
+    def to_code(code: int):
+        try:
+            return BmsChargingStatusCode(code)
+        except ValueError:
+            return None
+
+
+class HeatingStopReason(Enum):
+    LOW_BATTERY = 2
+    REACHED_STOP_CONDITION = 3
+    UNNECESSARY = 4
+    REACHED_STOP_TIME = 5
+    HEATING_SYSTEM_FAILURE = 7
+
+    @staticmethod
+    def to_code(code: int):
+        try:
+            return HeatingStopReason(code)
+        except ValueError:
+            return None
+
+
+class ChargingStopReason(Enum):
+    NO_REASON = 0
+    CHARGER_STATUS_ABNORMAL = 1
+    CHARGER_PORT_OVER_TEMPERATURE = 2
+    CHARGING_GUN_NOT_PROPERLY_PLUGGED_IN = 3
+    CHARGER_VOLTAGE_MISMATCH = 4
+    OTHER_REASON = 5
+
+    @staticmethod
+    def to_code(code: int):
+        try:
+            return ChargingStopReason(code)
+        except ValueError:
+            return ChargingStopReason.OTHER_REASON
+
+
 class TargetBatteryCode(Enum):
     P_40 = 1
     P_50 = 2
@@ -210,6 +264,30 @@ class ChrgMgmtData:
     @property
     def charging_port_locked(self) -> bool:
         return self.ccuEleccLckCtrlDspCmd == 1
+
+    @property
+    def is_bms_charging(self) -> bool:
+        if self.bmsChrgSts is not None and self.bmsChrgSts in (1, 3, 10, 12):
+            return True
+        return False
+
+    @property
+    def bms_charging_status(self) -> BmsChargingStatusCode | None:
+        if self.bmsChrgSts is not None:
+            return BmsChargingStatusCode.to_code(self.bmsChrgSts)
+        return None
+
+    @property
+    def charging_stop_reason(self) -> ChargingStopReason | None:
+        if self.bmsChrgSpRsn is not None:
+            return ChargingStopReason.to_code(self.bmsChrgSpRsn)
+        return None
+
+    @property
+    def heating_stop_reason(self) -> HeatingStopReason | None:
+        if self.bmsPTCHeatSpRsn is not None:
+            return HeatingStopReason.to_code(self.bmsPTCHeatResp)
+        return None
 
 
 @dataclass
@@ -401,6 +479,30 @@ class ChargingControlResp:
     @property
     def charging_port_locked(self) -> bool:
         return self.ccuEleccLckCtrlDspCmd == 1
+
+    @property
+    def is_bms_charging(self) -> bool:
+        if self.bmsChrgSts is not None and self.bmsChrgSts in (1, 3, 10, 12):
+            return True
+        return False
+
+    @property
+    def bms_charging_status(self) -> BmsChargingStatusCode | None:
+        if self.bmsChrgSts is not None:
+            return BmsChargingStatusCode.to_code(self.bmsChrgSts)
+        return None
+
+    @property
+    def charging_stop_reason(self) -> ChargingStopReason | None:
+        if self.bmsChrgSpRsn is not None:
+            return ChargingStopReason.to_code(self.bmsChrgSpRsn)
+        return None
+
+    @property
+    def heating_stop_reason(self) -> HeatingStopReason | None:
+        if self.bmsPTCHeatSpRsn is not None:
+            return HeatingStopReason.to_code(self.bmsPTCHeatResp)
+        return None
 
 
 @dataclass
