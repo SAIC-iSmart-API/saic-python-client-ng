@@ -393,6 +393,11 @@ class ChrgPtcHeatResp:
     def rvc_req_sts_decoded(self) -> Optional[bytes]:
         return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
 
+    @property
+    def heating_stop_reason(self) -> HeatingStopReason | None:
+        if self.ptcHeatResp is not None:
+            return HeatingStopReason.to_code(self.ptcHeatResp)
+        return None
 
 @dataclass
 class ChargingControlRequest:
@@ -500,7 +505,7 @@ class ChargingControlResp:
 
     @property
     def heating_stop_reason(self) -> HeatingStopReason | None:
-        if self.bmsPTCHeatSpRsn is not None:
+        if self.bmsPTCHeatResp is not None:
             return HeatingStopReason.to_code(self.bmsPTCHeatResp)
         return None
 
