@@ -32,7 +32,7 @@ class AbstractSaicClient(ABC):
 
                     body = request.content.decode("utf-8")
                 except Exception as e:
-                    self.__logger.warning(f"Error decoding request content: {e}")
+                    self.__logger.warning(f"Error decoding request content: {e}", exc_info=e)
 
             await self.__listener.on_request(
                 path=str(request.url).replace(self.configuration.base_uri, "/"),
@@ -40,7 +40,7 @@ class AbstractSaicClient(ABC):
                 headers=dict(request.headers),
             )
         except Exception as e:
-            self.__logger.warning(f"Error invoking request listener: {e}")
+            self.__logger.warning(f"Error invoking request listener: {e}", exc_info=e)
 
     async def invoke_response_listener(self, response: httpx.Response):
         if not self.__listener:
@@ -51,7 +51,7 @@ class AbstractSaicClient(ABC):
                 try:
                     body = body.decode("utf-8")
                 except Exception as e:
-                    self.__logger.warning(f"Error decoding request content: {e}")
+                    self.__logger.warning(f"Error decoding request content: {e}", exc_info=e)
 
             await self.__listener.on_response(
                 path=str(response.url).replace(self.configuration.base_uri, "/"),
@@ -59,4 +59,4 @@ class AbstractSaicClient(ABC):
                 headers=dict(response.headers),
             )
         except Exception as e:
-            self.__logger.warning(f"Error invoking request listener: {e}")
+            self.__logger.warning(f"Error invoking request listener: {e}", exc_info=e)
