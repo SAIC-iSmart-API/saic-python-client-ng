@@ -57,8 +57,8 @@ async def encrypt_request(
         base_uri: str,
         region: str,
         tenant_id: str,
-        user_token: Optional[str],
-        class_name: str,
+        user_token: str = "",
+        class_name: str = "",
 ):
     original_request_url = modified_request.url
     original_content_type = modified_request.headers.get("Content-Type")  # 'application/x-www-form-urlencoded'
