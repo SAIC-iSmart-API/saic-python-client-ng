@@ -49,8 +49,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          poetry run pytest tests --junit-xml=junit/test-results-${{ matrix.python-version }}.xml
-          poetry run coverage report
+          poetry run pytest tests --cov --junit-xml=junit/test-results-${{ matrix.python-version }}.xml
 
       - name: Lint with Ruff
         run: |
