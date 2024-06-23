@@ -1,5 +1,4 @@
 import logging
-from typing import override
 
 import httpx
 
@@ -19,7 +18,6 @@ class SaicLoginClient(AbstractSaicClient):
         super().__init__(configuration, listener, LOG)
         self.__listener = listener
 
-    @override
     async def encrypt_request(self, modified_request: httpx.Request):
         await super().encrypt_request(modified_request)
         modified_request.headers["Authorization"] = "Basic c3dvcmQ6c3dvcmRfc2VjcmV0"

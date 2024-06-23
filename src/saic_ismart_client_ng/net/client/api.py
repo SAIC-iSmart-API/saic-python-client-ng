@@ -1,5 +1,4 @@
 import logging
-from typing import override
 
 import httpx
 
@@ -19,7 +18,6 @@ class SaicApiClient(AbstractSaicClient):
     ):
         super().__init__(configuration, listener, LOG)
 
-    @override
     async def encrypt_request(self, modified_request: httpx.Request):
         if not self.user_token:
             raise SaicApiException("Client not authenticated, please call login first")
