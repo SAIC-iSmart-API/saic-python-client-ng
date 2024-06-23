@@ -44,5 +44,6 @@ class TestGetAppVerificationString(unittest.TestCase):
                                                       content_type, request_content, user_token)
         self.assertEqual('332c85836aa9afc864282436a740eb2cc778fafd1fea74dd887c1f8de5056de0', result)
 
+
 if __name__ == '__main__':
     unittest.main()
