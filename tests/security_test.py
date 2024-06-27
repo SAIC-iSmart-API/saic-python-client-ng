@@ -5,7 +5,8 @@ import unittest
 import httpx
 import pytest
 
-from saic_ismart_client_ng.net import security
+from saic_ismart_client_ng.net.crypto import get_app_verification_string
+from saic_ismart_client_ng.net.httpx import encrypt_httpx_request, decrypt_httpx_request
 
 
 def test_get_app_verification_string_valid():
@@ -17,8 +18,8 @@ def test_get_app_verification_string_valid():
     request_content = '{"key": "value"}'
     user_token = 'dummy_token'
 
-    result = security.get_app_verification_string(clazz_simple_name, request_path, current_ts, tenant_id,
-                                                  content_type, request_content, user_token)
+    result = get_app_verification_string(clazz_simple_name, request_path, current_ts, tenant_id,
+                                         content_type, request_content, user_token)
 
     assert 'afd4eaf98af2d964f8ea840fc144ee7bae95dbeeeb251d5e3a01371442f92eeb' == result
 
@@ -38,7 +39,7 @@ async def test_a_request_should_encrypt_properly():
     original_request_content = original_request.content.decode('utf-8').strip()
     region = 'EU'
     tenant_id = '2559'
-    computed_verification_string = security.get_app_verification_string(
+    computed_verification_string = get_app_verification_string(
         "",
         "/with/path?vin=zevin",
         str(int(ts.timestamp() * 1000)),
@@ -47,13 +48,8 @@ async def test_a_request_should_encrypt_properly():
         original_request_content, ''
     )
 
-    await security.encrypt_request(
-        modified_request=original_request,
-        request_timestamp=ts,
-        base_uri=base_uri,
-        region=region,
-        tenant_id=tenant_id,
-    )
+    await encrypt_httpx_request(modified_request=original_request, request_timestamp=ts, base_uri=base_uri,
+                                region=region, tenant_id=tenant_id)
     assert original_request != None
     assert region == original_request.headers['REGION']
     assert tenant_id == original_request.headers['tenant-id']
@@ -78,14 +74,9 @@ async def test_a_request_should_decrypt_properly():
     region = 'EU'
     tenant_id = '2559'
 
-    await security.encrypt_request(
-        modified_request=original_request,
-        request_timestamp=ts,
-        base_uri=base_uri,
-        region=region,
-        tenant_id=tenant_id,
-    )
-    decrypted = await security.decrypt_request(original_request, base_uri=base_uri)
+    await encrypt_httpx_request(modified_request=original_request, request_timestamp=ts, base_uri=base_uri,
+                                region=region, tenant_id=tenant_id)
+    decrypted = await decrypt_httpx_request(original_request, base_uri=base_uri)
 
     assert decrypted != None
     decrypted_json = json.loads(decrypted)
@@ -101,8 +92,8 @@ def test_with_empty_request_path():
     request_content = '{"key": "value"}'
     user_token = 'dummy_token'
 
-    result = security.get_app_verification_string(clazz_simple_name, request_path, current_ts, tenant_id,
-                                                  content_type, request_content, user_token)
+    result = get_app_verification_string(clazz_simple_name, request_path, current_ts, tenant_id,
+                                         content_type, request_content, user_token)
     assert 'ff8cb13ebcce5958e7fbfe602716c653fd72ce78842be87b6d50dccede198735' == result
 
 
@@ -115,8 +106,8 @@ def test_with_no_request_content():
     request_content = ''
     user_token = 'dummy_token'
 
-    result = security.get_app_verification_string(clazz_simple_name, request_path, current_ts, tenant_id,
-                                                  content_type, request_content, user_token)
+    result = get_app_verification_string(clazz_simple_name, request_path, current_ts, tenant_id,
+                                         content_type, request_content, user_token)
     assert '332c85836aa9afc864282436a740eb2cc778fafd1fea74dd887c1f8de5056de0' == result
 
 

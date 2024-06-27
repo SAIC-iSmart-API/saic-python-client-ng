@@ -6,7 +6,7 @@ import httpx
 
 from saic_ismart_client_ng.listener import SaicApiListener
 from saic_ismart_client_ng.model import SaicApiConfiguration
-from saic_ismart_client_ng.net.security import decrypt_response, encrypt_request
+from saic_ismart_client_ng.net.httpx import decrypt_httpx_response, encrypt_httpx_request
 
 
 class AbstractSaicClient(ABC):
@@ -24,7 +24,7 @@ class AbstractSaicClient(ABC):
         self.__client = httpx.AsyncClient(
             event_hooks={
                 "request": [self.invoke_request_listener, self.encrypt_request],
-                "response": [decrypt_response, self.invoke_response_listener]
+                "response": [decrypt_httpx_response, self.invoke_response_listener]
             }
         )
 
@@ -84,7 +84,7 @@ class AbstractSaicClient(ABC):
             self.__logger.warning(f"Error invoking request listener: {e}", exc_info=e)
 
     async def encrypt_request(self, modified_request: httpx.Request):
-        return await encrypt_request(
+        return await encrypt_httpx_request(
             modified_request=modified_request,
             request_timestamp=datetime.now(),
             base_uri=self.configuration.base_uri,

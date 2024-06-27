@@ -2,13 +2,10 @@ import hashlib
 import hmac
 import logging
 from datetime import datetime
-from typing import Optional
-
-from httpx import Response, Request
 
 from saic_ismart_client_ng.crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding, \
     decrypt_aes_cbc_pkcs5_padding
-from saic_ismart_client_ng.net.utils import update_request_with_content, normalize_content_type
+from saic_ismart_client_ng.net.utils import normalize_content_type
 
 logger = logging.getLogger(__name__)
 
@@ -50,18 +47,19 @@ def get_app_verification_string(
     return ""
 
 
-async def encrypt_request(
+def encrypt_request(
         *,
-        modified_request: Request,
+        original_request_url: str,
+        original_request_headers: dict,
+        original_request_content: str,
         request_timestamp: datetime,
         base_uri: str,
         region: str,
         tenant_id: str,
         user_token: str = "",
         class_name: str = "",
-):
-    original_request_url = modified_request.url
-    original_content_type = modified_request.headers.get("Content-Type")  # 'application/x-www-form-urlencoded'
+) -> (str, dict):
+    original_content_type = original_request_headers.get("Content-Type")  # 'application/x-www-form-urlencoded'
     if not original_content_type:
         modified_content_type = "application/json"
     else:
@@ -69,7 +67,8 @@ async def encrypt_request(
     request_content = ""
     current_ts = str(int(request_timestamp.timestamp() * 1000))
     request_path = str(original_request_url).replace(base_uri, "/")
-    request_body = modified_request.content.decode("utf-8")
+    request_body = original_request_content
+    new_content = original_request_content
     if request_body and "multipart" not in original_content_type:
         modified_content_type = normalize_content_type(original_content_type)
         request_content = request_body.strip()
@@ -84,23 +83,21 @@ async def encrypt_request(
             iv_hex = md5_hex_digest(current_ts, False)
             if key_hex and iv_hex:
                 new_content = encrypt_aes_cbc_pkcs5_padding(request_content, key_hex, iv_hex).encode('utf-8')
-                # Update the request content
-                update_request_with_content(modified_request, new_content)
 
-    modified_request.headers["User-Agent"] = "okhttp/3.14.9"
-    modified_request.headers["Content-Type"] = f"{modified_content_type};charset=utf-8"
-    modified_request.headers["Accept"] = "application/json"
-    modified_request.headers["Accept-Encoding"] = "gzip"
+    original_request_headers["User-Agent"] = "okhttp/3.14.9"
+    original_request_headers["Content-Type"] = f"{modified_content_type};charset=utf-8"
+    original_request_headers["Accept"] = "application/json"
+    original_request_headers["Accept-Encoding"] = "gzip"
 
-    modified_request.headers["REGION"] = region
+    original_request_headers["REGION"] = region
 
-    modified_request.headers["APP-SEND-DATE"] = current_ts
-    modified_request.headers["APP-CONTENT-ENCRYPTED"] = "1"
-    modified_request.headers["tenant-id"] = tenant_id
-    modified_request.headers["User-Type"] = "app"
-    modified_request.headers["APP-LANGUAGE-TYPE"] = "en"
+    original_request_headers["APP-SEND-DATE"] = current_ts
+    original_request_headers["APP-CONTENT-ENCRYPTED"] = "1"
+    original_request_headers["tenant-id"] = tenant_id
+    original_request_headers["User-Type"] = "app"
+    original_request_headers["APP-LANGUAGE-TYPE"] = "en"
     if user_token:
-        modified_request.headers["blade-auth"] = user_token
+        original_request_headers["blade-auth"] = user_token
     app_verification_string = get_app_verification_string(
         class_name,
         request_path,
@@ -110,20 +107,27 @@ async def encrypt_request(
         request_content,
         user_token
     )
-    modified_request.headers["ORIGINAL-CONTENT-TYPE"] = modified_content_type
-    modified_request.headers["APP-VERIFICATION-STRING"] = app_verification_string
+    original_request_headers["ORIGINAL-CONTENT-TYPE"] = modified_content_type
+    original_request_headers["APP-VERIFICATION-STRING"] = app_verification_string
+    return new_content, original_request_headers
 
 
-async def decrypt_request(req: Request, base_uri: str):
+def decrypt_request(
+        *,
+        original_request_url: str,
+        original_request_headers: dict,
+        original_request_content: str,
+        base_uri: str,
+) -> bytes:
     charset = 'utf-8'
-    req_content = (await req.aread()).decode(charset).strip()
+    req_content = original_request_content.strip()
     if req_content:
-        app_send_date = req.headers.get("APP-SEND-DATE")
-        original_content_type = req.headers.get("ORIGINAL-CONTENT-TYPE")
+        app_send_date = original_request_headers.get("APP-SEND-DATE")
+        original_content_type = original_request_headers.get("ORIGINAL-CONTENT-TYPE")
         if app_send_date and original_content_type:
-            tenant_id = req.headers['tenant-id']
-            user_token = req.headers.get('blade-auth', '')
-            request_path = str(req.url).replace(base_uri, "/")
+            tenant_id = original_request_headers['tenant-id']
+            user_token = original_request_headers.get('blade-auth', '')
+            request_path = original_request_url.replace(base_uri, "/")
             key = md5_hex_digest(
                 md5_hex_digest(
                     request_path + tenant_id + user_token + "app",
@@ -135,23 +139,26 @@ async def decrypt_request(req: Request, base_uri: str):
             decrypted = decrypt_aes_cbc_pkcs5_padding(req_content, key, iv)
             if decrypted:
                 return decrypted.encode(charset)
-    return req_content
+    return original_request_content.encode(charset)
 
 
-async def decrypt_response(resp: Response):
-    if resp.is_success:
-        charset = resp.encoding
-        resp_content = (await resp.aread()).decode(charset).strip()
-        if resp_content:
-            app_send_date = resp.headers.get("APP-SEND-DATE")
-            original_content_type = resp.headers.get("ORIGINAL-CONTENT-TYPE")
-            if app_send_date and original_content_type:
-                original_response_key = app_send_date + "1" + original_content_type
-                key = md5_hex_digest(original_response_key, False) if len(original_response_key) > 0 else ""
-                iv = md5_hex_digest(app_send_date, False)
-                decrypted = decrypt_aes_cbc_pkcs5_padding(resp_content, key, iv)
-                if decrypted:
-                    resp._content = decrypted.encode(charset)
-                    resp.headers["Content-Length"] = str(len(resp._content))
-                    resp.headers["Content-Type"] = original_content_type
-    return resp
+def decrypt_response(
+        *,
+        original_response_content: str,
+        original_response_headers: dict,
+        original_response_charset: str,
+) -> (bytes, dict):
+    resp_content = original_response_content.strip()
+    if resp_content:
+        app_send_date = original_response_headers.get("APP-SEND-DATE")
+        original_content_type = original_response_headers.get("ORIGINAL-CONTENT-TYPE")
+        if app_send_date and original_content_type:
+            original_response_key = app_send_date + "1" + original_content_type
+            key = md5_hex_digest(original_response_key, False) if len(original_response_key) > 0 else ""
+            iv = md5_hex_digest(app_send_date, False)
+            decrypted = decrypt_aes_cbc_pkcs5_padding(resp_content, key, iv)
+            if decrypted:
+                resp_content = decrypted
+                original_response_headers["Content-Type"] = original_content_type
+
+    return resp_content.encode(original_response_charset), original_response_headers
