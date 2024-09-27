@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "saic_ismart_client_ng"
 homepage = "https://github.com/SAIC-iSmart-API/saic-python-client-ng"
-version = "0.2.3"
+version = "0.3.0"
 description = "SAIC next gen client library (MG iSMART)"
 authors = [
     "Giovanni Condello <saic-python-client@nanomad.net>",
