@@ -50,7 +50,7 @@ async def test_a_request_should_encrypt_properly():
 
     await encrypt_httpx_request(modified_request=original_request, request_timestamp=ts, base_uri=base_uri,
                                 region=region, tenant_id=tenant_id)
-    assert original_request != None
+    assert original_request is not None
     assert region == original_request.headers['REGION']
     assert tenant_id == original_request.headers['tenant-id']
     assert 'app' == original_request.headers['User-Type']
@@ -78,7 +78,7 @@ async def test_a_request_should_decrypt_properly():
                                 region=region, tenant_id=tenant_id)
     decrypted = await decrypt_httpx_request(original_request, base_uri=base_uri)
 
-    assert decrypted != None
+    assert decrypted is not None
     decrypted_json = json.loads(decrypted)
     assert expected_json == decrypted_json
 

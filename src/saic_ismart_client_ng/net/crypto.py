@@ -150,7 +150,7 @@ def encrypt_response(
         response_timestamp_ms: int,
         base_uri: str,
         tenant_id: str,
-        user_token: '',
+        user_token: str = '',
 ):
     request_content = ""
     request_path = str(original_request_url).replace(base_uri, "/")

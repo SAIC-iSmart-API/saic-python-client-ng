@@ -12,7 +12,6 @@ class TestSaicApiConfiguration(unittest.TestCase):
             "https://test-uri.com",
             "123456",
             "test_region",
-            10.0,
             5.0
         )
 
@@ -36,9 +35,6 @@ class TestSaicApiConfiguration(unittest.TestCase):
 
     def test_region(self):
         self.assertEqual(self.config.region, "test_region")
-
-    def test_relogin_delay(self):
-        self.assertEqual(self.config.relogin_delay, 10.0)
 
     def test_sms_delivery_delay(self):
         self.assertEqual(self.config.sms_delivery_delay, 5.0)

@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import json
 import logging
@@ -31,7 +30,7 @@ class AbstractSaicApi(ABC):
         self.__configuration = configuration
         self.__login_client = SaicLoginClient(configuration, listener=listener)
         self.__api_client = SaicApiClient(configuration, listener=listener)
-        self.__token_expiration = None
+        self.__token_expiration: Optional[datetime.datetime] = None
 
     @property
     def configuration(self) -> SaicApiConfiguration:
@@ -137,12 +136,9 @@ class AbstractSaicApi(ABC):
             error_message = json_data.get('message', 'Unknown error')
             logger.debug(f"Response code: {return_code} {response.text}")
 
-            if return_code == 401:
-                await self._handle_logout(
-                    error_message=error_message,
-                    return_code=return_code,
-                    response=response,
-                )
+            if return_code in (401, 403) or response.status_code in (401, 403):
+                self.logout()
+                raise SaicLogoutException(response.text, return_code)
 
             if return_code in (2, 3, 7):
                 logger.error(f"API call return code is not acceptable: {return_code}: {response.text}")
@@ -197,20 +193,13 @@ class AbstractSaicApi(ABC):
             else:
                 raise SaicApiException(f"Failed to deserialize response: {e}. Original json was {response.text}") from e
 
-    async def _handle_logout(self, *, error_message: str, return_code: int, response: httpx.Response):
-        logger.error(f"API client got de-authenticated. {return_code}: {response.text}")
-        self.logout()
-        relogin_delay = self.__configuration.relogin_delay
-        if relogin_delay:
-            logger.warning(f"Waiting {relogin_delay}s since we got logged out.")
-            await asyncio.sleep(relogin_delay)
-        logger.warning("Logging in since we got logged out")
-        await self.login()
-        raise SaicApiException(error_message, return_code=return_code)
-
     def logout(self):
         self.api_client.user_token = None
         self.__token_expiration = None
+
+    def is_logged_in(self) -> bool:
+        return self.__token_expiration is not None \
+            and self.__token_expiration > datetime.datetime.now()
 
 
 def saic_api_after_retry(retry_state):
@@ -231,10 +220,10 @@ def saic_api_retry_policy(retry_state):
             logger.debug("Retrying since we got SaicApiRetryException")
             return True
         elif isinstance(wrapped_exception, SaicLogoutException):
-            logger.error("Retrying since we got logged out")
-            return True
+            logger.error("Not retrying since we got logged out")
+            return False
         elif isinstance(wrapped_exception, SaicApiException):
-            logger.error("NOT Retrying since we got a generic exception")
+            logger.error("Not retrying since we got a generic exception")
             return False
         else:
             logger.error(f"Not retrying {retry_state.args} {wrapped_exception}")

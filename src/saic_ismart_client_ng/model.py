@@ -8,7 +8,6 @@ class SaicApiConfiguration:
             base_uri: str = "https://gateway-mg-eu.soimt.com/api.app/v1/",
             tenant_id: str = "459771",
             region: str = "eu",
-            relogin_delay: float = None,
             sms_delivery_delay: float = 3.0,
     ):
         self.__username = username
@@ -18,7 +17,6 @@ class SaicApiConfiguration:
         self.__base_uri = base_uri
         self.__tenant_id = tenant_id
         self.__region = region
-        self.__relogin_delay = relogin_delay
         self.__sms_delivery_delay = sms_delivery_delay
 
     @property
@@ -48,10 +46,6 @@ class SaicApiConfiguration:
     @property
     def region(self):
         return self.__region
-
-    @property
-    def relogin_delay(self):
-        return self.__relogin_delay
 
     @property
     def sms_delivery_delay(self):

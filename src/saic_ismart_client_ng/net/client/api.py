@@ -2,7 +2,7 @@ import logging
 
 import httpx
 
-from saic_ismart_client_ng.exceptions import SaicApiException
+from saic_ismart_client_ng.exceptions import SaicLogoutException
 from saic_ismart_client_ng.listener import SaicApiListener
 from saic_ismart_client_ng.model import SaicApiConfiguration
 from saic_ismart_client_ng.net.client import AbstractSaicClient
@@ -20,5 +20,5 @@ class SaicApiClient(AbstractSaicClient):
 
     async def encrypt_request(self, modified_request: httpx.Request):
         if not self.user_token:
-            raise SaicApiException("Client not authenticated, please call login first")
+            raise SaicLogoutException("Client not authenticated, please call login first", return_code=401)
         await super().encrypt_request(modified_request)
