@@ -8,6 +8,7 @@ from typing import Type, T, Optional, Any
 import dacite
 import httpx
 import tenacity
+from httpx import TimeoutException
 from httpx._types import QueryParamTypes, HeaderTypes
 
 from saic_ismart_client_ng.api.schema import LoginResp
@@ -181,15 +182,15 @@ class AbstractSaicApi(ABC):
             raise se
         except Exception as e:
             if response.is_error:
-                if response.status_code == 401:
-                    await self._handle_logout(
-                        error_message=response.text,
-                        return_code=response.status_code,
-                        response=response,
+                if response.status_code in (401, 403):
+                    logger.error(
+                        f"API call failed due to an authentication failure: {response.status_code} {response.text}"
                     )
+                    self.logout()
+                    raise SaicLogoutException(response.text, response.status_code)
                 else:
-                    logger.error(f"API call failed: {response.text}")
-                    raise SaicApiException(f"API call failed with status code {response.status_code}: {response.text}")
+                    logger.error(f"API call failed: {response.status_code} {response.text}")
+                    raise SaicApiException(response.text, response.status_code)
             else:
                 raise SaicApiException(f"Failed to deserialize response: {e}. Original json was {response.text}") from e
 
