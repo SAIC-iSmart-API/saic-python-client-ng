@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "saic_ismart_client_ng"
 homepage = "https://github.com/SAIC-iSmart-API/saic-python-client-ng"
-version = "0.4.0"
+version = "0.5.1"
 description = "SAIC next gen client library (MG iSMART)"
 authors = [
     "Giovanni Condello <saic-python-client@nanomad.net>",
@@ -51,6 +51,7 @@ mock_use_standalone_module = true
 addopts = [
     "--import-mode=importlib",
 ]
+asyncio_default_fixture_loop_scope="function"
 
 [tool.coverage.run]
 omit = [

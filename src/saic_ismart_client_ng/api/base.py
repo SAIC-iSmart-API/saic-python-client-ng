@@ -8,7 +8,6 @@ from typing import Type, T, Optional, Any
 import dacite
 import httpx
 import tenacity
-from httpx import TimeoutException
 from httpx._types import QueryParamTypes, HeaderTypes
 
 from saic_ismart_client_ng.api.schema import LoginResp
@@ -16,8 +15,7 @@ from saic_ismart_client_ng.crypto_utils import sha1_hex_digest
 from saic_ismart_client_ng.exceptions import SaicApiException, SaicApiRetryException, SaicLogoutException
 from saic_ismart_client_ng.listener import SaicApiListener
 from saic_ismart_client_ng.model import SaicApiConfiguration
-from saic_ismart_client_ng.net.client.api import SaicApiClient
-from saic_ismart_client_ng.net.client.login import SaicLoginClient
+from saic_ismart_client_ng.net.client import SaicApiClient
 
 logger = logging.getLogger(__name__)
 
@@ -29,49 +27,36 @@ class AbstractSaicApi(ABC):
             listener: SaicApiListener = None,
     ):
         self.__configuration = configuration
-        self.__login_client = SaicLoginClient(configuration, listener=listener)
         self.__api_client = SaicApiClient(configuration, listener=listener)
         self.__token_expiration: Optional[datetime.datetime] = None
 
-    @property
-    def configuration(self) -> SaicApiConfiguration:
-        return self.__configuration
-
-    @property
-    def login_client(self) -> SaicLoginClient:
-        return self.__login_client
-
-    @property
-    def api_client(self) -> SaicApiClient:
-        return self.__api_client
-
-    @property
-    def token_expiration(self) -> Optional[datetime.datetime]:
-        return self.__token_expiration
-
     async def login(self) -> LoginResp:
-        url = f"{self.configuration.base_uri}oauth/token"
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json",
+            "Authorization": "Basic c3dvcmQ6c3dvcmRfc2VjcmV0"
         }
         firebase_device_id = "cqSHOMG1SmK4k-fzAeK6hr:APA91bGtGihOG5SEQ9hPx3Dtr9o9mQguNiKZrQzboa-1C_UBlRZYdFcMmdfLvh9Q_xA8A0dGFIjkMhZbdIXOYnKfHCeWafAfLXOrxBS3N18T4Slr-x9qpV6FHLMhE9s7I6s89k9lU7DD"
         form_body = {
             "grant_type": "password",
-            "username": self.configuration.username,
-            "password": sha1_hex_digest(self.configuration.password),
+            "username": self.__configuration.username,
+            "password": sha1_hex_digest(self.__configuration.password),
             "scope": "all",
             "deviceId": f"{firebase_device_id}###europecar",
             "deviceType": "1",  # 2 for huawei
-            "loginType": "2" if self.configuration.username_is_email else "1",
-            "countryCode": "" if self.configuration.username_is_email else self.configuration.phone_country_code,
+            "loginType": "2" if self.__configuration.username_is_email else "1",
+            "countryCode": "" if self.__configuration.username_is_email else self.__configuration.phone_country_code,
         }
 
-        req = httpx.Request("POST", url, data=form_body, headers=headers)
-        response = await self.login_client.client.send(req)
-        result = await self.deserialize(req, response, LoginResp)
+        result = await self.execute_api_call(
+            "POST",
+            "/oauth/token",
+            form_body=form_body,
+            out_type=LoginResp,
+            headers=headers
+        )
         # Update the user token
-        self.api_client.user_token = result.access_token
+        self.__api_client.user_token = result.access_token
         self.__token_expiration = datetime.datetime.now() + datetime.timedelta(seconds=result.expires_in)
         return result
 
@@ -81,15 +66,42 @@ class AbstractSaicApi(ABC):
             path: str,
             *,
             body: Optional[Any] = None,
+            form_body: Optional[Any] = None,
+            out_type: Optional[Type[T]] = None,
+            params: Optional[QueryParamTypes] = None,
+            headers: Optional[HeaderTypes] = None,
+    ) -> Optional[T]:
+        try:
+            return await self.__execute_api_call(
+                method,
+                path,
+                body=body,
+                form_body=form_body,
+                out_type=out_type,
+                params=params,
+                headers=headers
+            )
+        except SaicApiException as e:
+            raise e
+        except Exception as e:
+            raise SaicApiException(f"API call {method} {path} failed unexpectedly", return_code=500) from e
+
+    async def __execute_api_call(
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Optional[Any] = None,
+            form_body: Optional[Any] = None,
             out_type: Optional[Type[T]] = None,
             params: Optional[QueryParamTypes] = None,
             headers: Optional[HeaderTypes] = None,
     ) -> Optional[T]:
         url = f"{self.__configuration.base_uri}{path[1:] if path.startswith('/') else path}"
         json_body = asdict(body) if body else None
-        req = httpx.Request(method, url, params=params, headers=headers, json=json_body)
-        response = await self.api_client.client.send(req)
-        return await self.deserialize(req, response, out_type)
+        req = httpx.Request(method, url, params=params, headers=headers, data=form_body, json=json_body)
+        response = await self.__api_client.send(req)
+        return await self.__deserialize(req, response, out_type)
 
     async def execute_api_call_with_event_id(
             self,
@@ -112,7 +124,7 @@ class AbstractSaicApi(ABC):
         async def execute_api_call_with_event_id_inner(*, event_id: str):
             actual_headers = headers or dict()
             actual_headers.update({'event-id': event_id})
-            return await self.execute_api_call(
+            return await self.__execute_api_call(
                 method,
                 path,
                 body=body,
@@ -123,7 +135,7 @@ class AbstractSaicApi(ABC):
 
         return await execute_api_call_with_event_id_inner(event_id='0')
 
-    async def deserialize(
+    async def __deserialize(
             self,
             request: httpx.Request,
             response: httpx.Response,
@@ -184,23 +196,35 @@ class AbstractSaicApi(ABC):
             if response.is_error:
                 if response.status_code in (401, 403):
                     logger.error(
-                        f"API call failed due to an authentication failure: {response.status_code} {response.text}"
+                        f"API call failed due to an authentication failure: {response.status_code} {response.text}",
+                        exc_info=e
                     )
                     self.logout()
-                    raise SaicLogoutException(response.text, response.status_code)
+                    raise SaicLogoutException(response.text, response.status_code) from e
                 else:
-                    logger.error(f"API call failed: {response.status_code} {response.text}")
-                    raise SaicApiException(response.text, response.status_code)
+                    logger.error(
+                        f"API call failed: {response.status_code} {response.text}",
+                        exc_info=e
+                    )
+                    raise SaicApiException(response.text, response.status_code) from e
             else:
                 raise SaicApiException(f"Failed to deserialize response: {e}. Original json was {response.text}") from e
 
     def logout(self):
-        self.api_client.user_token = None
+        self.__api_client.user_token = None
         self.__token_expiration = None
 
+    @property
     def is_logged_in(self) -> bool:
-        return self.__token_expiration is not None \
-            and self.__token_expiration > datetime.datetime.now()
+        return (
+                self.__api_client.user_token is not None and
+                self.__token_expiration is not None and
+                self.__token_expiration > datetime.datetime.now()
+        )
+
+    @property
+    def token_expiration(self) -> Optional[datetime.datetime]:
+        return self.__token_expiration
 
 
 def saic_api_after_retry(retry_state):
