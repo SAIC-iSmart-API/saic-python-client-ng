@@ -19,8 +19,8 @@ class SaicApiClient:
         self.__configuration = configuration
         self.__listener = listener
         self.__logger = logger
-        self.__user_token = ""
-        self.__class_name = ""
+        self.__user_token: str = ''
+        self.__class_name: str = ''
         self.__client = httpx.AsyncClient(
             event_hooks={
                 "request": [self.__invoke_request_listener, self.__encrypt_request],

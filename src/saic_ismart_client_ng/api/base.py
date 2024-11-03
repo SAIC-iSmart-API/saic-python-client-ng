@@ -211,7 +211,7 @@ class AbstractSaicApi(ABC):
                 raise SaicApiException(f"Failed to deserialize response: {e}. Original json was {response.text}") from e
 
     def logout(self):
-        self.__api_client.user_token = None
+        self.__api_client.user_token = ''
         self.__token_expiration = None
 
     @property

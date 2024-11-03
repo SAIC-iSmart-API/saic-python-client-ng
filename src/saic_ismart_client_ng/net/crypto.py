@@ -59,6 +59,10 @@ def encrypt_request(
         user_token: str = "",
         class_name: str = "",
 ) -> (str, dict):
+    if user_token is None:
+        user_token = ""
+    if class_name is None:
+        class_name = ""
     original_content_type = original_request_headers.get("Content-Type")  # 'application/x-www-form-urlencoded'
     if not original_content_type:
         modified_content_type = "application/json"
