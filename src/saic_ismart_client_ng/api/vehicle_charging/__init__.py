@@ -55,6 +55,14 @@ class SaicVehicleChargingApi(AbstractSaicApi):
         )
         return await self.send_vehicle_charging_control(vin, body)
 
+    async def control_v2x(self, vin: str, *, stop_v2x: bool) -> ChargingControlResp:
+        body = ChargingControlRequest(
+            chrgCtrlReq=0,
+            tboxV2XReq=2 if stop_v2x else 1,
+            tboxEleccLckCtrlReq=0,
+        )
+        return await self.send_vehicle_charging_control(vin, body)
+
     async def send_vehicle_charging_reservation(
             self,
             vin: str,
@@ -170,6 +178,15 @@ class SaicVehicleChargingApi(AbstractSaicApi):
             out_type=ChargingSettingResp
         )
 
+    async def get_vehicle_charging_settings(self, vin: str) -> ChargingSettingResp:
+        body = ChargingSettingRequest(
+            altngChrgCrntReq=0,
+            onBdChrgTrgtSOCReq=0,
+            tboxV2XSpSOCReq=0,
+            vin=sha256_hex_digest(vin)
+        )
+        return await self.send_vehicle_charging_settings(vin, body)
+
     async def set_target_battery_soc(
             self,
             vin: str,
@@ -180,6 +197,19 @@ class SaicVehicleChargingApi(AbstractSaicApi):
             onBdChrgTrgtSOCReq=target_soc.value,
             altngChrgCrntReq=charge_current_limit.value,
             tboxV2XSpSOCReq=0,
+            vin=sha256_hex_digest(vin)
+        )
+        return await self.send_vehicle_charging_settings(vin, body)
+
+    async def set_v2x_target_battery_soc(
+            self,
+            vin: str,
+            target_soc: TargetBatteryCode
+    ) -> ChargingSettingResp:
+        body = ChargingSettingRequest(
+            onBdChrgTrgtSOCReq=0,
+            altngChrgCrntReq=0,
+            tboxV2XSpSOCReq=target_soc.value,
             vin=sha256_hex_digest(vin)
         )
         return await self.send_vehicle_charging_settings(vin, body)

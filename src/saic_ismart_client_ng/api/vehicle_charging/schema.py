@@ -104,6 +104,7 @@ class ChargingStopReason(Enum):
 
 
 class TargetBatteryCode(Enum):
+    P_IGNORE = 0
     P_40 = 1
     P_50 = 2
     P_60 = 3
@@ -258,6 +259,14 @@ class ChrgMgmtData:
             return None
 
     @property
+    def charge_current_limit(self) -> Optional[ChargeCurrentLimitCode]:
+        raw_charge_current_limit = self.bmsAltngChrgCrntDspCmd
+        try:
+            return ChargeCurrentLimitCode(raw_charge_current_limit)
+        except ValueError:
+            return None
+
+    @property
     def is_battery_heating(self) -> bool:
         return self.bmsPTCHeatReqDspCmd == 1
 
@@ -349,6 +358,30 @@ class ChargingSettingResp:
     def rvc_req_sts_decoded(self) -> Optional[bytes]:
         return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
 
+    @property
+    def charge_target_soc(self) -> Optional[TargetBatteryCode]:
+        raw_target_soc = self.bmsOnBdChrgTrgtSOCDspCmd
+        try:
+            return TargetBatteryCode(raw_target_soc)
+        except ValueError:
+            return None
+
+    @property
+    def charge_current_limit(self) -> Optional[ChargeCurrentLimitCode]:
+        raw_charge_current_limit = self.bmsAltngChrgCrntDspCmd
+        try:
+            return ChargeCurrentLimitCode(raw_charge_current_limit)
+        except ValueError:
+            return None
+
+    @property
+    def v2x_target_soc(self) -> Optional[TargetBatteryCode]:
+        raw_target_soc = self.imcuDschrgTrgtSOCDspCmd
+        try:
+            return TargetBatteryCode(raw_target_soc)
+        except ValueError:
+            return None
+
 
 @dataclass
 class ScheduledChargingRequest:
@@ -398,6 +431,7 @@ class ChrgPtcHeatResp:
         if self.ptcHeatResp is not None:
             return HeatingStopReason.to_code(self.ptcHeatResp)
         return None
+
 
 @dataclass
 class ChargingControlRequest:
@@ -472,6 +506,22 @@ class ChargingControlResp:
     @property
     def charge_target_soc(self) -> Optional[TargetBatteryCode]:
         raw_target_soc = self.bmsOnBdChrgTrgtSOCDspCmd
+        try:
+            return TargetBatteryCode(raw_target_soc)
+        except ValueError:
+            return None
+
+    @property
+    def charge_current_limit(self) -> Optional[ChargeCurrentLimitCode]:
+        raw_charge_current_limit = self.bmsAltngChrgCrntDspCmd
+        try:
+            return ChargeCurrentLimitCode(raw_charge_current_limit)
+        except ValueError:
+            return None
+
+    @property
+    def v2x_target_soc(self) -> Optional[TargetBatteryCode]:
+        raw_target_soc = self.imcuDschrgTrgtSOCDspCmd
         try:
             return TargetBatteryCode(raw_target_soc)
         except ValueError:
