@@ -70,6 +70,7 @@ class AbstractSaicApi(ABC):
             out_type: Optional[Type[T]] = None,
             params: Optional[QueryParamTypes] = None,
             headers: Optional[HeaderTypes] = None,
+            allow_null_body: bool = False,
     ) -> Optional[T]:
         try:
             return await self.__execute_api_call(
@@ -79,7 +80,8 @@ class AbstractSaicApi(ABC):
                 form_body=form_body,
                 out_type=out_type,
                 params=params,
-                headers=headers
+                headers=headers,
+                allow_null_body=allow_null_body
             )
         except SaicApiException as e:
             raise e
@@ -96,12 +98,13 @@ class AbstractSaicApi(ABC):
             out_type: Optional[Type[T]] = None,
             params: Optional[QueryParamTypes] = None,
             headers: Optional[HeaderTypes] = None,
+            allow_null_body: bool = False,
     ) -> Optional[T]:
         url = f"{self.__configuration.base_uri}{path[1:] if path.startswith('/') else path}"
         json_body = asdict(body) if body else None
         req = httpx.Request(method, url, params=params, headers=headers, data=form_body, json=json_body)
         response = await self.__api_client.send(req)
-        return await self.__deserialize(req, response, out_type)
+        return await self.__deserialize(req, response, out_type, allow_null_body)
 
     async def execute_api_call_with_event_id(
             self,
@@ -139,7 +142,8 @@ class AbstractSaicApi(ABC):
             self,
             request: httpx.Request,
             response: httpx.Response,
-            data_class: Optional[Type[T]]
+            data_class: Optional[Type[T]],
+            allow_null_body: bool
     ) -> Optional[T]:
 
         try:
@@ -187,6 +191,8 @@ class AbstractSaicApi(ABC):
                     return json_data['data']
                 else:
                     return dacite.from_dict(data_class, json_data['data'])
+            elif allow_null_body:
+                return None
             else:
                 raise SaicApiException(f"Failed to deserialize response, missing 'data' field: {response.text}")
 

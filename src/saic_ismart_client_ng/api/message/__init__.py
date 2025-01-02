@@ -5,16 +5,16 @@ from saic_ismart_client_ng.api.message.schema import MessageResp, UpateMessageRe
 
 
 class SaicMessageApi(AbstractSaicApi):
-    async def get_alarm_list(self, *, page_num: int, page_size: int) -> MessageResp:
+    async def get_alarm_list(self, *, page_num: int, page_size: int) -> Optional[MessageResp]:
         return await self.get_message_list(page_num=page_num, page_size=page_size, message_group='ALARM')
 
-    async def get_command_list(self, *, page_num: int, page_size: int) -> MessageResp:
+    async def get_command_list(self, *, page_num: int, page_size: int) -> Optional[MessageResp]:
         return await self.get_message_list(page_num=page_num, page_size=page_size, message_group='COMMAND')
 
-    async def get_news_list(self, *, page_num: int, page_size: int) -> MessageResp:
+    async def get_news_list(self, *, page_num: int, page_size: int) -> Optional[MessageResp]:
         return await self.get_message_list(page_num=page_num, page_size=page_size, message_group='NEWS')
 
-    async def get_message_list(self, *, page_num: int, page_size: int, message_group: str) -> MessageResp:
+    async def get_message_list(self, *, page_num: int, page_size: int, message_group: str) -> Optional[MessageResp]:
         return await self.execute_api_call(
             "GET",
             "/message/list",
@@ -23,7 +23,8 @@ class SaicMessageApi(AbstractSaicApi):
                 "pageSize": page_size,
                 "messageGroup": message_group,
             },
-            out_type=MessageResp
+            out_type=MessageResp,
+            allow_null_body=True
         )
 
     async def delete_all_alarms(self):
@@ -55,9 +56,10 @@ class SaicMessageApi(AbstractSaicApi):
             body=data,
         )
 
-    async def get_unread_messages_count(self) -> MessageResp:
+    async def get_unread_messages_count(self) -> Optional[MessageResp]:
         return await self.execute_api_call(
             "GET",
             "/message/unreadCount",
-            out_type=MessageResp
+            out_type=MessageResp,
+            allow_null_body=True
         )
