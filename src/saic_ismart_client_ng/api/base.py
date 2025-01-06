@@ -57,7 +57,7 @@ class AbstractSaicApi(ABC):
         )
         # Update the user token
         self.__api_client.user_token = result.access_token
-        self.__token_expiration = datetime.datetime.now() + datetime.timedelta(seconds=result.expires_in)
+        self.__token_expiration = datetime.datetime.now() + datetime.timedelta(milliseconds=result.expires_in)
         return result
 
     async def execute_api_call(
