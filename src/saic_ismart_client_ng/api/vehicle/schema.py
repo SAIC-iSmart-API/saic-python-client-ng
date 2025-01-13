@@ -116,14 +116,6 @@ class VehicleStatusResp:
     statusTime: int = None
 
     @property
-    def is_charging(self) -> bool:
-        return (
-                self.basicVehicleStatus and
-                self.basicVehicleStatus.extendedData2
-                and self.basicVehicleStatus.extendedData2 >= 1
-        )
-
-    @property
     def is_parked(self) -> bool:
         return (
                 self.basicVehicleStatus.engineStatus != 1
