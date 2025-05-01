@@ -7,9 +7,9 @@ LOGGER = logging.getLogger(__name__)
 
 # FIXME: The API returns date-times inconsistently. This is terrible a workaround.
 MESSAGE_DATE_TIME_FORMATS = [
-    '%Y-%m-%d %H:%M:%S',
-    '%d-%m-%Y %H:%M:%S',
-    '%d/%m/%Y %H:%M:%S',
+    "%Y-%m-%d %H:%M:%S",
+    "%d-%m-%Y %H:%M:%S",
+    "%d/%m/%Y %H:%M:%S",
 ]
 
 
@@ -33,26 +33,33 @@ class MessageEntity:
         if self.messageTime:
             for date_format in MESSAGE_DATE_TIME_FORMATS:
                 try:
-                    parsed_date = datetime.datetime.strptime(self.messageTime, date_format)
+                    parsed_date = datetime.datetime.strptime(
+                        self.messageTime, date_format
+                    )
                     return parsed_date
                 except ValueError:
                     pass
-            LOGGER.error('Could not parse messageTime \'%s\'. This is a bug. Please file a ticket', self.messageTime)
+            LOGGER.error(
+                "Could not parse messageTime '%s'. This is a bug. Please file a ticket",
+                self.messageTime,
+            )
         return datetime.datetime.now()
 
     @property
     def read_status(self) -> str:
         if self.readStatus is None:
-            return 'unknown'
+            return "unknown"
         elif self.readStatus == 0:
-            return 'unread'
+            return "unread"
         else:
-            return 'read'
+            return "read"
 
     @property
     def details(self) -> str:
-        return f'ID: {self.messageId}, Time: {self.message_time}, Type: {self.messageType}, Title: {self.title}, ' \
-            + f'Content: {self.content}, Status: {self.read_status}, Sender: {self.sender}, VIN: {self.vin}'
+        return (
+            f"ID: {self.messageId}, Time: {self.message_time}, Type: {self.messageType}, Title: {self.title}, "
+            + f"Content: {self.content}, Status: {self.read_status}, Sender: {self.sender}, VIN: {self.vin}"
+        )
 
 
 @dataclass

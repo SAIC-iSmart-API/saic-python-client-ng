@@ -24,11 +24,13 @@ def md5_hex_digest(content, do_padding):
             if v1 < 16:
                 hex_string += "0"
 
-            hex_string += format(v1, 'x')
+            hex_string += format(v1, "x")
 
         return hex_string
     except Exception as e:
-        logger.error("Could not compute md5 hex digest for input string=%s", content, exc_info=e)
+        logger.error(
+            "Could not compute md5 hex digest for input string=%s", content, exc_info=e
+        )
         return None
 
 
@@ -38,7 +40,9 @@ def sha1_hex_digest(content):
         message_digest.update(content.encode())
         return message_digest.hexdigest()
     except Exception as e:
-        logger.error("Could not compute sha1 hex digest for input string=%s", content, exc_info=e)
+        logger.error(
+            "Could not compute sha1 hex digest for input string=%s", content, exc_info=e
+        )
         raise RuntimeError(e)
 
 
@@ -48,7 +52,11 @@ def sha256_hex_digest(content):
         message_digest.update(content.encode())
         return message_digest.hexdigest()
     except Exception as e:
-        logger.error("Could not compute sha256 hex digest for input string=%s", content, exc_info=e)
+        logger.error(
+            "Could not compute sha256 hex digest for input string=%s",
+            content,
+            exc_info=e,
+        )
         raise RuntimeError(e)
 
 
@@ -58,9 +66,9 @@ def encrypt_aes_cbc_pkcs5_padding(content, key, iv):
             key_bytes = unhexlify(key)
             iv_bytes = unhexlify(iv)
             cipher = AES.new(key_bytes, AES.MODE_CBC, iv_bytes)
-            padded_content = pad(content.encode('utf-8'), AES.block_size)
+            padded_content = pad(content.encode("utf-8"), AES.block_size)
             encrypted_content = cipher.encrypt(padded_content)
-            return hexlify(encrypted_content).decode('utf-8')
+            return hexlify(encrypted_content).decode("utf-8")
         except Exception as e:
             logger.error("Could not encrypt content=%s", content, exc_info=e)
             raise RuntimeError(e)
@@ -77,7 +85,7 @@ def decrypt_aes_cbc_pkcs5_padding(cypher_text, key, iv):
             cipher = AES.new(key_bytes, AES.MODE_CBC, iv_bytes)
             decrypted_text = unpad(cipher.decrypt(cypher_text_bytes), AES.block_size)
 
-            return decrypted_text.decode('utf-8')
+            return decrypted_text.decode("utf-8")
         except Exception as exception0:
             raise RuntimeError(exception0)
 

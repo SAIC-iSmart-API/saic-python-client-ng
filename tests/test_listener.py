@@ -10,7 +10,7 @@ def api_listener():
 
 @pytest.mark.asyncio
 async def test_on_request(api_listener, mocker):
-    mocker.patch.object(api_listener, 'on_request')
+    mocker.patch.object(api_listener, "on_request")
     path = "/test/path"
     body = "test body"
     headers = {"Content-Type": "application/json"}
@@ -21,7 +21,7 @@ async def test_on_request(api_listener, mocker):
 
 @pytest.mark.asyncio
 async def test_on_response(api_listener, mocker):
-    mocker.patch.object(api_listener, 'on_response')
+    mocker.patch.object(api_listener, "on_response")
     path = "/test/path"
     body = "test body"
     headers = {"Content-Type": "application/json"}

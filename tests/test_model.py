@@ -12,7 +12,7 @@ class TestSaicApiConfiguration(unittest.TestCase):
             "https://test-uri.com",
             "123456",
             "test_region",
-            5.0
+            5.0,
         )
 
     def test_username(self):
@@ -40,6 +40,5 @@ class TestSaicApiConfiguration(unittest.TestCase):
         self.assertEqual(self.config.sms_delivery_delay, 5.0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-

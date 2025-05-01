@@ -15,6 +15,6 @@ class SaicApi(
     SaicVehicleLocksApi,
     SaicVehicleWindowsApi,
     SaicVehicleClimateApi,
-    SaicVehicleChargingApi
+    SaicVehicleChargingApi,
 ):
-    """ The SAIC Api client """
+    """The SAIC Api client"""

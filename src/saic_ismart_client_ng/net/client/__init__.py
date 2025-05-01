@@ -6,33 +6,33 @@ from httpx import Request, Response
 
 from saic_ismart_client_ng.listener import SaicApiListener
 from saic_ismart_client_ng.model import SaicApiConfiguration
-from saic_ismart_client_ng.net.httpx import decrypt_httpx_response, encrypt_httpx_request
+from saic_ismart_client_ng.net.httpx import (
+    decrypt_httpx_response,
+    encrypt_httpx_request,
+)
 from typing import Optional
 
 
 class SaicApiClient:
     def __init__(
-            self,
-            configuration: SaicApiConfiguration,
-            listener: Optional[SaicApiListener] = None,
-            logger: logging.Logger = logging.getLogger(__name__)
+        self,
+        configuration: SaicApiConfiguration,
+        listener: Optional[SaicApiListener] = None,
+        logger: logging.Logger = logging.getLogger(__name__),
     ):
         self.__configuration = configuration
         self.__listener = listener
         self.__logger = logger
-        self.__user_token: str = ''
-        self.__class_name: str = ''
+        self.__user_token: str = ""
+        self.__class_name: str = ""
         self.__client = httpx.AsyncClient(
             event_hooks={
                 "request": [self.__invoke_request_listener, self.__encrypt_request],
-                "response": [decrypt_httpx_response, self.__invoke_response_listener]
+                "response": [decrypt_httpx_response, self.__invoke_response_listener],
             }
         )
 
-    async def send(
-            self,
-            request: Request
-    ) -> Response:
+    async def send(self, request: Request) -> Response:
         return await self.__client.send(request)
 
     @property
@@ -50,10 +50,11 @@ class SaicApiClient:
             body = None
             if request.content:
                 try:
-
                     body = request.content.decode("utf-8")
                 except Exception as e:
-                    self.__logger.warning(f"Error decoding request content: {e}", exc_info=e)
+                    self.__logger.warning(
+                        f"Error decoding request content: {e}", exc_info=e
+                    )
 
             await self.__listener.on_request(
                 path=str(request.url).replace(self.__configuration.base_uri, "/"),
@@ -73,7 +74,9 @@ class SaicApiClient:
                 try:
                     decoded_body = body.decode("utf-8")
                 except Exception as e:
-                    self.__logger.warning(f"Error decoding request content: {e}", exc_info=e)
+                    self.__logger.warning(
+                        f"Error decoding request content: {e}", exc_info=e
+                    )
 
             await self.__listener.on_response(
                 path=str(response.url).replace(self.__configuration.base_uri, "/"),
@@ -91,5 +94,5 @@ class SaicApiClient:
             region=self.__configuration.region,
             tenant_id=self.__configuration.tenant_id,
             user_token=self.user_token,
-            class_name=self.__class_name
+            class_name=self.__class_name,
         )

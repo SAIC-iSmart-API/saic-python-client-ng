@@ -32,7 +32,7 @@ class ChargeCurrentLimitCode(Enum):
             case "MAX":
                 return ChargeCurrentLimitCode.C_MAX
             case _:
-                raise ValueError(f'Unknown charge current limit: {limit}')
+                raise ValueError(f"Unknown charge current limit: {limit}")
 
     @property
     def limit(self) -> str:
@@ -46,7 +46,7 @@ class ChargeCurrentLimitCode(Enum):
             case ChargeCurrentLimitCode.C_MAX:
                 return "Max"
             case _:
-                raise ValueError(f'Unknown charge current limit code: {self}')
+                raise ValueError(f"Unknown charge current limit code: {self}")
 
 
 class BmsChargingStatusCode(Enum):
@@ -134,7 +134,7 @@ class TargetBatteryCode(Enum):
             case TargetBatteryCode.P_100:
                 return 100
             case _:
-                raise ValueError(f'Unknown target battery code: {self}')
+                raise ValueError(f"Unknown target battery code: {self}")
 
     @staticmethod
     def from_percentage(percentage: int):
@@ -154,7 +154,7 @@ class TargetBatteryCode(Enum):
             case 100:
                 return TargetBatteryCode.P_100
             case _:  # default
-                raise ValueError(f'Unknown target battery percentage: {percentage}')
+                raise ValueError(f"Unknown target battery percentage: {percentage}")
 
 
 @dataclass
@@ -243,7 +243,9 @@ class ChrgMgmtData:
 
     @property
     def decoded_current(self) -> float | None:
-        return self.bmsPackCrnt * 0.05 - 1000.0 if self.bmsPackCrnt is not None else None
+        return (
+            self.bmsPackCrnt * 0.05 - 1000.0 if self.bmsPackCrnt is not None else None
+        )
 
     @property
     def decoded_voltage(self) -> float | None:
@@ -251,7 +253,11 @@ class ChrgMgmtData:
 
     @property
     def decoded_power(self) -> float | None:
-        return self.decoded_current * self.decoded_voltage / 1000.0 if self.decoded_current is not None and self.decoded_voltage is not None else None
+        return (
+            self.decoded_current * self.decoded_voltage / 1000.0
+            if self.decoded_current is not None and self.decoded_voltage is not None
+            else None
+        )
 
     @property
     def charge_target_soc(self) -> Optional[TargetBatteryCode]:
@@ -359,7 +365,7 @@ class ChargingSettingResp:
 
     @property
     def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+        return decode_bytes(input_value=self.rvcReqSts, field_name="rvcReqSts")
 
     @property
     def charge_target_soc(self) -> Optional[TargetBatteryCode]:
@@ -410,7 +416,7 @@ class ScheduledChargingResp:
 
     @property
     def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+        return decode_bytes(input_value=self.rvcReqSts, field_name="rvcReqSts")
 
 
 @dataclass
@@ -427,7 +433,7 @@ class ChrgPtcHeatResp:
 
     @property
     def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+        return decode_bytes(input_value=self.rvcReqSts, field_name="rvcReqSts")
 
     @property
     def heating_stop_reason(self) -> HeatingStopReason | None:
@@ -504,7 +510,7 @@ class ChargingControlResp:
 
     @property
     def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+        return decode_bytes(input_value=self.rvcReqSts, field_name="rvcReqSts")
 
     @property
     def charge_target_soc(self) -> Optional[TargetBatteryCode]:

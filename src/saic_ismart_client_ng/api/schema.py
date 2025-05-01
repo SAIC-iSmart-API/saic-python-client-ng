@@ -7,9 +7,9 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class LoginResp():
+class LoginResp:
     @dataclass
-    class LoginRespDetail():
+    class LoginRespDetail:
         languageType: Optional[str] = None
 
     access_token: Optional[str] = None
