@@ -80,3 +80,6 @@ ignore_errors = true
 
 [tool.ruff]
 output-format = "github"
+
+[tool.mypy]
+files = ["./src", "./tests"]

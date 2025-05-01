@@ -74,7 +74,7 @@ def encrypt_request(
     request_path = str(original_request_url).replace(base_uri, "/")
     request_body = original_request_content
     new_content = original_request_content
-    if request_body and "multipart" not in original_content_type:
+    if request_body and (not original_content_type or "multipart" not in original_content_type):
         modified_content_type = normalize_content_type(original_content_type)
         request_content = request_body.strip()
         if request_content:
