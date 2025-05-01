@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import unittest
 
@@ -7,8 +9,8 @@ from saic_ismart_client_ng.api.vehicle_charging import ChrgMgmtDataResp
 
 
 class TestChargeInfoResp(unittest.TestCase):
-    def test_decode_from_json(self):
-        as_json = '''{
+    def test_decode_from_json(self) -> None:
+        as_json = """{
           "chrgMgmtData": {
             "bmsChrgSts": 1,
             "bmsPackVol": 1649,
@@ -71,11 +73,11 @@ class TestChargeInfoResp(unittest.TestCase):
             "mileageSinceLastCharge": 0,
             "powerUsageSinceLastCharge": 0
           }
-        }'''
+        }"""
         as_dict = json.loads(as_json)
         decoded = dacite.from_dict(ChrgMgmtDataResp, as_dict)
-        self.assertIsNotNone(decoded)
+        assert decoded is not None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

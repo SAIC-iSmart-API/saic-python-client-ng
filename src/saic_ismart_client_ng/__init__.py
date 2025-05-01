@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 from saic_ismart_client_ng.api.message import SaicMessageApi
 from saic_ismart_client_ng.api.user import SaicUserApi
-from saic_ismart_client_ng.api.vehicle import SaicVehicleApi as SaicVehicleApi
 from saic_ismart_client_ng.api.vehicle.alarm import SaicVehicleAlarmApi
 from saic_ismart_client_ng.api.vehicle.climate import SaicVehicleClimateApi
 from saic_ismart_client_ng.api.vehicle.locks import SaicVehicleLocksApi
@@ -15,6 +16,6 @@ class SaicApi(
     SaicVehicleLocksApi,
     SaicVehicleWindowsApi,
     SaicVehicleClimateApi,
-    SaicVehicleChargingApi
+    SaicVehicleChargingApi,
 ):
-    """ The SAIC Api client """
+    """The SAIC Api client."""

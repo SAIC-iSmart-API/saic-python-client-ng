@@ -1,10 +1,14 @@
-import datetime
-from dataclasses import dataclass
-from enum import Enum
-from typing import Optional
+from __future__ import annotations
 
-from saic_ismart_client_ng.api.schema import GpsPosition
+from dataclasses import dataclass
+import datetime
+from enum import Enum
+from typing import TYPE_CHECKING
+
 from saic_ismart_client_ng.api.serialization_utils import decode_bytes
+
+if TYPE_CHECKING:
+    from saic_ismart_client_ng.api.schema import GpsPosition
 
 
 class ScheduledChargingMode(Enum):
@@ -21,7 +25,7 @@ class ChargeCurrentLimitCode(Enum):
     C_MAX = 4
 
     @staticmethod
-    def to_code(limit: str):
+    def to_code(limit: str) -> ChargeCurrentLimitCode:
         match limit.upper():
             case "6A":
                 return ChargeCurrentLimitCode.C_6A
@@ -32,7 +36,8 @@ class ChargeCurrentLimitCode(Enum):
             case "MAX":
                 return ChargeCurrentLimitCode.C_MAX
             case _:
-                raise ValueError(f'Unknown charge current limit: {limit}')
+                msg = f"Unknown charge current limit: {limit}"
+                raise ValueError(msg)
 
     @property
     def limit(self) -> str:
@@ -46,7 +51,8 @@ class ChargeCurrentLimitCode(Enum):
             case ChargeCurrentLimitCode.C_MAX:
                 return "Max"
             case _:
-                raise ValueError(f'Unknown charge current limit code: {self}')
+                msg = f"Unknown charge current limit code: {self}"
+                raise ValueError(msg)
 
 
 class BmsChargingStatusCode(Enum):
@@ -65,7 +71,7 @@ class BmsChargingStatusCode(Enum):
     CHARGING_12 = 12
 
     @staticmethod
-    def to_code(code: int):
+    def to_code(code: int) -> BmsChargingStatusCode | None:
         try:
             return BmsChargingStatusCode(code)
         except ValueError:
@@ -73,14 +79,17 @@ class BmsChargingStatusCode(Enum):
 
 
 class HeatingStopReason(Enum):
+    NO_REASON = 0
+    UNKNOWN_1 = 1
     LOW_BATTERY = 2
     REACHED_STOP_CONDITION = 3
     UNNECESSARY = 4
     REACHED_STOP_TIME = 5
+    UNKNOWN_6 = 6
     HEATING_SYSTEM_FAILURE = 7
 
     @staticmethod
-    def to_code(code: int):
+    def to_code(code: int) -> HeatingStopReason | None:
         try:
             return HeatingStopReason(code)
         except ValueError:
@@ -96,7 +105,7 @@ class ChargingStopReason(Enum):
     OTHER_REASON = 5
 
     @staticmethod
-    def to_code(code: int):
+    def to_code(code: int) -> ChargingStopReason:
         try:
             return ChargingStopReason(code)
         except ValueError:
@@ -114,7 +123,8 @@ class TargetBatteryCode(Enum):
     P_100 = 7
 
     @property
-    def percentage(self) -> int:
+    # pylint: disable=too-many-return-statements
+    def percentage(self) -> int:  # noqa: PLR0911
         match self:
             case TargetBatteryCode.P_40:
                 return 40
@@ -131,10 +141,12 @@ class TargetBatteryCode(Enum):
             case TargetBatteryCode.P_100:
                 return 100
             case _:
-                raise ValueError(f'Unknown target battery code: {self}')
+                msg = f"Unknown target battery code: {self}"
+                raise ValueError(msg)
 
     @staticmethod
-    def from_percentage(percentage: int):
+    # pylint: disable=too-many-return-statements
+    def from_percentage(percentage: int) -> TargetBatteryCode:  # noqa: PLR0911
         match percentage:
             case 40:
                 return TargetBatteryCode.P_40
@@ -151,107 +163,117 @@ class TargetBatteryCode(Enum):
             case 100:
                 return TargetBatteryCode.P_100
             case _:  # default
-                raise ValueError(f'Unknown target battery percentage: {percentage}')
+                msg = f"Unknown target battery percentage: {percentage}"
+                raise ValueError(msg)
 
 
 @dataclass
 class ChargingStatus:
-    chargingCurrent: int = None
-    chargingDuration: int = None
-    chargingElectricityPhase: int = None
-    chargingGunState: int = None
-    chargingPileID: str = None
-    chargingPileSupplier: str = None
-    chargingState: int = None
-    chargingTimeLevelPrc: int = None
-    chargingType: int = None
-    chargingVoltage: int = None
-    endTime: int = None
-    fotaLowestVoltage: int = None
-    fuelRangeElec: int = None
-    lastChargeEndingPower: int = None
-    mileage: int = None
-    mileageOfDay: int = None
-    mileageSinceLastCharge: int = None
-    powerLevelPrc: int = None
-    powerUsageOfDay: int = None
-    powerUsageSinceLastCharge: int = None
-    realtimePower: int = None
-    startTime: int = None
-    staticEnergyConsumption: int = None
-    totalBatteryCapacity: int = None
-    workingCurrent: int = None
-    workingVoltage: int = None
+    chargingCurrent: int | None = None
+    chargingDuration: int | None = None
+    chargingElectricityPhase: int | None = None
+    chargingGunState: int | None = None
+    chargingPileID: str | None = None
+    chargingPileSupplier: str | None = None
+    chargingState: int | None = None
+    chargingTimeLevelPrc: int | None = None
+    chargingType: int | None = None
+    chargingVoltage: int | None = None
+    endTime: int | None = None
+    fotaLowestVoltage: int | None = None
+    fuelRangeElec: int | None = None
+    lastChargeEndingPower: int | None = None
+    mileage: int | None = None
+    mileageOfDay: int | None = None
+    mileageSinceLastCharge: int | None = None
+    powerLevelPrc: int | None = None
+    powerUsageOfDay: int | None = None
+    powerUsageSinceLastCharge: int | None = None
+    realtimePower: int | None = None
+    startTime: int | None = None
+    staticEnergyConsumption: int | None = None
+    totalBatteryCapacity: int | None = None
+    workingCurrent: int | None = None
+    workingVoltage: int | None = None
 
 
 @dataclass
 class ChargeStatusResp:
-    chargingStatus: ChargingStatus = None
-    gpsPosition: GpsPosition = None
-    statusTime: int = None
+    # pylint: disable=import-outside-toplevel
+    from saic_ismart_client_ng.api.schema import GpsPosition
+
+    chargingStatus: ChargingStatus | None = None
+    gpsPosition: GpsPosition | None = None
+    statusTime: int | None = None
 
 
 @dataclass
 class ChrgMgmtData:
-    bmsAdpPubChrgSttnDspCmd: int = None
-    bmsAltngChrgCrntDspCmd: int = None
-    bmsChrgCtrlDspCmd: int = None
-    bmsChrgOtptCrntReq: int = None
-    bmsChrgOtptCrntReqV: Optional[int] = None
-    bmsChrgSpRsn: int = None
-    bmsChrgSts: int = None
-    bmsDsChrgSpRsn: Optional[int] = None
-    bmsEstdElecRng: int = None
-    bmsOnBdChrgTrgtSOCDspCmd: int = None
-    bmsPackCrnt: int = None
-    bmsPackCrntV: Optional[int] = None
-    bmsPackSOCDsp: int = None
-    bmsPackVol: int = None
-    bmsPTCHeatReqDspCmd: int = None
-    bmsPTCHeatResp: Optional[int] = None
-    bmsPTCHeatSpRsn: Optional[int] = None
-    bmsReserCtrlDspCmd: int = None
-    bmsReserSpHourDspCmd: int = None
-    bmsReserSpMintueDspCmd: int = None
-    bmsReserStHourDspCmd: int = None
-    bmsReserStMintueDspCmd: int = None
-    ccuEleccLckCtrlDspCmd: Optional[int] = None
-    ccuOffBdChrgrPlugOn: Optional[int] = None
-    ccuOnbdChrgrPlugOn: Optional[int] = None
-    chrgngAddedElecRng: Optional[int] = None
-    chrgngAddedElecRngV: Optional[int] = None
-    chrgngDoorOpenCnd: Optional[int] = None
-    chrgngDoorPosSts: Optional[int] = None
-    chrgngRmnngTime: int = None
-    chrgngRmnngTimeV: int = None
-    chrgngSpdngTime: Optional[int] = None
-    chrgngSpdngTimeV: Optional[int] = None
-    clstrElecRngToEPT: int = None
-    disChrgngRmnngTime: Optional[int] = None
-    disChrgngRmnngTimeV: Optional[int] = None
-    imcuChrgngEstdElecRng: Optional[int] = None
-    imcuChrgngEstdElecRngV: Optional[int] = None
-    imcuDschrgngEstdElecRng: Optional[int] = None
-    imcuDschrgngEstdElecRngV: Optional[int] = None
-    imcuVehElecRng: Optional[int] = None
-    imcuVehElecRngV: Optional[int] = None
-    onBdChrgrAltrCrntInptCrnt: Optional[int] = None
-    onBdChrgrAltrCrntInptVol: Optional[int] = None
+    bmsAdpPubChrgSttnDspCmd: int | None = None
+    bmsAltngChrgCrntDspCmd: int | None = None
+    bmsChrgCtrlDspCmd: int | None = None
+    bmsChrgOtptCrntReq: int | None = None
+    bmsChrgOtptCrntReqV: int | None = None
+    bmsChrgSpRsn: int | None = None
+    bmsChrgSts: int | None = None
+    bmsDsChrgSpRsn: int | None = None
+    bmsEstdElecRng: int | None = None
+    bmsOnBdChrgTrgtSOCDspCmd: int | None = None
+    bmsPackCrnt: int | None = None
+    bmsPackCrntV: int | None = None
+    bmsPackSOCDsp: int | None = None
+    bmsPackVol: int | None = None
+    bmsPTCHeatReqDspCmd: int | None = None
+    bmsPTCHeatResp: int | None = None
+    bmsPTCHeatSpRsn: int | None = None
+    bmsReserCtrlDspCmd: int | None = None
+    bmsReserSpHourDspCmd: int | None = None
+    bmsReserSpMintueDspCmd: int | None = None
+    bmsReserStHourDspCmd: int | None = None
+    bmsReserStMintueDspCmd: int | None = None
+    ccuEleccLckCtrlDspCmd: int | None = None
+    ccuOffBdChrgrPlugOn: int | None = None
+    ccuOnbdChrgrPlugOn: int | None = None
+    chrgngAddedElecRng: int | None = None
+    chrgngAddedElecRngV: int | None = None
+    chrgngDoorOpenCnd: int | None = None
+    chrgngDoorPosSts: int | None = None
+    chrgngRmnngTime: int | None = None
+    chrgngRmnngTimeV: int | None = None
+    chrgngSpdngTime: int | None = None
+    chrgngSpdngTimeV: int | None = None
+    clstrElecRngToEPT: int | None = None
+    disChrgngRmnngTime: int | None = None
+    disChrgngRmnngTimeV: int | None = None
+    imcuChrgngEstdElecRng: int | None = None
+    imcuChrgngEstdElecRngV: int | None = None
+    imcuDschrgngEstdElecRng: int | None = None
+    imcuDschrgngEstdElecRngV: int | None = None
+    imcuVehElecRng: int | None = None
+    imcuVehElecRngV: int | None = None
+    onBdChrgrAltrCrntInptCrnt: int | None = None
+    onBdChrgrAltrCrntInptVol: int | None = None
 
     @property
-    def decoded_current(self) -> float:
-        return self.bmsPackCrnt * 0.05 - 1000.0
+    def decoded_current(self) -> float | None:
+        return (
+            self.bmsPackCrnt * 0.05 - 1000.0 if self.bmsPackCrnt is not None else None
+        )
 
     @property
-    def decoded_voltage(self) -> float:
-        return self.bmsPackVol * 0.25
+    def decoded_voltage(self) -> float | None:
+        return self.bmsPackVol * 0.25 if self.bmsPackVol is not None else None
 
     @property
-    def decoded_power(self) -> float:
-        return self.decoded_current * self.decoded_voltage / 1000.0
+    def decoded_power(self) -> float | None:
+        return (
+            self.decoded_current * self.decoded_voltage / 1000.0
+            if self.decoded_current is not None and self.decoded_voltage is not None
+            else None
+        )
 
     @property
-    def charge_target_soc(self) -> Optional[TargetBatteryCode]:
+    def charge_target_soc(self) -> TargetBatteryCode | None:
         raw_target_soc = self.bmsOnBdChrgTrgtSOCDspCmd
         try:
             return TargetBatteryCode(raw_target_soc)
@@ -259,7 +281,7 @@ class ChrgMgmtData:
             return None
 
     @property
-    def charge_current_limit(self) -> Optional[ChargeCurrentLimitCode]:
+    def charge_current_limit(self) -> ChargeCurrentLimitCode | None:
         raw_charge_current_limit = self.bmsAltngChrgCrntDspCmd
         try:
             return ChargeCurrentLimitCode(raw_charge_current_limit)
@@ -276,9 +298,7 @@ class ChrgMgmtData:
 
     @property
     def is_bms_charging(self) -> bool:
-        if self.bmsChrgSts is not None and self.bmsChrgSts in (1, 3, 10, 12):
-            return True
-        return False
+        return bool(self.bmsChrgSts is not None and self.bmsChrgSts in (1, 3, 10, 12))
 
     @property
     def bms_charging_status(self) -> BmsChargingStatusCode | None:
@@ -294,72 +314,72 @@ class ChrgMgmtData:
 
     @property
     def heating_stop_reason(self) -> HeatingStopReason | None:
-        if self.bmsPTCHeatSpRsn is not None:
+        if self.bmsPTCHeatResp is not None:
             return HeatingStopReason.to_code(self.bmsPTCHeatResp)
         return None
 
 
 @dataclass
 class RvsChargeStatus:
-    chargingDuration: Optional[int] = None
-    chargingElectricityPhase: Optional[int] = None
-    chargingGunState: int = None
-    chargingPileID: Optional[str] = None
-    chargingPileSupplier: Optional[str] = None
-    chargingType: int = None
-    endTime: Optional[int] = None
-    extendedData1: Optional[int] = None
-    extendedData2: Optional[int] = None
-    extendedData3: Optional[str] = None
-    extendedData4: Optional[str] = None
-    fotaLowestVoltage: Optional[int] = None
-    fuelRangeElec: int = None
-    lastChargeEndingPower: Optional[int] = None
-    mileage: int = None
-    mileageOfDay: Optional[int] = None
-    mileageSinceLastCharge: Optional[int] = None
-    powerUsageOfDay: Optional[int] = None
-    powerUsageSinceLastCharge: Optional[int] = None
-    realtimePower: int = None
-    startTime: Optional[int] = None
-    staticEnergyConsumption: Optional[int] = None
-    totalBatteryCapacity: Optional[int] = None
-    workingCurrent: Optional[int] = None
-    workingVoltage: Optional[int] = None
+    chargingDuration: int | None = None
+    chargingElectricityPhase: int | None = None
+    chargingGunState: int | None = None
+    chargingPileID: str | None = None
+    chargingPileSupplier: str | None = None
+    chargingType: int | None = None
+    endTime: int | None = None
+    extendedData1: int | None = None
+    extendedData2: int | None = None
+    extendedData3: str | None = None
+    extendedData4: str | None = None
+    fotaLowestVoltage: int | None = None
+    fuelRangeElec: int | None = None
+    lastChargeEndingPower: int | None = None
+    mileage: int | None = None
+    mileageOfDay: int | None = None
+    mileageSinceLastCharge: int | None = None
+    powerUsageOfDay: int | None = None
+    powerUsageSinceLastCharge: int | None = None
+    realtimePower: int | None = None
+    startTime: int | None = None
+    staticEnergyConsumption: int | None = None
+    totalBatteryCapacity: int | None = None
+    workingCurrent: int | None = None
+    workingVoltage: int | None = None
 
 
 @dataclass
 class ChrgMgmtDataResp:
-    chrgMgmtData: ChrgMgmtData = None,
-    rvsChargeStatus: RvsChargeStatus = None,
+    chrgMgmtData: ChrgMgmtData | None = None
+    rvsChargeStatus: RvsChargeStatus | None = None
 
 
 @dataclass
 class ChargingSettingRequest:
-    altngChrgCrntReq: int = None
-    onBdChrgTrgtSOCReq: int = None
-    tboxV2XSpSOCReq: int = None
-    vin: str = None
+    altngChrgCrntReq: int | None = None
+    onBdChrgTrgtSOCReq: int | None = None
+    tboxV2XSpSOCReq: int | None = None
+    vin: str | None = None
 
 
 @dataclass
 class ChargingSettingResp:
-    bmsAltngChrgCrntDspCmd: int = None
-    bmsAltngChrgCrntResp: int = None
-    bmsChrgTrgtSOCResp: int = None
-    bmsEstdElecRng: int = None
-    bmsOnBdChrgTrgtSOCDspCmd: int = None
-    bmsPackCrnt: int = None
-    imcuDschrgTrgtSOCDspCmd: int = None
-    imcuDschrgTrgtSOCResp: int = None
-    rvcReqSts: Optional[str | int] = None
+    bmsAltngChrgCrntDspCmd: int | None = None
+    bmsAltngChrgCrntResp: int | None = None
+    bmsChrgTrgtSOCResp: int | None = None
+    bmsEstdElecRng: int | None = None
+    bmsOnBdChrgTrgtSOCDspCmd: int | None = None
+    bmsPackCrnt: int | None = None
+    imcuDschrgTrgtSOCDspCmd: int | None = None
+    imcuDschrgTrgtSOCResp: int | None = None
+    rvcReqSts: str | int | None = None
 
     @property
-    def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+    def rvc_req_sts_decoded(self) -> bytes | None:
+        return decode_bytes(input_value=self.rvcReqSts, field_name="rvcReqSts")
 
     @property
-    def charge_target_soc(self) -> Optional[TargetBatteryCode]:
+    def charge_target_soc(self) -> TargetBatteryCode | None:
         raw_target_soc = self.bmsOnBdChrgTrgtSOCDspCmd
         try:
             return TargetBatteryCode(raw_target_soc)
@@ -367,7 +387,7 @@ class ChargingSettingResp:
             return None
 
     @property
-    def charge_current_limit(self) -> Optional[ChargeCurrentLimitCode]:
+    def charge_current_limit(self) -> ChargeCurrentLimitCode | None:
         raw_charge_current_limit = self.bmsAltngChrgCrntDspCmd
         try:
             return ChargeCurrentLimitCode(raw_charge_current_limit)
@@ -375,7 +395,7 @@ class ChargingSettingResp:
             return None
 
     @property
-    def v2x_target_soc(self) -> Optional[TargetBatteryCode]:
+    def v2x_target_soc(self) -> TargetBatteryCode | None:
         raw_target_soc = self.imcuDschrgTrgtSOCDspCmd
         try:
             return TargetBatteryCode(raw_target_soc)
@@ -385,46 +405,46 @@ class ChargingSettingResp:
 
 @dataclass
 class ScheduledChargingRequest:
-    rsvanSpHour: int = None
-    rsvanSpMintue: int = None
-    rsvanStHour: int = None
-    rsvanStMintue: int = None
-    tboxAdpPubChrgSttnReq: int = None
-    tboxReserCtrlReq: int = None
-    vin: str = None
+    rsvanSpHour: int | None = None
+    rsvanSpMintue: int | None = None
+    rsvanStHour: int | None = None
+    rsvanStMintue: int | None = None
+    tboxAdpPubChrgSttnReq: int | None = None
+    tboxReserCtrlReq: int | None = None
+    vin: str | None = None
 
 
 @dataclass
 class ScheduledChargingResp:
-    bmsAdpPubChrgSttnDspCmd: int = None
-    bmsReserChrgCtrlResp: int = None
-    bmsReserCtrlDspCmd: int = None
-    bmsReserSpHourDspCmd: int = None
-    bmsReserSpMintueDspCmd: int = None
-    bmsReserStHourDspCmd: int = None
-    bmsReserStMintueDspCmd: int = None
-    rvcReqSts: Optional[str | int] = None
+    bmsAdpPubChrgSttnDspCmd: int | None = None
+    bmsReserChrgCtrlResp: int | None = None
+    bmsReserCtrlDspCmd: int | None = None
+    bmsReserSpHourDspCmd: int | None = None
+    bmsReserSpMintueDspCmd: int | None = None
+    bmsReserStHourDspCmd: int | None = None
+    bmsReserStMintueDspCmd: int | None = None
+    rvcReqSts: str | int | None = None
 
     @property
-    def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+    def rvc_req_sts_decoded(self) -> bytes | None:
+        return decode_bytes(input_value=self.rvcReqSts, field_name="rvcReqSts")
 
 
 @dataclass
 class ChargingPtcHeatRequest:
-    ptcHeatReq: int = None
-    vin: str = None
+    ptcHeatReq: int | None = None
+    vin: str | None = None
 
 
 @dataclass
 class ChrgPtcHeatResp:
-    ptcHeatReqDspCmd: int = None
-    ptcHeatResp: int = None
-    rvcReqSts: Optional[str | int] = None
+    ptcHeatReqDspCmd: int | None = None
+    ptcHeatResp: int | None = None
+    rvcReqSts: str | int | None = None
 
     @property
-    def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+    def rvc_req_sts_decoded(self) -> bytes | None:
+        return decode_bytes(input_value=self.rvcReqSts, field_name="rvcReqSts")
 
     @property
     def heating_stop_reason(self) -> HeatingStopReason | None:
@@ -435,76 +455,76 @@ class ChrgPtcHeatResp:
 
 @dataclass
 class ChargingControlRequest:
-    chrgCtrlReq: int = None
-    tboxEleccLckCtrlReq: int = None
-    tboxV2XReq: int = None
-    vin: str = None
+    chrgCtrlReq: int | None = None
+    tboxEleccLckCtrlReq: int | None = None
+    tboxV2XReq: int | None = None
+    vin: str | None = None
 
 
 @dataclass
 class ChargingControlResp:
-    bmsAdpPubChrgSttnDspCmd: int = None
-    bmsAltngChrgCrntDspCmd: int = None
-    bmsAltngChrgCrntResp: int = None
-    bmsChrgCtrlDspCmd: int = None
-    bmsChrgOtptCrntReq: int = None
-    bmsChrgOtptCrntReqV: int = None
-    bmsChrgSpRsn: int = None
-    bmsChrgSts: int = None
-    bmsChrgTrgtSOCResp: int = None
-    bmsDsChrgCtrlDspCmd: int = None
-    bmsDsChrgCtrlResp: int = None
-    bmsDsChrgSpRsn: int = None
-    bmsEstdElecRng: int = None
-    bmsOnBdChrgTrgtSOCDspCmd: int = None
-    bmsPTCHeatReqDspCmd: int = None
-    bmsPTCHeatResp: int = None
-    bmsPTCHeatSpRsn: int = None
-    bmsPackCrnt: int = None
-    bmsPackCrntV: int = None
-    bmsPackSOCDsp: int = None
-    bmsPackVol: int = None
-    bmsReserChrgCtrlResp: int = None
-    bmsReserCtrlDspCmd: int = None
-    bmsReserSpHourDspCmd: int = None
-    bmsReserSpMintueDspCmd: int = None
-    bmsReserStHourDspCmd: int = None
-    bmsReserStMintueDspCmd: int = None
-    ccuEleccLckCtrlDspCmd: int = None
-    ccuEleccLckCtrlResp: int = None
-    ccuOffBdChrgrPlugOn: int = None
-    ccuOnbdChrgrPlugOn: int = None
-    chrgCtrlDspCmd: int = None
-    chrgCtrlResp: int = None
-    chrgngAddedElecRng: int = None
-    chrgngAddedElecRngV: int = None
-    chrgngDoorOpenCnd: int = None
-    chrgngDoorPosSts: int = None
-    chrgngRmnngTime: int = None
-    chrgngRmnngTimeV: int = None
-    chrgngSpdngTime: int = None
-    chrgngSpdngTimeV: int = None
-    clstrElecRngToEPT: int = None
-    disChrgngRmnngTime: int = None
-    disChrgngRmnngTimeV: int = None
-    imcuChrgngEstdElecRng: int = None
-    imcuChrgngEstdElecRngV: int = None
-    imcuDschrgTrgtSOCDspCmd: int = None
-    imcuDschrgTrgtSOCResp: int = None
-    imcuDschrgngEstdElecRng: int = None
-    imcuDschrgngEstdElecRngV: int = None
-    imcuVehElecRng: int = None
-    imcuVehElecRngV: int = None
-    onBdChrgrAltrCrntInptCrnt: int = None
-    onBdChrgrAltrCrntInptVol: int = None
-    rvcReqSts: Optional[str | int] = None
+    bmsAdpPubChrgSttnDspCmd: int | None = None
+    bmsAltngChrgCrntDspCmd: int | None = None
+    bmsAltngChrgCrntResp: int | None = None
+    bmsChrgCtrlDspCmd: int | None = None
+    bmsChrgOtptCrntReq: int | None = None
+    bmsChrgOtptCrntReqV: int | None = None
+    bmsChrgSpRsn: int | None = None
+    bmsChrgSts: int | None = None
+    bmsChrgTrgtSOCResp: int | None = None
+    bmsDsChrgCtrlDspCmd: int | None = None
+    bmsDsChrgCtrlResp: int | None = None
+    bmsDsChrgSpRsn: int | None = None
+    bmsEstdElecRng: int | None = None
+    bmsOnBdChrgTrgtSOCDspCmd: int | None = None
+    bmsPTCHeatReqDspCmd: int | None = None
+    bmsPTCHeatResp: int | None = None
+    bmsPTCHeatSpRsn: int | None = None
+    bmsPackCrnt: int | None = None
+    bmsPackCrntV: int | None = None
+    bmsPackSOCDsp: int | None = None
+    bmsPackVol: int | None = None
+    bmsReserChrgCtrlResp: int | None = None
+    bmsReserCtrlDspCmd: int | None = None
+    bmsReserSpHourDspCmd: int | None = None
+    bmsReserSpMintueDspCmd: int | None = None
+    bmsReserStHourDspCmd: int | None = None
+    bmsReserStMintueDspCmd: int | None = None
+    ccuEleccLckCtrlDspCmd: int | None = None
+    ccuEleccLckCtrlResp: int | None = None
+    ccuOffBdChrgrPlugOn: int | None = None
+    ccuOnbdChrgrPlugOn: int | None = None
+    chrgCtrlDspCmd: int | None = None
+    chrgCtrlResp: int | None = None
+    chrgngAddedElecRng: int | None = None
+    chrgngAddedElecRngV: int | None = None
+    chrgngDoorOpenCnd: int | None = None
+    chrgngDoorPosSts: int | None = None
+    chrgngRmnngTime: int | None = None
+    chrgngRmnngTimeV: int | None = None
+    chrgngSpdngTime: int | None = None
+    chrgngSpdngTimeV: int | None = None
+    clstrElecRngToEPT: int | None = None
+    disChrgngRmnngTime: int | None = None
+    disChrgngRmnngTimeV: int | None = None
+    imcuChrgngEstdElecRng: int | None = None
+    imcuChrgngEstdElecRngV: int | None = None
+    imcuDschrgTrgtSOCDspCmd: int | None = None
+    imcuDschrgTrgtSOCResp: int | None = None
+    imcuDschrgngEstdElecRng: int | None = None
+    imcuDschrgngEstdElecRngV: int | None = None
+    imcuVehElecRng: int | None = None
+    imcuVehElecRngV: int | None = None
+    onBdChrgrAltrCrntInptCrnt: int | None = None
+    onBdChrgrAltrCrntInptVol: int | None = None
+    rvcReqSts: str | int | None = None
 
     @property
-    def rvc_req_sts_decoded(self) -> Optional[bytes]:
-        return decode_bytes(input_value=self.rvcReqSts, field_name='rvcReqSts')
+    def rvc_req_sts_decoded(self) -> bytes | None:
+        return decode_bytes(input_value=self.rvcReqSts, field_name="rvcReqSts")
 
     @property
-    def charge_target_soc(self) -> Optional[TargetBatteryCode]:
+    def charge_target_soc(self) -> TargetBatteryCode | None:
         raw_target_soc = self.bmsOnBdChrgTrgtSOCDspCmd
         try:
             return TargetBatteryCode(raw_target_soc)
@@ -512,7 +532,7 @@ class ChargingControlResp:
             return None
 
     @property
-    def charge_current_limit(self) -> Optional[ChargeCurrentLimitCode]:
+    def charge_current_limit(self) -> ChargeCurrentLimitCode | None:
         raw_charge_current_limit = self.bmsAltngChrgCrntDspCmd
         try:
             return ChargeCurrentLimitCode(raw_charge_current_limit)
@@ -520,7 +540,7 @@ class ChargingControlResp:
             return None
 
     @property
-    def v2x_target_soc(self) -> Optional[TargetBatteryCode]:
+    def v2x_target_soc(self) -> TargetBatteryCode | None:
         raw_target_soc = self.imcuDschrgTrgtSOCDspCmd
         try:
             return TargetBatteryCode(raw_target_soc)
@@ -537,9 +557,7 @@ class ChargingControlResp:
 
     @property
     def is_bms_charging(self) -> bool:
-        if self.bmsChrgSts is not None and self.bmsChrgSts in (1, 3, 10, 12):
-            return True
-        return False
+        return bool(self.bmsChrgSts is not None and self.bmsChrgSts in (1, 3, 10, 12))
 
     @property
     def bms_charging_status(self) -> BmsChargingStatusCode | None:
@@ -562,22 +580,22 @@ class ChargingControlResp:
 
 @dataclass
 class ScheduledBatteryHeatingRequest:
-    startTime: int = None
-    status: int = None
-    vin: str = None
+    startTime: int | None = None
+    status: int | None = None
+    vin: str | None = None
 
 
 @dataclass
 class ScheduledBatteryHeatingResp:
-    startTime: int = None
-    status: int = None
+    startTime: int | None = None
+    status: int | None = None
 
     @property
     def is_enabled(self) -> bool:
         return self.status == 1
 
     @property
-    def decoded_start_time(self) -> Optional[datetime.time]:
+    def decoded_start_time(self) -> datetime.time | None:
         if self.startTime is None:
             return None
         return datetime.datetime.fromtimestamp(self.startTime / 1000).time()

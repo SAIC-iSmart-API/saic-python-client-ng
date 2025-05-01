@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 
 from saic_ismart_client_ng.api.vehicle import RvcParamsId

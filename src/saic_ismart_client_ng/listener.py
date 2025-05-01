@@ -1,10 +1,13 @@
-from abc import ABC
-from typing import Optional
+from __future__ import annotations
 
 
-class SaicApiListener(ABC):
-    async def on_request(self, path: str, body: Optional[str] = None, headers: Optional[dict] = None):
+class SaicApiListener:
+    async def on_request(
+        self, path: str, body: str | None = None, headers: dict[str, str] | None = None
+    ) -> None:
         pass
 
-    async def on_response(self, path: str, body: Optional[str] = None, headers: Optional[dict] = None):
+    async def on_response(
+        self, path: str, body: str | None = None, headers: dict[str, str] | None = None
+    ) -> None:
         pass

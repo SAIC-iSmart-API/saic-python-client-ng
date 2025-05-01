@@ -1,0 +1,121 @@
+name: CI
+run-name: "${{ github.event_name == 'workflow_dispatch' && format('CI: {0}', github.ref_name) || '' }}"
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ (github.event_name == 'release' && github.run_id) || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.11", "3.12", "3.13" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: |
+          poetry install --no-interaction --no-root
+
+      - name: Install as a library
+        run: poetry install --no-interaction
+
+      - name: Run mypy
+        run: |
+          poetry run mypy src
+
+      - name: Lint with Ruff
+        run: |
+          poetry run ruff check . --output-format=github
+        if: success() || failure()
+
+      - name: Lint with pylint
+        run: |
+          poetry run pylint src/**/*.py
+        if: success() || failure()
+
+      - name: Run tests with coverage
+        run: |
+          poetry run pytest tests --cov --junit-xml=junit/test-results-${{ matrix.python-version }}.xml
+        if: success() || failure()
+
+      - name: Surface failing tests
+        uses: pmeier/pytest-results-action@main
+        with:
+          title: Test results (Python ${{ matrix.python-version }})
+          path: junit/test-results-${{ matrix.python-version }}.xml
+
+          # (Optional) Add a summary of the results at the top of the report
+          summary: true
+          # (Optional) Select which results should be included in the report.
+          # Follows the same syntax as `pytest -r`
+          display-options: fEX
+
+          # (Optional) Fail the workflow if no JUnit XML was found.
+          fail-on-empty: true
+        if: success() || failure()
+
+  release:
+    name: Release to PyPi
+    if: ${{ github.event_name == 'release' }}
+    runs-on: ubuntu-latest
+    needs:
+      - build
+
+    environment:
+      name: release
+      url: https://pypi.org/p/saic_ismart_client_ng
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build and publish to pypi
+        uses: JRubics/poetry-publish@v2.0
+        with:
+          pypi_token: ${{ secrets.PYPI_API_TOKEN }}

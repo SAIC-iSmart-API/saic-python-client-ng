@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 import sys
@@ -6,11 +8,12 @@ from saic_ismart_client_ng import SaicApi
 from saic_ismart_client_ng.model import SaicApiConfiguration
 
 
-async def main():
-    config = SaicApiConfiguration(username="XXXXX@xxxx.com", password="XXXXX", )
-    saic_api = SaicApi(
-        config
+async def main() -> None:
+    config = SaicApiConfiguration(
+        username="XXXXX@xxxx.com",
+        password="XXXXX",
     )
+    saic_api = SaicApi(config)
     await saic_api.login()
     while True:
         logging.info("Auth token expires at %s", saic_api.token_expiration)
@@ -26,7 +29,7 @@ async def main():
         await asyncio.sleep(10)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(
         stream=sys.stdout,
         format="%(levelname)s [%(asctime)s] %(name)s - %(message)s",
