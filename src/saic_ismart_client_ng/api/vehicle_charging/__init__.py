@@ -1,22 +1,24 @@
-from datetime import datetime, timedelta, time
+from __future__ import annotations
+
+from datetime import datetime, time, timedelta
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle_charging.schema import (
+    ChargeCurrentLimitCode,
     ChargeStatusResp,
     ChargingControlRequest,
     ChargingControlResp,
-    ScheduledChargingRequest,
     ChargingPtcHeatRequest,
     ChargingSettingRequest,
-    ChrgPtcHeatResp,
-    ScheduledChargingResp,
     ChargingSettingResp,
-    TargetBatteryCode,
-    ChargeCurrentLimitCode,
-    ScheduledChargingMode,
+    ChrgMgmtDataResp,
+    ChrgPtcHeatResp,
     ScheduledBatteryHeatingRequest,
     ScheduledBatteryHeatingResp,
-    ChrgMgmtDataResp,
+    ScheduledChargingMode,
+    ScheduledChargingRequest,
+    ScheduledChargingResp,
+    TargetBatteryCode,
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 

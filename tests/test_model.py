@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import unittest
+
 from saic_ismart_client_ng.model import SaicApiConfiguration
 
 

@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 from typing import List
 
 from saic_ismart_client_ng import SaicVehicleApi
 from saic_ismart_client_ng.api.vehicle.schema import (
+    RvcParams,
+    RvcParamsId,
+    RvcReqType,
     VehicleControlReq,
     VehicleControlResp,
-    RvcParams,
-    RvcReqType,
-    RvcParamsId,
 )
 from saic_ismart_client_ng.api.vehicle.windows.schema import VehicleWindowId
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest

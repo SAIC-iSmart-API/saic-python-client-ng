@@ -1,13 +1,15 @@
+from __future__ import annotations
+
+from datetime import datetime
 import hashlib
 import hmac
 import logging
-from datetime import datetime
 from typing import Tuple
 
 from saic_ismart_client_ng.crypto_utils import (
-    md5_hex_digest,
-    encrypt_aes_cbc_pkcs5_padding,
     decrypt_aes_cbc_pkcs5_padding,
+    encrypt_aes_cbc_pkcs5_padding,
+    md5_hex_digest,
 )
 from saic_ismart_client_ng.net.utils import normalize_content_type
 

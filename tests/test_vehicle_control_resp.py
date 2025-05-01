@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import json
 import unittest
+
 import dacite
 
 from saic_ismart_client_ng.api.vehicle import VehicleControlResp

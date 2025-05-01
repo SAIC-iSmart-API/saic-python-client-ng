@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import json
 import unittest
@@ -6,7 +8,7 @@ import httpx
 import pytest
 
 from saic_ismart_client_ng.net.crypto import get_app_verification_string
-from saic_ismart_client_ng.net.httpx import encrypt_httpx_request, decrypt_httpx_request
+from saic_ismart_client_ng.net.httpx import decrypt_httpx_request, encrypt_httpx_request
 
 
 def test_get_app_verification_string_valid():
@@ -28,7 +30,7 @@ def test_get_app_verification_string_valid():
         user_token,
     )
 
-    assert "afd4eaf98af2d964f8ea840fc144ee7bae95dbeeeb251d5e3a01371442f92eeb" == result
+    assert result == "afd4eaf98af2d964f8ea840fc144ee7bae95dbeeeb251d5e3a01371442f92eeb"
 
 
 @pytest.mark.asyncio
@@ -66,9 +68,9 @@ async def test_a_request_should_encrypt_properly():
     assert original_request is not None
     assert region == original_request.headers["REGION"]
     assert tenant_id == original_request.headers["tenant-id"]
-    assert "app" == original_request.headers["User-Type"]
+    assert original_request.headers["User-Type"] == "app"
     assert str(int(ts.timestamp() * 1000)) == original_request.headers["APP-SEND-DATE"]
-    assert "1" == original_request.headers["APP-CONTENT-ENCRYPTED"]
+    assert original_request.headers["APP-CONTENT-ENCRYPTED"] == "1"
     assert (
         computed_verification_string
         == original_request.headers["APP-VERIFICATION-STRING"]
@@ -122,7 +124,7 @@ def test_with_empty_request_path():
         request_content,
         user_token,
     )
-    assert "ff8cb13ebcce5958e7fbfe602716c653fd72ce78842be87b6d50dccede198735" == result
+    assert result == "ff8cb13ebcce5958e7fbfe602716c653fd72ce78842be87b6d50dccede198735"
 
 
 def test_with_no_request_content():
@@ -143,7 +145,7 @@ def test_with_no_request_content():
         request_content,
         user_token,
     )
-    assert "332c85836aa9afc864282436a740eb2cc778fafd1fea74dd887c1f8de5056de0" == result
+    assert result == "332c85836aa9afc864282436a740eb2cc778fafd1fea74dd887c1f8de5056de0"
 
 
 if __name__ == "__main__":

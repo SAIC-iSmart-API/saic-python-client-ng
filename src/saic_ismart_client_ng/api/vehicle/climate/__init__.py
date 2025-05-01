@@ -1,20 +1,21 @@
+from __future__ import annotations
+
 from typing import Optional
 
 from saic_ismart_client_ng import SaicVehicleApi
 from saic_ismart_client_ng.api.vehicle import (
-    VehicleControlResp,
     RvcParams,
     RvcParamsId,
-    VehicleControlReq,
     RvcReqType,
+    VehicleControlReq,
+    VehicleControlResp,
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 
 
 # FIXME: This needs to be refactored according to the logic below
 class SaicVehicleClimateApi(SaicVehicleApi):
-    """
-    currentTempType = 0 is ATC, 1 is ETC (T11 option code is 2)
+    """currentTempType = 0 is ATC, 1 is ETC (T11 option code is 2)
     if(AirConditionerViewModel.this.currentTempType == 0) {
         AirConditionerViewModel.this.sendAcTemp("0", AirTempUtils.getTempToClict(AirConditionerViewModel.this.temp_current, AirConditionerViewModel.this.currentVehicle.getSeries()));
         return;

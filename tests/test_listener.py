@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import pytest
 
 from saic_ismart_client_ng.listener import SaicApiListener
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_listener():
     return SaicApiListener()
 

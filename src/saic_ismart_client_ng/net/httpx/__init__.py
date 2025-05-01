@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Union
 
@@ -6,9 +8,9 @@ from httpx import Request, Response
 from httpx._content import encode_request
 
 from saic_ismart_client_ng.net.crypto import (
-    encrypt_request,
     decrypt_request,
     decrypt_response,
+    encrypt_request,
 )
 
 

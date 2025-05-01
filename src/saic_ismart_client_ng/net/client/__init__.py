@@ -1,5 +1,8 @@
-import logging
+from __future__ import annotations
+
 from datetime import datetime
+import logging
+from typing import Optional
 
 import httpx
 from httpx import Request, Response
@@ -10,7 +13,6 @@ from saic_ismart_client_ng.net.httpx import (
     decrypt_httpx_response,
     encrypt_httpx_request,
 )
-from typing import Optional
 
 
 class SaicApiClient:

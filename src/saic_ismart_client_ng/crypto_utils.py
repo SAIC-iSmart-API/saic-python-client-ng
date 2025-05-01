@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from binascii import hexlify, unhexlify
 import hashlib
 import logging
-from binascii import unhexlify, hexlify
 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad

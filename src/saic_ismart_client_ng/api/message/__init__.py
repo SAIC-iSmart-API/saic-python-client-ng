@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional, Union
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi

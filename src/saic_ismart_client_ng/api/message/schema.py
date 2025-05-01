@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
 import datetime
 import logging
-from dataclasses import dataclass, field
 from typing import List, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
@@ -49,10 +51,9 @@ class MessageEntity:
     def read_status(self) -> str:
         if self.readStatus is None:
             return "unknown"
-        elif self.readStatus == 0:
+        if self.readStatus == 0:
             return "unread"
-        else:
-            return "read"
+        return "read"
 
     @property
     def details(self) -> str:

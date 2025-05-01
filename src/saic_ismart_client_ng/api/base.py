@@ -1,14 +1,16 @@
+from __future__ import annotations
+
+from abc import ABC
+from dataclasses import asdict
 import datetime
 import json
 import logging
-from abc import ABC
-from dataclasses import asdict
-from typing import Type, Optional, Any, TypeVar
+from typing import Any, Optional, Type, TypeVar
 
 import dacite
 import httpx
+from httpx._types import HeaderTypes, QueryParamTypes
 import tenacity
-from httpx._types import QueryParamTypes, HeaderTypes
 
 from saic_ismart_client_ng.api.schema import LoginResp
 from saic_ismart_client_ng.crypto_utils import sha1_hex_digest
@@ -112,7 +114,7 @@ class AbstractSaicApi(ABC):
         headers: Optional[HeaderTypes] = None,
         allow_null_body: bool = False,
     ) -> Optional[T]:
-        url = f"{self.__configuration.base_uri}{path[1:] if path.startswith('/') else path}"
+        url = f"{self.__configuration.base_uri}{path.removeprefix('/')}"
         json_body = asdict(body) if body else None
         req = httpx.Request(
             method, url, params=params, headers=headers, data=form_body, json=json_body
@@ -195,27 +197,24 @@ class AbstractSaicApi(ABC):
                         event_id=request_event_id,
                         return_code=return_code,
                     )
-                else:
-                    logger.error(
-                        f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}"
-                    )
-                    raise SaicApiException(error_message, return_code=return_code)
+                logger.error(
+                    f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}"
+                )
+                raise SaicApiException(error_message, return_code=return_code)
 
             if data_class is None:
                 return None
-            elif "data" in json_data:
+            if "data" in json_data:
                 if data_class is str:
                     return json.dumps(json_data["data"])
-                elif data_class is dict:
+                if data_class is dict:
                     return json_data["data"]
-                else:
-                    return dacite.from_dict(data_class, json_data["data"])
-            elif allow_null_body:
+                return dacite.from_dict(data_class, json_data["data"])
+            if allow_null_body:
                 return None
-            else:
-                raise SaicApiException(
-                    f"Failed to deserialize response, missing 'data' field: {response.text}"
-                )
+            raise SaicApiException(
+                f"Failed to deserialize response, missing 'data' field: {response.text}"
+            )
 
         except SaicApiException as se:
             raise se
@@ -230,16 +229,14 @@ class AbstractSaicApi(ABC):
                     raise SaicLogoutException(
                         response.text, response.status_code
                     ) from e
-                else:
-                    logger.error(
-                        f"API call failed: {response.status_code} {response.text}",
-                        exc_info=e,
-                    )
-                    raise SaicApiException(response.text, response.status_code) from e
-            else:
-                raise SaicApiException(
-                    f"Failed to deserialize response: {e}. Original json was {response.text}"
-                ) from e
+                logger.error(
+                    f"API call failed: {response.status_code} {response.text}",
+                    exc_info=e,
+                )
+                raise SaicApiException(response.text, response.status_code) from e
+            raise SaicApiException(
+                f"Failed to deserialize response: {e}. Original json was {response.text}"
+            ) from e
 
     def logout(self):
         self.__api_client.user_token = ""
@@ -277,13 +274,12 @@ def saic_api_retry_policy(retry_state):
         if isinstance(wrapped_exception, SaicApiRetryException):
             logger.debug("Retrying since we got SaicApiRetryException")
             return True
-        elif isinstance(wrapped_exception, SaicLogoutException):
+        if isinstance(wrapped_exception, SaicLogoutException):
             logger.error("Not retrying since we got logged out")
             return False
-        elif isinstance(wrapped_exception, SaicApiException):
+        if isinstance(wrapped_exception, SaicApiException):
             logger.error("Not retrying since we got a generic exception")
             return False
-        else:
-            logger.error(f"Not retrying {retry_state.args} {wrapped_exception}")
-            return False
+        logger.error(f"Not retrying {retry_state.args} {wrapped_exception}")
+        return False
     return False

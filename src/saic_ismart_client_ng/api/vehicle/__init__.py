@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 import tenacity
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle.schema import (
-    VehicleListResp,
-    VehicleStatusResp,
+    RvcParams,
+    RvcParamsId,
+    RvcReqType,
     VehicleControlReq,
     VehicleControlResp,
-    RvcParams,
-    RvcReqType,
-    RvcParamsId,
+    VehicleListResp,
+    VehicleStatusResp,
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 
