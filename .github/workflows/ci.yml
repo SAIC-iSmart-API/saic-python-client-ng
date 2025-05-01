@@ -60,12 +60,11 @@ jobs:
       - name: Run mypy
         run: |
           poetry run mypy src
-        # Temporary until we fix all typing issues
-        continue-on-error: true
 
       - name: Lint with Ruff
         run: |
           poetry run ruff check . --output-format=github
+        if: success() || failure()
 
       - name: Lint with pylint
         run: |

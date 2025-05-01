@@ -36,7 +36,7 @@ class MessageEntity:
             for date_format in MESSAGE_DATE_TIME_FORMATS:
                 try:
                     return datetime.datetime.strptime(self.messageTime, date_format)
-                except ValueError:  # noqa: PERF203
+                except ValueError:
                     pass
             LOGGER.error(
                 "Could not parse messageTime '%s'. This is a bug. Please file a ticket",
