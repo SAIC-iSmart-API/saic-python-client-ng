@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Optional
 
 
 class AlarmType(Enum):
@@ -13,17 +12,17 @@ class AlarmType(Enum):
 
 @dataclass
 class AlarmSwitch:
-    alarmType: Optional[int] = None
-    functionSwitch: Optional[int] = None
-    alarmSwitch: Optional[int] = None
+    alarmType: int | None = None
+    functionSwitch: int | None = None
+    alarmSwitch: int | None = None
 
 
 @dataclass
 class AlarmSwitchResp:
-    alarmSwitchList: List[AlarmSwitch] = field(default_factory=list)
+    alarmSwitchList: list[AlarmSwitch] = field(default_factory=list)
 
 
 @dataclass
 class AlarmSwitchReq:
     vin: str
-    alarmSwitchList: List[AlarmSwitch] = field(default_factory=list)
+    alarmSwitchList: list[AlarmSwitch] = field(default_factory=list)

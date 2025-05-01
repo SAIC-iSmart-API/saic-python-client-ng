@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from typing import Optional
 
-
-def normalize_content_type(original_content_type: Optional[str]) -> str:
+def normalize_content_type(original_content_type: str | None) -> str:
     normalized = "application/json"
     if original_content_type:
         if "multipart" in original_content_type:

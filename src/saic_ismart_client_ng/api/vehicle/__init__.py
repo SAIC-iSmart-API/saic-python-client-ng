@@ -4,15 +4,35 @@ import tenacity
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle.schema import (
+    BasicVehicleStatus,
+    ExtendedVehicleStatus,
     RvcParams,
     RvcParamsId,
     RvcReqType,
+    SubAccount,
     VehicleControlReq,
     VehicleControlResp,
     VehicleListResp,
+    VehicleModelConfiguration,
     VehicleStatusResp,
+    VinInfo,
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
+
+__all__ = [
+    "BasicVehicleStatus",
+    "ExtendedVehicleStatus",
+    "RvcParams",
+    "RvcParamsId",
+    "RvcReqType",
+    "SubAccount",
+    "VehicleControlReq",
+    "VehicleControlResp",
+    "VehicleListResp",
+    "VehicleModelConfiguration",
+    "VehicleStatusResp",
+    "VinInfo",
+]
 
 
 class SaicVehicleApi(AbstractSaicApi):

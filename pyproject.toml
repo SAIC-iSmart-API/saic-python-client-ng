@@ -1,10 +1,9 @@
-[tool.poetry]
+[project]
 name = "saic_ismart_client_ng"
-homepage = "https://github.com/SAIC-iSmart-API/saic-python-client-ng"
-version = "0.7.1"
+version = "0.8.0"
 description = "SAIC next gen client library (MG iSMART)"
 authors = [
-    "Giovanni Condello <saic-python-client@nanomad.net>",
+    { name = "Giovanni Condello", email = "saic-python-client@nanomad.net" },
 ]
 readme = "README.md"
 
@@ -14,17 +13,18 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-[tool.poetry.urls]
-"Bug Tracker" = "https://github.com/SAIC-iSmart-API/saic-python-client-ng/issues"
+requires-python = "^3.11"
 
+dependencies = [
+    "pycryptodome (>=3.20.0,<4.0.0)",
+    "httpx (>=0.27.0,<0.29.0)",
+    "tenacity (>=9.0.0,<10.0.0)",
+    "dacite (>=1.8.1,<2.0.0)"
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-pycryptodome = "^3.20.0"
-httpx = ">=0.27.0,<0.29.0"
-tenacity = "^9.0.0"
-dacite = "^1.8.1"
-
+[project.urls]
+Homepage = "https://github.com/SAIC-iSmart-API/saic-python-client-ng"
+Issues = "https://github.com/SAIC-iSmart-API/saic-python-client-ng/issues"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
@@ -53,7 +53,7 @@ mock_use_standalone_module = true
 addopts = [
     "--import-mode=importlib",
 ]
-asyncio_default_fixture_loop_scope="function"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 omit = [
@@ -79,14 +79,20 @@ exclude_lines = [
 ]
 ignore_errors = true
 
+[tool.ruff]
+include = [
+    "src/**/*.py",
+    "tests/**/*.py",
+    "**/pyproject.toml"
+]
 [tool.ruff.lint]
 select = ["ALL"]
 
 ignore = [
     "ANN401", # Opinioated warning on disallowing dynamically typed expressions
-    "D203",   # Conflicts with other rules
-    "D213",   # Conflicts with other rules
-    "EM101",  # raw-string-in-exception
+    "D203", # Conflicts with other rules
+    "D213", # Conflicts with other rules
+    "EM101", # raw-string-in-exception
 
     "D105", # Missing docstring in magic method
     "D107", # Missing docstring in `__init__`
@@ -96,16 +102,27 @@ ignore = [
 
     "PLR2004", # Magic value used in comparison, consider replacing {value} with a constant variable
 
+    # Used to map JSON responses
+    "N815",
     # Conflicts with the Ruff formatter
     "COM812",
-
+    # We use Exception istead of Error
+    "N818",
     # Remove later
-    "TD",     # Todos
-    "A",      # bultins
-    "DTZ",    # use tz need to test it first
-    "TRY",    # tryceratops
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D106", # Missing docstring in public nested class
+    "TD", # Todos
+    "A", # bultins
+    "DTZ", # use tz need to test it first
+    "TRY", # tryceratops
     "FIX002", # Line contains TODO, consider resolving the issue
-    "BLE001", # Do not catch blind exception: `Exception`
+    "BLE001", # Do not catch blind exception: `Exception`,
+    "PLR0913", # Too many arguments in function definition
+    "ERA001"   # Commented-out code
 
 ]
 
@@ -122,15 +139,15 @@ required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = [
-    "D100",    # Missing docstring in public module
-    "D103",    # Missing docstring in public function
-    "D104",    # Missing docstring in public package
-    "N802",    # Function name {name} should be lowercase
-    "N816",    # Variable {name} in global scope should not be mixedCase
+    "D100", # Missing docstring in public module
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "N802", # Function name {name} should be lowercase
+    "N816", # Variable {name} in global scope should not be mixedCase
     "PLR0913", # Too many arguments in function definition
-    "S101",    # Use of assert detected
-    "SLF001",  # Private member accessed: {access}
-    "T201",    # print found
+    "S101", # Use of assert detected
+    "SLF001", # Private member accessed: {access}
+    "T201", # print found
 ]
 
 [tool.ruff.lint.mccabe]
@@ -193,6 +210,13 @@ disable = [
     "too-many-ancestors",
     "too-few-public-methods",
     "invalid-name",
+    # Remove later
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "broad-exception-caught",
+    "logging-fstring-interpolation",
+    "fixme"
 ]
 enable = ["useless-suppression", "use-symbolic-message-instead"]
 

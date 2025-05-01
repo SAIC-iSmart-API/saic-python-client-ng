@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
-
-from saic_ismart_client_ng import SaicVehicleApi
+from saic_ismart_client_ng.api.vehicle import SaicVehicleApi
 from saic_ismart_client_ng.api.vehicle.locks.schema import VehicleLockId
 from saic_ismart_client_ng.api.vehicle.schema import (
     RvcParams,
@@ -13,6 +11,8 @@ from saic_ismart_client_ng.api.vehicle.schema import (
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 from saic_ismart_client_ng.exceptions import SaicApiException
+
+__all__ = ["VehicleLockId"]
 
 
 class SaicVehicleLocksApi(SaicVehicleApi):
@@ -34,7 +34,7 @@ class SaicVehicleLocksApi(SaicVehicleApi):
         vin: str,
         *,
         should_lock: bool,
-        lock_id: Optional[VehicleLockId] = None,
+        lock_id: VehicleLockId | None = None,
     ) -> VehicleControlResp:
         if should_lock:
             request_type = RvcReqType.CLOSE_LOCKS

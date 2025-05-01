@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 import logging
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -12,28 +11,28 @@ logger = logging.getLogger(__name__)
 class LoginResp:
     @dataclass
     class LoginRespDetail:
-        languageType: Optional[str] = None
+        languageType: str | None = None
 
-    access_token: Optional[str] = None
-    account: Optional[str] = None
-    avatar: Optional[str] = None
-    client_id: Optional[str] = None
-    dept_id: Optional[str] = None
-    detail: Optional[LoginRespDetail] = None
-    expires_in: Optional[int] = None
-    jti: Optional[str] = None
-    languageType: Optional[str] = None
-    license: Optional[str] = None
-    oauth_id: Optional[str] = None
-    post_id: Optional[str] = None
-    refresh_token: Optional[str] = None
-    role_id: Optional[str] = None
-    role_name: Optional[str] = None
-    scope: Optional[str] = None
-    tenant_id: Optional[str] = None
-    token_type: Optional[str] = None
-    user_id: Optional[str] = None
-    user_name: Optional[str] = None
+    access_token: str | None = None
+    account: str | None = None
+    avatar: str | None = None
+    client_id: str | None = None
+    dept_id: str | None = None
+    detail: LoginRespDetail | None = None
+    expires_in: int | None = None
+    jti: str | None = None
+    languageType: str | None = None
+    license: str | None = None
+    oauth_id: str | None = None
+    post_id: str | None = None
+    refresh_token: str | None = None
+    role_id: str | None = None
+    role_name: str | None = None
+    scope: str | None = None
+    tenant_id: str | None = None
+    token_type: str | None = None
+    user_id: str | None = None
+    user_name: str | None = None
 
 
 class GpsStatus(Enum):
@@ -49,27 +48,27 @@ class GpsPosition:
     class WayPoint:
         @dataclass
         class Position:
-            altitude: Optional[int] = None
-            latitude: Optional[int] = None
-            longitude: Optional[int] = None
+            altitude: int | None = None
+            latitude: int | None = None
+            longitude: int | None = None
 
-        hdop: Optional[int] = None
-        heading: Optional[int] = None
-        position: Optional[Position] = None
-        satellites: Optional[int] = None
-        speed: Optional[int] = None
+        hdop: int | None = None
+        heading: int | None = None
+        position: Position | None = None
+        satellites: int | None = None
+        speed: int | None = None
 
-    gpsStatus: Optional[int] = None
-    timeStamp: Optional[int] = None
-    wayPoint: Optional[WayPoint] = None
+    gpsStatus: int | None = None
+    timeStamp: int | None = None
+    wayPoint: WayPoint | None = None
 
     @property
-    def gps_status_decoded(self) -> Optional[GpsStatus]:
+    def gps_status_decoded(self) -> GpsStatus | None:
         value = self.gpsStatus
         if value is None:
             return None
         try:
             return GpsStatus(value)
         except ValueError:
-            logger.error(f"Could not decode {value} as GpsStatus")
+            logger.error("Could not decode %s as GpsStatus", value)
             return None

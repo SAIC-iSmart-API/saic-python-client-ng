@@ -2,14 +2,11 @@ from __future__ import annotations
 
 import base64
 import logging
-from typing import Optional
 
 __LOGGER = logging.getLogger(__name__)
 
 
-def decode_bytes(
-    *, input_value: Optional[str | int], field_name: str
-) -> Optional[bytes]:
+def decode_bytes(*, input_value: str | int | None, field_name: str) -> bytes | None:
     try:
         if isinstance(input_value, str):
             return base64.b64decode(input_value)

@@ -8,7 +8,7 @@ from saic_ismart_client_ng import SaicApi
 from saic_ismart_client_ng.model import SaicApiConfiguration
 
 
-async def main():
+async def main() -> None:
     config = SaicApiConfiguration(
         username="XXXXX@xxxx.com",
         password="XXXXX",

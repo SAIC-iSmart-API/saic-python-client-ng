@@ -1,44 +1,20 @@
 from __future__ import annotations
 
-from typing import Optional
-
-from saic_ismart_client_ng import SaicVehicleApi
 from saic_ismart_client_ng.api.vehicle import (
     RvcParams,
     RvcParamsId,
     RvcReqType,
+    SaicVehicleApi,
     VehicleControlReq,
     VehicleControlResp,
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 
 
-# FIXME: This needs to be refactored according to the logic below
 class SaicVehicleClimateApi(SaicVehicleApi):
-    """currentTempType = 0 is ATC, 1 is ETC (T11 option code is 2)
-    if(AirConditionerViewModel.this.currentTempType == 0) {
-        AirConditionerViewModel.this.sendAcTemp("0", AirTempUtils.getTempToClict(AirConditionerViewModel.this.temp_current, AirConditionerViewModel.this.currentVehicle.getSeries()));
-        return;
-    }
-
-    if(((Boolean)AirConditionerViewModel.this.heating.get()).booleanValue()) {
-        AirConditionerViewModel.this.sendAcTempToETC("0", 4);
-        return;
-    }
-
-    if(((Boolean)AirConditionerViewModel.this.refrigerate.get()).booleanValue()) {
-        AirConditionerViewModel.this.sendAcTempToETC("0", 3);
-        return;
-    }
-
-    if(((Boolean)AirConditionerViewModel.this.acBlowing.get()).booleanValue()) {
-        AirConditionerViewModel.this.sendAcTempToETC("0", 1);
-        return;
-    }
-    AirConditionerViewModel.this.sendAcTempToETC("0", 0);
-    """
-
-    async def start_ac(self, vin: str, *, temperature_idx=8) -> VehicleControlResp:
+    async def start_ac(
+        self, vin: str, *, temperature_idx: int = 8
+    ) -> VehicleControlResp:
         return await self.control_climate(
             vin, fan_speed=2, ac_on=None, temperature_idx=temperature_idx
         )
@@ -63,7 +39,7 @@ class SaicVehicleClimateApi(SaicVehicleApi):
         vin: str,
         *,
         fan_speed: int = 5,
-        ac_on: Optional[bool] = True,
+        ac_on: bool | None = True,
         temperature_idx: int = 8,
     ) -> VehicleControlResp:
         if fan_speed == 0:

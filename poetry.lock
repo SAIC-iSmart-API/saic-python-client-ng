@@ -635,4 +635,4 @@ markers = {main = "python_version < \"3.13\""}
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "4b95bf99c8f7116c28095f8ab13f8e81764915b930516f46bda61147fed9ef38"
+content-hash = "c4d5825844d9cc966c0f5e409ae372b02442f57103e3921f279297f6ec9b20ba"

@@ -4,6 +4,7 @@ from datetime import datetime, time, timedelta
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle_charging.schema import (
+    BmsChargingStatusCode,
     ChargeCurrentLimitCode,
     ChargeStatusResp,
     ChargingControlRequest,
@@ -11,8 +12,13 @@ from saic_ismart_client_ng.api.vehicle_charging.schema import (
     ChargingPtcHeatRequest,
     ChargingSettingRequest,
     ChargingSettingResp,
+    ChargingStatus,
+    ChargingStopReason,
+    ChrgMgmtData,
     ChrgMgmtDataResp,
     ChrgPtcHeatResp,
+    HeatingStopReason,
+    RvsChargeStatus,
     ScheduledBatteryHeatingRequest,
     ScheduledBatteryHeatingResp,
     ScheduledChargingMode,
@@ -21,6 +27,30 @@ from saic_ismart_client_ng.api.vehicle_charging.schema import (
     TargetBatteryCode,
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
+
+__all__ = [
+    "BmsChargingStatusCode",
+    "ChargeCurrentLimitCode",
+    "ChargeStatusResp",
+    "ChargingControlRequest",
+    "ChargingControlResp",
+    "ChargingPtcHeatRequest",
+    "ChargingSettingRequest",
+    "ChargingSettingResp",
+    "ChargingStatus",
+    "ChargingStopReason",
+    "ChrgMgmtData",
+    "ChrgMgmtDataResp",
+    "ChrgPtcHeatResp",
+    "HeatingStopReason",
+    "RvsChargeStatus",
+    "ScheduledBatteryHeatingRequest",
+    "ScheduledBatteryHeatingResp",
+    "ScheduledChargingMode",
+    "ScheduledChargingRequest",
+    "ScheduledChargingResp",
+    "TargetBatteryCode",
+]
 
 
 class SaicVehicleChargingApi(AbstractSaicApi):
@@ -125,7 +155,7 @@ class SaicVehicleChargingApi(AbstractSaicApi):
         self, vin: str, body: ScheduledBatteryHeatingRequest
     ) -> None:
         body.vin = sha256_hex_digest(vin)
-        return await self.execute_api_call(
+        await self.execute_api_call_no_result(
             "POST",
             "/charging/batteryHeating",
             body=body,

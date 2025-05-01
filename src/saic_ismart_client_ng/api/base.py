@@ -1,16 +1,20 @@
 from __future__ import annotations
 
-from abc import ABC
 from dataclasses import asdict
 import datetime
-import json
 import logging
-from typing import Any, Optional, Type, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Protocol,
+    TypeVar,
+)
 
 import dacite
 import httpx
-from httpx._types import HeaderTypes, QueryParamTypes
 import tenacity
+from tenacity import RetryCallState, retry_if_exception
 
 from saic_ismart_client_ng.api.schema import LoginResp
 from saic_ismart_client_ng.crypto_utils import sha1_hex_digest
@@ -19,24 +23,35 @@ from saic_ismart_client_ng.exceptions import (
     SaicApiRetryException,
     SaicLogoutException,
 )
-from saic_ismart_client_ng.listener import SaicApiListener
-from saic_ismart_client_ng.model import SaicApiConfiguration
 from saic_ismart_client_ng.net.client import SaicApiClient
+
+if TYPE_CHECKING:
+    from collections.abc import MutableMapping
+
+    from httpx._types import HeaderTypes, QueryParamTypes
+
+    from saic_ismart_client_ng.listener import SaicApiListener
+    from saic_ismart_client_ng.model import SaicApiConfiguration
+
+    class IsDataclass(Protocol):
+        # as already noted in comments, checking for this attribute is currently
+        # the most reliable way to ascertain that something is a dataclass
+        __dataclass_fields__: ClassVar[dict[str, Any]]
+
+    T = TypeVar("T", bound=IsDataclass)
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar("T")
 
-
-class AbstractSaicApi(ABC):
+class AbstractSaicApi:
     def __init__(
         self,
         configuration: SaicApiConfiguration,
-        listener: Optional[SaicApiListener] = None,
-    ):
+        listener: SaicApiListener | None = None,
+    ) -> None:
         self.__configuration = configuration
         self.__api_client = SaicApiClient(configuration, listener=listener)
-        self.__token_expiration: Optional[datetime.datetime] = None
+        self.__token_expiration: datetime.datetime | None = None
 
     async def login(self) -> LoginResp:
         headers = {
@@ -66,9 +81,16 @@ class AbstractSaicApi(ABC):
             headers=headers,
         )
         # Update the user token
-        self.__api_client.user_token = result.access_token
+        if not (access_token := result.access_token) or not (
+            expiration := result.expires_in
+        ):
+            raise SaicApiException(
+                "Failed to get an access token, please check your credentials"
+            )
+
+        self.__api_client.user_token = access_token
         self.__token_expiration = datetime.datetime.now() + datetime.timedelta(
-            seconds=result.expires_in
+            seconds=expiration
         )
         return result
 
@@ -77,71 +99,144 @@ class AbstractSaicApi(ABC):
         method: str,
         path: str,
         *,
-        body: Optional[Any] = None,
-        form_body: Optional[Any] = None,
-        out_type: Optional[Type[T]] = None,
-        params: Optional[QueryParamTypes] = None,
-        headers: Optional[HeaderTypes] = None,
+        body: Any | None = None,
+        form_body: Any | None = None,
+        out_type: type[T],
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
         allow_null_body: bool = False,
     ) -> T:
-        try:
-            return await self.__execute_api_call(
-                method,
-                path,
-                body=body,
-                form_body=form_body,
-                out_type=out_type,
-                params=params,
-                headers=headers,
-                allow_null_body=allow_null_body,
-            )
-        except SaicApiException as e:
-            raise e
-        except Exception as e:
-            raise SaicApiException(
-                f"API call {method} {path} failed unexpectedly", return_code=500
-            ) from e
+        result = await self.__execute_api_call(
+            method,
+            path,
+            body=body,
+            form_body=form_body,
+            out_type=out_type,
+            params=params,
+            headers=headers,
+            allow_null_body=allow_null_body,
+        )
+        if result is None:
+            msg = f"Failed to execute api call {method} {path}, was expecting a result of type {out_type} got None instead"
+            raise SaicApiException(msg)
+        return result
+
+    async def execute_api_call_no_result(
+        self,
+        method: str,
+        path: str,
+        *,
+        body: Any | None = None,
+        form_body: Any | None = None,
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
+        allow_null_body: bool = False,
+    ) -> None:
+        await self.__execute_api_call(
+            method,
+            path,
+            body=body,
+            form_body=form_body,
+            params=params,
+            headers=headers,
+            allow_null_body=allow_null_body,
+        )
 
     async def __execute_api_call(
         self,
         method: str,
         path: str,
         *,
-        body: Optional[Any] = None,
-        form_body: Optional[Any] = None,
-        out_type: Optional[Type[T]] = None,
-        params: Optional[QueryParamTypes] = None,
-        headers: Optional[HeaderTypes] = None,
+        body: Any | None = None,
+        form_body: Any | None = None,
+        out_type: type[T] | None = None,
+        params: QueryParamTypes | None = None,
+        headers: HeaderTypes | None = None,
         allow_null_body: bool = False,
-    ) -> Optional[T]:
-        url = f"{self.__configuration.base_uri}{path.removeprefix('/')}"
-        json_body = asdict(body) if body else None
-        req = httpx.Request(
-            method, url, params=params, headers=headers, data=form_body, json=json_body
-        )
-        response = await self.__api_client.send(req)
-        return await self.__deserialize(req, response, out_type, allow_null_body)
+    ) -> T | None:
+        try:
+            url = f"{self.__configuration.base_uri}{path.removeprefix('/')}"
+            json_body = asdict(body) if body else None
+            req = httpx.Request(
+                method,
+                url,
+                params=params,
+                headers=headers,
+                data=form_body,
+                json=json_body,
+            )
+            response = await self.__api_client.send(req)
+            return await self.__deserialize(req, response, out_type, allow_null_body)
+        except SaicApiException as e:
+            raise e
+        except Exception as e:
+            msg = f"API call {method} {path} failed unexpectedly"
+            raise SaicApiException(msg, return_code=500) from e
 
     async def execute_api_call_with_event_id(
         self,
         method: str,
         path: str,
         *,
-        body: Optional[Any] = None,
-        out_type: Optional[Type[T]] = None,
-        params: Optional[QueryParamTypes] = None,
-        headers: Optional[HeaderTypes] = None,
-        delay: Optional[tenacity.wait.WaitBaseT] = None,
-    ) -> Optional[T]:
+        body: Any | None = None,
+        out_type: type[T],
+        params: QueryParamTypes | None = None,
+        headers: MutableMapping[str, str] | None = None,
+        delay: tenacity.wait.WaitBaseT | None = None,
+    ) -> T:
+        result = await self.__execute_api_call_with_event_id(
+            method,
+            path,
+            body=body,
+            out_type=out_type,
+            params=params,
+            headers=headers,
+            delay=delay,
+        )
+        if result is None:
+            msg = f"Failed to execute api call {method} {path}, was expecting a result of type {out_type} got None instead"
+            raise SaicApiException(msg)
+        return result
+
+    async def execute_api_call_with_event_id_no_result(
+        self,
+        method: str,
+        path: str,
+        *,
+        body: Any | None = None,
+        params: QueryParamTypes | None = None,
+        headers: MutableMapping[str, str] | None = None,
+        delay: tenacity.wait.WaitBaseT | None = None,
+    ) -> None:
+        await self.__execute_api_call_with_event_id(
+            method,
+            path,
+            body=body,
+            params=params,
+            headers=headers,
+            delay=delay,
+        )
+
+    async def __execute_api_call_with_event_id(
+        self,
+        method: str,
+        path: str,
+        *,
+        body: Any | None = None,
+        out_type: type[T] | None = None,
+        params: QueryParamTypes | None = None,
+        headers: MutableMapping[str, str] | None = None,
+        delay: tenacity.wait.WaitBaseT | None = None,
+    ) -> T | None:
         @tenacity.retry(
             stop=tenacity.stop_after_delay(30),
             wait=delay or tenacity.wait_fixed(self.__configuration.sms_delivery_delay),
-            retry=saic_api_retry_policy,
+            retry=SaicApiRetryPolicy(),
             after=saic_api_after_retry,
             reraise=True,
         )
-        async def execute_api_call_with_event_id_inner(*, event_id: str):
-            actual_headers = headers or dict()
+        async def execute_api_call_with_event_id_inner(*, event_id: str) -> T | None:
+            actual_headers = headers or {}
             actual_headers.update({"event-id": event_id})
             return await self.__execute_api_call(
                 method,
@@ -154,19 +249,20 @@ class AbstractSaicApi(ABC):
 
         return await execute_api_call_with_event_id_inner(event_id="0")
 
+    # pylint: disable=too-many-branches
     async def __deserialize(
         self,
         request: httpx.Request,
         response: httpx.Response,
-        data_class: Optional[Type[T]],
+        data_class: type[T] | None,
         allow_null_body: bool,
-    ) -> Optional[T]:
+    ) -> T | None:
         try:
             request_event_id = request.headers.get("event-id")
             json_data = response.json()
             return_code = json_data.get("code", -1)
             error_message = json_data.get("message", "Unknown error")
-            logger.debug(f"Response code: {return_code} {response.text}")
+            logger.debug("Response code: %s %s", return_code, response.text)
 
             if return_code in (401, 403) or response.status_code in (401, 403):
                 self.logout()
@@ -174,14 +270,17 @@ class AbstractSaicApi(ABC):
 
             if return_code in (2, 3, 7):
                 logger.error(
-                    f"API call return code is not acceptable: {return_code}: {response.text}"
+                    "API call return code is not acceptable: %s: %s",
+                    return_code,
+                    response.text,
                 )
                 raise SaicApiException(error_message, return_code=return_code)
 
             if "event-id" in response.headers and "data" not in json_data:
                 event_id = response.headers["event-id"]
                 logger.info(
-                    f"Retrying since we got event-id in headers: {event_id}, but no data"
+                    "Retrying since we got event-id in headers: %s, but no data",
+                    event_id,
                 )
                 raise SaicApiRetryException(
                     error_message, event_id=event_id, return_code=return_code
@@ -190,7 +289,10 @@ class AbstractSaicApi(ABC):
             if return_code != 0:
                 if request_event_id is not None and request_event_id != "0":
                     logger.info(
-                        f"API call asked us to retry: {return_code}: {response.text}. Event id was: {request_event_id}"
+                        "API call asked us to retry: %s %s. Event id was: %s",
+                        return_code,
+                        response.text,
+                        request_event_id,
                     )
                     raise SaicApiRetryException(
                         error_message,
@@ -198,47 +300,48 @@ class AbstractSaicApi(ABC):
                         return_code=return_code,
                     )
                 logger.error(
-                    f"API call return code is not acceptable: {return_code}: {response.text}. Headers: {response.headers}"
+                    "API call return code is not acceptable: %s %s. Headers: %s",
+                    return_code,
+                    response.text,
+                    response.headers,
                 )
                 raise SaicApiException(error_message, return_code=return_code)
 
             if data_class is None:
                 return None
             if "data" in json_data:
-                if data_class is str:
-                    return json.dumps(json_data["data"])
-                if data_class is dict:
-                    return json_data["data"]
                 return dacite.from_dict(data_class, json_data["data"])
             if allow_null_body:
                 return None
-            raise SaicApiException(
+            msg = (
                 f"Failed to deserialize response, missing 'data' field: {response.text}"
             )
+            raise SaicApiException(msg)
 
         except SaicApiException as se:
             raise se
         except Exception as e:
             if response.is_error:
                 if response.status_code in (401, 403):
-                    logger.error(
-                        f"API call failed due to an authentication failure: {response.status_code} {response.text}",
-                        exc_info=e,
+                    logger.exception(
+                        "API call failed due to an authentication failure: %s %s",
+                        response.status_code,
+                        response.text,
                     )
                     self.logout()
                     raise SaicLogoutException(
                         response.text, response.status_code
                     ) from e
-                logger.error(
-                    f"API call failed: {response.status_code} {response.text}",
-                    exc_info=e,
+                logger.exception(
+                    "API call failed: %s %s",
+                    response.status_code,
+                    response.text,
                 )
                 raise SaicApiException(response.text, response.status_code) from e
-            raise SaicApiException(
-                f"Failed to deserialize response: {e}. Original json was {response.text}"
-            ) from e
+            msg = f"Failed to deserialize response: {e}. Original json was {response.text}"
+            raise SaicApiException(msg) from e
 
-    def logout(self):
+    def logout(self) -> None:
         self.__api_client.user_token = ""
         self.__token_expiration = None
 
@@ -251,35 +354,39 @@ class AbstractSaicApi(ABC):
         )
 
     @property
-    def token_expiration(self) -> Optional[datetime.datetime]:
+    def token_expiration(self) -> datetime.datetime | None:
         return self.__token_expiration
 
 
-def saic_api_after_retry(retry_state):
+def saic_api_after_retry(retry_state: RetryCallState) -> None:
+    if not retry_state.outcome:
+        return
     wrapped_exception = retry_state.outcome.exception()
     if isinstance(wrapped_exception, SaicApiRetryException):
         if "event_id" in retry_state.kwargs:
+            event_id = wrapped_exception.event_id
             logger.debug(
-                f"Updating event_id to the newly obtained value {wrapped_exception.event_id}"
+                "Updating event_id to the newly obtained value %d",
+                event_id,
             )
-            retry_state.kwargs["event_id"] = wrapped_exception.event_id
+            retry_state.kwargs["event_id"] = event_id
         else:
             logger.debug("Retrying without an event_id")
 
 
-def saic_api_retry_policy(retry_state):
-    is_failed = retry_state.outcome.failed
-    if is_failed:
-        wrapped_exception = retry_state.outcome.exception()
-        if isinstance(wrapped_exception, SaicApiRetryException):
-            logger.debug("Retrying since we got SaicApiRetryException")
-            return True
-        if isinstance(wrapped_exception, SaicLogoutException):
-            logger.error("Not retrying since we got logged out")
+class SaicApiRetryPolicy(retry_if_exception):
+    def __init__(self) -> None:
+        def __retry_policy(wrapped_exception: BaseException) -> bool:
+            if isinstance(wrapped_exception, SaicApiRetryException):
+                logger.debug("Retrying since we got SaicApiRetryException")
+                return True
+            if isinstance(wrapped_exception, SaicLogoutException):
+                logger.error("Not retrying since we got logged out")
+                return False
+            if isinstance(wrapped_exception, SaicApiException):
+                logger.error("Not retrying since we got a generic exception")
+                return False
+            logger.error("Not retrying", exc_info=wrapped_exception)
             return False
-        if isinstance(wrapped_exception, SaicApiException):
-            logger.error("Not retrying since we got a generic exception")
-            return False
-        logger.error(f"Not retrying {retry_state.args} {wrapped_exception}")
-        return False
-    return False
+
+        super().__init__(__retry_policy)

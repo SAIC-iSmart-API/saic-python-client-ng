@@ -6,7 +6,7 @@ from saic_ismart_client_ng.model import SaicApiConfiguration
 
 
 class TestSaicApiConfiguration(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.config = SaicApiConfiguration(
             "test_username",
             "test_password",
@@ -18,29 +18,29 @@ class TestSaicApiConfiguration(unittest.TestCase):
             5.0,
         )
 
-    def test_username(self):
-        self.assertEqual(self.config.username, "test_username")
+    def test_username(self) -> None:
+        assert self.config.username == "test_username"
 
-    def test_password(self):
-        self.assertEqual(self.config.password, "test_password")
+    def test_password(self) -> None:
+        assert self.config.password == "test_password"  # noqa: S105
 
-    def test_username_is_email(self):
-        self.assertEqual(self.config.username_is_email, True)
+    def test_username_is_email(self) -> None:
+        assert self.config.username_is_email
 
-    def test_phone_country_code(self):
-        self.assertEqual(self.config.phone_country_code, "GB")
+    def test_phone_country_code(self) -> None:
+        assert self.config.phone_country_code == "GB"
 
-    def test_base_uri(self):
-        self.assertEqual(self.config.base_uri, "https://test-uri.com")
+    def test_base_uri(self) -> None:
+        assert self.config.base_uri == "https://test-uri.com"
 
-    def test_tenant_id(self):
-        self.assertEqual(self.config.tenant_id, "123456")
+    def test_tenant_id(self) -> None:
+        assert self.config.tenant_id == "123456"
 
-    def test_region(self):
-        self.assertEqual(self.config.region, "test_region")
+    def test_region(self) -> None:
+        assert self.config.region == "test_region"
 
-    def test_sms_delivery_delay(self):
-        self.assertEqual(self.config.sms_delivery_delay, 5.0)
+    def test_sms_delivery_delay(self) -> None:
+        assert self.config.sms_delivery_delay == 5.0
 
 
 if __name__ == "__main__":

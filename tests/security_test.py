@@ -11,30 +11,28 @@ from saic_ismart_client_ng.net.crypto import get_app_verification_string
 from saic_ismart_client_ng.net.httpx import decrypt_httpx_request, encrypt_httpx_request
 
 
-def test_get_app_verification_string_valid():
-    clazz_simple_name = "SampleClass"
+def test_get_app_verification_string_valid() -> None:
     request_path = "/api/v1/data"
     current_ts = "20230514123000"
     tenant_id = "1234"
     content_type = "application/json"
     request_content = '{"key": "value"}'
-    user_token = "dummy_token"
+    user_token = "dummy_token"  # noqa: S105
 
     result = get_app_verification_string(
-        clazz_simple_name,
-        request_path,
-        current_ts,
-        tenant_id,
-        content_type,
-        request_content,
-        user_token,
+        request_path=request_path,
+        current_ts=current_ts,
+        tenant_id=tenant_id,
+        content_type=content_type,
+        request_content=request_content,
+        user_token=user_token,
     )
 
     assert result == "afd4eaf98af2d964f8ea840fc144ee7bae95dbeeeb251d5e3a01371442f92eeb"
 
 
 @pytest.mark.asyncio
-async def test_a_request_should_encrypt_properly():
+async def test_a_request_should_encrypt_properly() -> None:
     ts = datetime.datetime.now()
     expected_json = {"change": "me"}
     base_uri = "http://fake.server/"
@@ -49,13 +47,12 @@ async def test_a_request_should_encrypt_properly():
     region = "EU"
     tenant_id = "2559"
     computed_verification_string = get_app_verification_string(
-        "",
-        "/with/path?vin=zevin",
-        str(int(ts.timestamp() * 1000)),
-        tenant_id,
-        "application/json",
-        original_request_content,
-        "",
+        request_path="/with/path?vin=zevin",
+        current_ts=str(int(ts.timestamp() * 1000)),
+        tenant_id=tenant_id,
+        content_type="application/json",
+        request_content=original_request_content,
+        user_token="",
     )
 
     await encrypt_httpx_request(
@@ -78,7 +75,7 @@ async def test_a_request_should_encrypt_properly():
 
 
 @pytest.mark.asyncio
-async def test_a_request_should_decrypt_properly():
+async def test_a_request_should_decrypt_properly() -> None:
     ts = datetime.datetime.now()
     expected_json = {"change": "me"}
     base_uri = "http://fake.server/"
@@ -106,44 +103,40 @@ async def test_a_request_should_decrypt_properly():
     assert expected_json == decrypted_json
 
 
-def test_with_empty_request_path():
-    clazz_simple_name = "SampleClass"
+def test_with_empty_request_path() -> None:
     request_path = ""
     current_ts = "20230514123000"
     tenant_id = "1234"
     content_type = "application/json"
     request_content = '{"key": "value"}'
-    user_token = "dummy_token"
+    user_token = "dummy_token"  # noqa: S105
 
     result = get_app_verification_string(
-        clazz_simple_name,
-        request_path,
-        current_ts,
-        tenant_id,
-        content_type,
-        request_content,
-        user_token,
+        request_path=request_path,
+        current_ts=current_ts,
+        tenant_id=tenant_id,
+        content_type=content_type,
+        request_content=request_content,
+        user_token=user_token,
     )
     assert result == "ff8cb13ebcce5958e7fbfe602716c653fd72ce78842be87b6d50dccede198735"
 
 
-def test_with_no_request_content():
-    clazz_simple_name = "SampleClass"
+def test_with_no_request_content() -> None:
     request_path = "/api/v1/data"
     current_ts = "20230514123000"
     tenant_id = "1234"
     content_type = "application/json"
     request_content = ""
-    user_token = "dummy_token"
+    user_token = "dummy_token"  # noqa: S105
 
     result = get_app_verification_string(
-        clazz_simple_name,
-        request_path,
-        current_ts,
-        tenant_id,
-        content_type,
-        request_content,
-        user_token,
+        request_path=request_path,
+        current_ts=current_ts,
+        tenant_id=tenant_id,
+        content_type=content_type,
+        request_content=request_content,
+        user_token=user_token,
     )
     assert result == "332c85836aa9afc864282436a740eb2cc778fafd1fea74dd887c1f8de5056de0"
 
