@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 
 class AlarmType(Enum):
@@ -11,9 +11,9 @@ class AlarmType(Enum):
 
 @dataclass
 class AlarmSwitch:
-    alarmType: int = None
-    functionSwitch: int = None
-    alarmSwitch: int = None
+    alarmType: Optional[int] = None
+    functionSwitch: Optional[int] = None
+    alarmSwitch: Optional[int] = None
 
 
 @dataclass

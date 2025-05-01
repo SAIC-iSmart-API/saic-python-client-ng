@@ -1,3 +1,5 @@
+from typing import List
+
 from saic_ismart_client_ng import SaicVehicleApi
 from saic_ismart_client_ng.api.vehicle.alarm.schema import AlarmSwitchReq, AlarmSwitchResp, AlarmType, AlarmSwitch
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
@@ -14,7 +16,7 @@ class SaicVehicleAlarmApi(SaicVehicleApi):
             }
         )
 
-    async def set_alarm_switches(self, alarm_switches: [AlarmType], vin: str) -> None:
+    async def set_alarm_switches(self, alarm_switches: List[AlarmType], vin: str) -> None:
         actual_switches = [
             AlarmSwitch(alarmType=alarm_type.value, alarmSwitch=1, functionSwitch=1)
             for alarm_type in alarm_switches

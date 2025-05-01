@@ -3,7 +3,7 @@ import json
 import logging
 from abc import ABC
 from dataclasses import asdict
-from typing import Type, T, Optional, Any
+from typing import Type, Optional, Any, TypeVar
 
 import dacite
 import httpx
@@ -19,12 +19,14 @@ from saic_ismart_client_ng.net.client import SaicApiClient
 
 logger = logging.getLogger(__name__)
 
+T = TypeVar('T')
+
 
 class AbstractSaicApi(ABC):
     def __init__(
             self,
             configuration: SaicApiConfiguration,
-            listener: SaicApiListener = None,
+            listener: Optional[SaicApiListener] = None,
     ):
         self.__configuration = configuration
         self.__api_client = SaicApiClient(configuration, listener=listener)
@@ -71,7 +73,7 @@ class AbstractSaicApi(ABC):
             params: Optional[QueryParamTypes] = None,
             headers: Optional[HeaderTypes] = None,
             allow_null_body: bool = False,
-    ) -> Optional[T]:
+    ) -> T:
         try:
             return await self.__execute_api_call(
                 method,

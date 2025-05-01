@@ -9,41 +9,41 @@ from saic_ismart_client_ng.api.serialization_utils import decode_bytes
 
 @dataclass
 class VehicleModelConfiguration:
-    itemCode: str = None
-    itemName: str = None
-    itemValue: str = None
+    itemCode: Optional[str] = None
+    itemName: Optional[str] = None
+    itemValue: Optional[str] = None
 
 
 @dataclass
 class SubAccount:
-    authorizationCardType: int = None
-    btKeyStatus: int = None
-    locationAuthorization: int = None
-    modelName: str = None
-    operationType: int = None
-    status: int = None
-    subaccountId: int = None
-    subscriberId: int = None
-    userAccount: str = None
-    userName: str = None
-    validityEndTime: int = None
-    validityStartTime: int = None
-    vin: str = None
+    authorizationCardType: Optional[int] = None
+    btKeyStatus: Optional[int] = None
+    locationAuthorization: Optional[int] = None
+    modelName: Optional[str] = None
+    operationType: Optional[int] = None
+    status: Optional[int] = None
+    subaccountId: Optional[int] = None
+    subscriberId: Optional[int] = None
+    userAccount: Optional[str] = None
+    userName: Optional[str] = None
+    validityEndTime: Optional[int] = None
+    validityStartTime: Optional[int] = None
+    vin: Optional[str] = None
 
 
 @dataclass
 class VinInfo:
-    bindTime: int = None
-    brandName: str = None
-    colorName: str = None
-    isActivate: bool = None
-    isCurrentVehicle: bool = None
-    isSubaccount: bool = None
-    modelName: str = None
-    modelYear: str = None
-    name: str = None
-    series: str = None
-    vin: str = None
+    bindTime: Optional[int] = None
+    brandName: Optional[str] = None
+    colorName: Optional[str] = None
+    isActivate: Optional[bool] = None
+    isCurrentVehicle: Optional[bool] = None
+    isSubaccount: Optional[bool] = None
+    modelName: Optional[str] = None
+    modelYear: Optional[str] = None
+    name: Optional[str] = None
+    series: Optional[str] = None
+    vin: Optional[str] = None
     subAccountList: List[SubAccount] = field(default_factory=list)
     vehicleModelConfiguration: List[VehicleModelConfiguration] = field(default_factory=list)
 
@@ -55,50 +55,50 @@ class VehicleListResp:
 
 @dataclass
 class BasicVehicleStatus:
-    batteryVoltage: int = None
-    bonnetStatus: int = None
-    bootStatus: int = None
-    canBusActive: int = None
-    clstrDspdFuelLvlSgmt: int = None
-    currentJourneyId: int = None
-    currentJourneyDistance: int = None
-    dippedBeamStatus: int = None
-    driverDoor: int = None
+    batteryVoltage: Optional[int] = None
+    bonnetStatus: Optional[int] = None
+    bootStatus: Optional[int] = None
+    canBusActive: Optional[int] = None
+    clstrDspdFuelLvlSgmt: Optional[int] = None
+    currentJourneyId: Optional[int] = None
+    currentJourneyDistance: Optional[int] = None
+    dippedBeamStatus: Optional[int] = None
+    driverDoor: Optional[int] = None
     driverWindow: Optional[int] = None
-    engineStatus: int = None
+    engineStatus: Optional[int] = None
     extendedData1: Optional[int] = None
     extendedData2: Optional[int] = None
-    exteriorTemperature: int = None
+    exteriorTemperature: Optional[int] = None
     frontLeftSeatHeatLevel: Optional[int] = None
     frontLeftTyrePressure: Optional[int] = None
     frontRightSeatHeatLevel: Optional[int] = None
     frontRightTyrePressure: Optional[int] = None
-    fuelLevelPrc: int = None
-    fuelRange: int = None
+    fuelLevelPrc: Optional[int] = None
+    fuelRange: Optional[int] = None
     fuelRangeElec: Optional[int] = None
-    handBrake: int = None
-    interiorTemperature: int = None
-    lastKeySeen: int = None
-    lockStatus: int = None
-    mainBeamStatus: int = None
-    mileage: int = None
-    passengerDoor: int = None
+    handBrake: Optional[int] = None
+    interiorTemperature: Optional[int] = None
+    lastKeySeen: Optional[int] = None
+    lockStatus: Optional[int] = None
+    mainBeamStatus: Optional[int] = None
+    mileage: Optional[int] = None
+    passengerDoor: Optional[int] = None
     passengerWindow: Optional[int] = None
-    powerMode: int = None
-    rearLeftDoor: int = None
+    powerMode: Optional[int] = None
+    rearLeftDoor: Optional[int] = None
     rearLeftTyrePressure: Optional[int] = None
     rearLeftWindow: Optional[int] = None
-    rearRightDoor: int = None
+    rearRightDoor: Optional[int] = None
     rearRightTyrePressure: Optional[int] = None
     rearRightWindow: Optional[int] = None
-    remoteClimateStatus: int = None
-    rmtHtdRrWndSt: int = None
-    sideLightStatus: int = None
-    steeringHeatLevel: int = None
-    steeringWheelHeatFailureReason: int = None
+    remoteClimateStatus: Optional[int] = None
+    rmtHtdRrWndSt: Optional[int] = None
+    sideLightStatus: Optional[int] = None
+    steeringHeatLevel: Optional[int] = None
+    steeringWheelHeatFailureReason: Optional[int] = None
     sunroofStatus: Optional[int] = None
-    timeOfLastCANBUSActivity: int = None
-    vehElecRngDsp: int = None
+    timeOfLastCANBUSActivity: Optional[int] = None
+    vehElecRngDsp: Optional[int] = None
     vehicleAlarmStatus: Optional[int] = None
     wheelTyreMonitorStatus: Optional[int] = None
 
@@ -110,21 +110,21 @@ class ExtendedVehicleStatus:
 
 @dataclass
 class VehicleStatusResp:
-    basicVehicleStatus: BasicVehicleStatus = None
-    extendedVehicleStatus: ExtendedVehicleStatus = None
-    gpsPosition: GpsPosition = None
-    statusTime: int = None
+    basicVehicleStatus: Optional[BasicVehicleStatus] = None
+    extendedVehicleStatus: Optional[ExtendedVehicleStatus] = None
+    gpsPosition: Optional[GpsPosition] = None
+    statusTime: Optional[int] = None
 
     @property
     def is_parked(self) -> bool:
-        return (
-                self.basicVehicleStatus.engineStatus != 1
-                or self.basicVehicleStatus.handBrake
+        return (v := self.basicVehicleStatus) is not None and (
+                v.engineStatus != 1
+                or v.handBrake == 1
         )
 
     @property
     def is_engine_running(self) -> bool:
-        return self.basicVehicleStatus.engineStatus == 1
+        return (v := self.basicVehicleStatus) is not None and v.engineStatus == 1
 
 
 class RvcParamsId(Enum):
@@ -178,11 +178,11 @@ class RvcReqType(Enum):
 
 @dataclass
 class VehicleControlReq:
-    rvcParams: List[RvcParams]
+    rvcParams: Optional[List[RvcParams]]
     rvcReqType: Optional[str | int]
     vin: str
 
-    def __init__(self, rvc_params: List[RvcParams], rvc_req_type: RvcReqType, vin: str):
+    def __init__(self, rvc_params: Optional[List[RvcParams]], rvc_req_type: RvcReqType, vin: str):
         self.rvcParams = rvc_params
         self.rvcReqType = rvc_req_type.value
         self.vin = vin
@@ -194,9 +194,9 @@ class VehicleControlReq:
 
 @dataclass
 class VehicleControlResp:
-    basicVehicleStatus: BasicVehicleStatus = None
-    failureType: int = None
-    gpsPosition: GpsPosition = None
+    basicVehicleStatus: Optional[BasicVehicleStatus] = None
+    failureType: Optional[int] = None
+    gpsPosition: Optional[GpsPosition] = None
     rvcReqSts: Optional[str | int] = None
     rvcReqType: Optional[str | int] = None
 

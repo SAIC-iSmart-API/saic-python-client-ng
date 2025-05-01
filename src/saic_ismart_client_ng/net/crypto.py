@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import logging
 from datetime import datetime
+from typing import Tuple
 
 from saic_ismart_client_ng.crypto_utils import md5_hex_digest, encrypt_aes_cbc_pkcs5_padding, \
     decrypt_aes_cbc_pkcs5_padding
@@ -58,7 +59,7 @@ def encrypt_request(
         tenant_id: str,
         user_token: str = "",
         class_name: str = "",
-) -> (str, dict):
+) -> tuple[str, dict]:
     if user_token is None:
         user_token = ""
     if class_name is None:
@@ -200,7 +201,7 @@ def decrypt_response(
         original_response_content: str,
         original_response_headers: dict,
         original_response_charset: str,
-) -> (bytes, dict):
+) -> Tuple[bytes, dict]:
     resp_content = original_response_content.strip()
     if resp_content:
         app_send_date = original_response_headers.get("APP-SEND-DATE")

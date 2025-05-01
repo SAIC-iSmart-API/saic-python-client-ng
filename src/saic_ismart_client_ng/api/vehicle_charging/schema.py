@@ -73,10 +73,13 @@ class BmsChargingStatusCode(Enum):
 
 
 class HeatingStopReason(Enum):
+    NO_REASON = 0
+    UNKNOWN_1 = 1
     LOW_BATTERY = 2
     REACHED_STOP_CONDITION = 3
     UNNECESSARY = 4
     REACHED_STOP_TIME = 5
+    UNKNOWN_6 = 6
     HEATING_SYSTEM_FAILURE = 7
 
     @staticmethod
@@ -156,65 +159,65 @@ class TargetBatteryCode(Enum):
 
 @dataclass
 class ChargingStatus:
-    chargingCurrent: int = None
-    chargingDuration: int = None
-    chargingElectricityPhase: int = None
-    chargingGunState: int = None
-    chargingPileID: str = None
-    chargingPileSupplier: str = None
-    chargingState: int = None
-    chargingTimeLevelPrc: int = None
-    chargingType: int = None
-    chargingVoltage: int = None
-    endTime: int = None
-    fotaLowestVoltage: int = None
-    fuelRangeElec: int = None
-    lastChargeEndingPower: int = None
-    mileage: int = None
-    mileageOfDay: int = None
-    mileageSinceLastCharge: int = None
-    powerLevelPrc: int = None
-    powerUsageOfDay: int = None
-    powerUsageSinceLastCharge: int = None
-    realtimePower: int = None
-    startTime: int = None
-    staticEnergyConsumption: int = None
-    totalBatteryCapacity: int = None
-    workingCurrent: int = None
-    workingVoltage: int = None
+    chargingCurrent: Optional[int] = None
+    chargingDuration: Optional[int] = None
+    chargingElectricityPhase: Optional[int] = None
+    chargingGunState: Optional[int] = None
+    chargingPileID: Optional[str] = None
+    chargingPileSupplier: Optional[str] = None
+    chargingState: Optional[int] = None
+    chargingTimeLevelPrc: Optional[int] = None
+    chargingType: Optional[int] = None
+    chargingVoltage: Optional[int] = None
+    endTime: Optional[int] = None
+    fotaLowestVoltage: Optional[int] = None
+    fuelRangeElec: Optional[int] = None
+    lastChargeEndingPower: Optional[int] = None
+    mileage: Optional[int] = None
+    mileageOfDay: Optional[int] = None
+    mileageSinceLastCharge: Optional[int] = None
+    powerLevelPrc: Optional[int] = None
+    powerUsageOfDay: Optional[int] = None
+    powerUsageSinceLastCharge: Optional[int] = None
+    realtimePower: Optional[int] = None
+    startTime: Optional[int] = None
+    staticEnergyConsumption: Optional[int] = None
+    totalBatteryCapacity: Optional[int] = None
+    workingCurrent: Optional[int] = None
+    workingVoltage: Optional[int] = None
 
 
 @dataclass
 class ChargeStatusResp:
-    chargingStatus: ChargingStatus = None
-    gpsPosition: GpsPosition = None
-    statusTime: int = None
+    chargingStatus: Optional[ChargingStatus] = None
+    gpsPosition: Optional[GpsPosition] = None
+    statusTime: Optional[int] = None
 
 
 @dataclass
 class ChrgMgmtData:
-    bmsAdpPubChrgSttnDspCmd: int = None
-    bmsAltngChrgCrntDspCmd: int = None
-    bmsChrgCtrlDspCmd: int = None
-    bmsChrgOtptCrntReq: int = None
+    bmsAdpPubChrgSttnDspCmd: Optional[int] = None
+    bmsAltngChrgCrntDspCmd: Optional[int] = None
+    bmsChrgCtrlDspCmd: Optional[int] = None
+    bmsChrgOtptCrntReq: Optional[int] = None
     bmsChrgOtptCrntReqV: Optional[int] = None
-    bmsChrgSpRsn: int = None
-    bmsChrgSts: int = None
+    bmsChrgSpRsn: Optional[int] = None
+    bmsChrgSts: Optional[int] = None
     bmsDsChrgSpRsn: Optional[int] = None
-    bmsEstdElecRng: int = None
-    bmsOnBdChrgTrgtSOCDspCmd: int = None
-    bmsPackCrnt: int = None
+    bmsEstdElecRng: Optional[int] = None
+    bmsOnBdChrgTrgtSOCDspCmd: Optional[int] = None
+    bmsPackCrnt: Optional[int] = None
     bmsPackCrntV: Optional[int] = None
-    bmsPackSOCDsp: int = None
-    bmsPackVol: int = None
-    bmsPTCHeatReqDspCmd: int = None
+    bmsPackSOCDsp: Optional[int] = None
+    bmsPackVol: Optional[int] = None
+    bmsPTCHeatReqDspCmd: Optional[int] = None
     bmsPTCHeatResp: Optional[int] = None
     bmsPTCHeatSpRsn: Optional[int] = None
-    bmsReserCtrlDspCmd: int = None
-    bmsReserSpHourDspCmd: int = None
-    bmsReserSpMintueDspCmd: int = None
-    bmsReserStHourDspCmd: int = None
-    bmsReserStMintueDspCmd: int = None
+    bmsReserCtrlDspCmd: Optional[int] = None
+    bmsReserSpHourDspCmd: Optional[int] = None
+    bmsReserSpMintueDspCmd: Optional[int] = None
+    bmsReserStHourDspCmd: Optional[int] = None
+    bmsReserStMintueDspCmd: Optional[int] = None
     ccuEleccLckCtrlDspCmd: Optional[int] = None
     ccuOffBdChrgrPlugOn: Optional[int] = None
     ccuOnbdChrgrPlugOn: Optional[int] = None
@@ -222,11 +225,11 @@ class ChrgMgmtData:
     chrgngAddedElecRngV: Optional[int] = None
     chrgngDoorOpenCnd: Optional[int] = None
     chrgngDoorPosSts: Optional[int] = None
-    chrgngRmnngTime: int = None
-    chrgngRmnngTimeV: int = None
+    chrgngRmnngTime: Optional[int] = None
+    chrgngRmnngTimeV: Optional[int] = None
     chrgngSpdngTime: Optional[int] = None
     chrgngSpdngTimeV: Optional[int] = None
-    clstrElecRngToEPT: int = None
+    clstrElecRngToEPT: Optional[int] = None
     disChrgngRmnngTime: Optional[int] = None
     disChrgngRmnngTimeV: Optional[int] = None
     imcuChrgngEstdElecRng: Optional[int] = None
@@ -239,16 +242,16 @@ class ChrgMgmtData:
     onBdChrgrAltrCrntInptVol: Optional[int] = None
 
     @property
-    def decoded_current(self) -> float:
-        return self.bmsPackCrnt * 0.05 - 1000.0
+    def decoded_current(self) -> float | None:
+        return self.bmsPackCrnt * 0.05 - 1000.0 if self.bmsPackCrnt is not None else None
 
     @property
-    def decoded_voltage(self) -> float:
-        return self.bmsPackVol * 0.25
+    def decoded_voltage(self) -> float | None:
+        return self.bmsPackVol * 0.25 if self.bmsPackVol is not None else None
 
     @property
-    def decoded_power(self) -> float:
-        return self.decoded_current * self.decoded_voltage / 1000.0
+    def decoded_power(self) -> float | None:
+        return self.decoded_current * self.decoded_voltage / 1000.0 if self.decoded_current is not None and self.decoded_voltage is not None else None
 
     @property
     def charge_target_soc(self) -> Optional[TargetBatteryCode]:
@@ -294,7 +297,7 @@ class ChrgMgmtData:
 
     @property
     def heating_stop_reason(self) -> HeatingStopReason | None:
-        if self.bmsPTCHeatSpRsn is not None:
+        if self.bmsPTCHeatResp is not None:
             return HeatingStopReason.to_code(self.bmsPTCHeatResp)
         return None
 
@@ -303,24 +306,24 @@ class ChrgMgmtData:
 class RvsChargeStatus:
     chargingDuration: Optional[int] = None
     chargingElectricityPhase: Optional[int] = None
-    chargingGunState: int = None
+    chargingGunState: Optional[int] = None
     chargingPileID: Optional[str] = None
     chargingPileSupplier: Optional[str] = None
-    chargingType: int = None
+    chargingType: Optional[int] = None
     endTime: Optional[int] = None
     extendedData1: Optional[int] = None
     extendedData2: Optional[int] = None
     extendedData3: Optional[str] = None
     extendedData4: Optional[str] = None
     fotaLowestVoltage: Optional[int] = None
-    fuelRangeElec: int = None
+    fuelRangeElec: Optional[int] = None
     lastChargeEndingPower: Optional[int] = None
-    mileage: int = None
+    mileage: Optional[int] = None
     mileageOfDay: Optional[int] = None
     mileageSinceLastCharge: Optional[int] = None
     powerUsageOfDay: Optional[int] = None
     powerUsageSinceLastCharge: Optional[int] = None
-    realtimePower: int = None
+    realtimePower: Optional[int] = None
     startTime: Optional[int] = None
     staticEnergyConsumption: Optional[int] = None
     totalBatteryCapacity: Optional[int] = None
@@ -330,28 +333,28 @@ class RvsChargeStatus:
 
 @dataclass
 class ChrgMgmtDataResp:
-    chrgMgmtData: ChrgMgmtData = None,
-    rvsChargeStatus: RvsChargeStatus = None,
+    chrgMgmtData: Optional[ChrgMgmtData] = None
+    rvsChargeStatus: Optional[RvsChargeStatus] = None
 
 
 @dataclass
 class ChargingSettingRequest:
-    altngChrgCrntReq: int = None
-    onBdChrgTrgtSOCReq: int = None
-    tboxV2XSpSOCReq: int = None
-    vin: str = None
+    altngChrgCrntReq: Optional[int] = None
+    onBdChrgTrgtSOCReq: Optional[int] = None
+    tboxV2XSpSOCReq: Optional[int] = None
+    vin: Optional[str] = None
 
 
 @dataclass
 class ChargingSettingResp:
-    bmsAltngChrgCrntDspCmd: int = None
-    bmsAltngChrgCrntResp: int = None
-    bmsChrgTrgtSOCResp: int = None
-    bmsEstdElecRng: int = None
-    bmsOnBdChrgTrgtSOCDspCmd: int = None
-    bmsPackCrnt: int = None
-    imcuDschrgTrgtSOCDspCmd: int = None
-    imcuDschrgTrgtSOCResp: int = None
+    bmsAltngChrgCrntDspCmd: Optional[int] = None
+    bmsAltngChrgCrntResp: Optional[int] = None
+    bmsChrgTrgtSOCResp: Optional[int] = None
+    bmsEstdElecRng: Optional[int] = None
+    bmsOnBdChrgTrgtSOCDspCmd: Optional[int] = None
+    bmsPackCrnt: Optional[int] = None
+    imcuDschrgTrgtSOCDspCmd: Optional[int] = None
+    imcuDschrgTrgtSOCResp: Optional[int] = None
     rvcReqSts: Optional[str | int] = None
 
     @property
@@ -385,24 +388,24 @@ class ChargingSettingResp:
 
 @dataclass
 class ScheduledChargingRequest:
-    rsvanSpHour: int = None
-    rsvanSpMintue: int = None
-    rsvanStHour: int = None
-    rsvanStMintue: int = None
-    tboxAdpPubChrgSttnReq: int = None
-    tboxReserCtrlReq: int = None
-    vin: str = None
+    rsvanSpHour: Optional[int] = None
+    rsvanSpMintue: Optional[int] = None
+    rsvanStHour: Optional[int] = None
+    rsvanStMintue: Optional[int] = None
+    tboxAdpPubChrgSttnReq: Optional[int] = None
+    tboxReserCtrlReq: Optional[int] = None
+    vin: Optional[str] = None
 
 
 @dataclass
 class ScheduledChargingResp:
-    bmsAdpPubChrgSttnDspCmd: int = None
-    bmsReserChrgCtrlResp: int = None
-    bmsReserCtrlDspCmd: int = None
-    bmsReserSpHourDspCmd: int = None
-    bmsReserSpMintueDspCmd: int = None
-    bmsReserStHourDspCmd: int = None
-    bmsReserStMintueDspCmd: int = None
+    bmsAdpPubChrgSttnDspCmd: Optional[int] = None
+    bmsReserChrgCtrlResp: Optional[int] = None
+    bmsReserCtrlDspCmd: Optional[int] = None
+    bmsReserSpHourDspCmd: Optional[int] = None
+    bmsReserSpMintueDspCmd: Optional[int] = None
+    bmsReserStHourDspCmd: Optional[int] = None
+    bmsReserStMintueDspCmd: Optional[int] = None
     rvcReqSts: Optional[str | int] = None
 
     @property
@@ -412,14 +415,14 @@ class ScheduledChargingResp:
 
 @dataclass
 class ChargingPtcHeatRequest:
-    ptcHeatReq: int = None
-    vin: str = None
+    ptcHeatReq: Optional[int] = None
+    vin: Optional[str] = None
 
 
 @dataclass
 class ChrgPtcHeatResp:
-    ptcHeatReqDspCmd: int = None
-    ptcHeatResp: int = None
+    ptcHeatReqDspCmd: Optional[int] = None
+    ptcHeatResp: Optional[int] = None
     rvcReqSts: Optional[str | int] = None
 
     @property
@@ -435,68 +438,68 @@ class ChrgPtcHeatResp:
 
 @dataclass
 class ChargingControlRequest:
-    chrgCtrlReq: int = None
-    tboxEleccLckCtrlReq: int = None
-    tboxV2XReq: int = None
-    vin: str = None
+    chrgCtrlReq: Optional[int] = None
+    tboxEleccLckCtrlReq: Optional[int] = None
+    tboxV2XReq: Optional[int] = None
+    vin: Optional[str] = None
 
 
 @dataclass
 class ChargingControlResp:
-    bmsAdpPubChrgSttnDspCmd: int = None
-    bmsAltngChrgCrntDspCmd: int = None
-    bmsAltngChrgCrntResp: int = None
-    bmsChrgCtrlDspCmd: int = None
-    bmsChrgOtptCrntReq: int = None
-    bmsChrgOtptCrntReqV: int = None
-    bmsChrgSpRsn: int = None
-    bmsChrgSts: int = None
-    bmsChrgTrgtSOCResp: int = None
-    bmsDsChrgCtrlDspCmd: int = None
-    bmsDsChrgCtrlResp: int = None
-    bmsDsChrgSpRsn: int = None
-    bmsEstdElecRng: int = None
-    bmsOnBdChrgTrgtSOCDspCmd: int = None
-    bmsPTCHeatReqDspCmd: int = None
-    bmsPTCHeatResp: int = None
-    bmsPTCHeatSpRsn: int = None
-    bmsPackCrnt: int = None
-    bmsPackCrntV: int = None
-    bmsPackSOCDsp: int = None
-    bmsPackVol: int = None
-    bmsReserChrgCtrlResp: int = None
-    bmsReserCtrlDspCmd: int = None
-    bmsReserSpHourDspCmd: int = None
-    bmsReserSpMintueDspCmd: int = None
-    bmsReserStHourDspCmd: int = None
-    bmsReserStMintueDspCmd: int = None
-    ccuEleccLckCtrlDspCmd: int = None
-    ccuEleccLckCtrlResp: int = None
-    ccuOffBdChrgrPlugOn: int = None
-    ccuOnbdChrgrPlugOn: int = None
-    chrgCtrlDspCmd: int = None
-    chrgCtrlResp: int = None
-    chrgngAddedElecRng: int = None
-    chrgngAddedElecRngV: int = None
-    chrgngDoorOpenCnd: int = None
-    chrgngDoorPosSts: int = None
-    chrgngRmnngTime: int = None
-    chrgngRmnngTimeV: int = None
-    chrgngSpdngTime: int = None
-    chrgngSpdngTimeV: int = None
-    clstrElecRngToEPT: int = None
-    disChrgngRmnngTime: int = None
-    disChrgngRmnngTimeV: int = None
-    imcuChrgngEstdElecRng: int = None
-    imcuChrgngEstdElecRngV: int = None
-    imcuDschrgTrgtSOCDspCmd: int = None
-    imcuDschrgTrgtSOCResp: int = None
-    imcuDschrgngEstdElecRng: int = None
-    imcuDschrgngEstdElecRngV: int = None
-    imcuVehElecRng: int = None
-    imcuVehElecRngV: int = None
-    onBdChrgrAltrCrntInptCrnt: int = None
-    onBdChrgrAltrCrntInptVol: int = None
+    bmsAdpPubChrgSttnDspCmd: Optional[int] = None
+    bmsAltngChrgCrntDspCmd: Optional[int] = None
+    bmsAltngChrgCrntResp: Optional[int] = None
+    bmsChrgCtrlDspCmd: Optional[int] = None
+    bmsChrgOtptCrntReq: Optional[int] = None
+    bmsChrgOtptCrntReqV: Optional[int] = None
+    bmsChrgSpRsn: Optional[int] = None
+    bmsChrgSts: Optional[int] = None
+    bmsChrgTrgtSOCResp: Optional[int] = None
+    bmsDsChrgCtrlDspCmd: Optional[int] = None
+    bmsDsChrgCtrlResp: Optional[int] = None
+    bmsDsChrgSpRsn: Optional[int] = None
+    bmsEstdElecRng: Optional[int] = None
+    bmsOnBdChrgTrgtSOCDspCmd: Optional[int] = None
+    bmsPTCHeatReqDspCmd: Optional[int] = None
+    bmsPTCHeatResp: Optional[int] = None
+    bmsPTCHeatSpRsn: Optional[int] = None
+    bmsPackCrnt: Optional[int] = None
+    bmsPackCrntV: Optional[int] = None
+    bmsPackSOCDsp: Optional[int] = None
+    bmsPackVol: Optional[int] = None
+    bmsReserChrgCtrlResp: Optional[int] = None
+    bmsReserCtrlDspCmd: Optional[int] = None
+    bmsReserSpHourDspCmd: Optional[int] = None
+    bmsReserSpMintueDspCmd: Optional[int] = None
+    bmsReserStHourDspCmd: Optional[int] = None
+    bmsReserStMintueDspCmd: Optional[int] = None
+    ccuEleccLckCtrlDspCmd: Optional[int] = None
+    ccuEleccLckCtrlResp: Optional[int] = None
+    ccuOffBdChrgrPlugOn: Optional[int] = None
+    ccuOnbdChrgrPlugOn: Optional[int] = None
+    chrgCtrlDspCmd: Optional[int] = None
+    chrgCtrlResp: Optional[int] = None
+    chrgngAddedElecRng: Optional[int] = None
+    chrgngAddedElecRngV: Optional[int] = None
+    chrgngDoorOpenCnd: Optional[int] = None
+    chrgngDoorPosSts: Optional[int] = None
+    chrgngRmnngTime: Optional[int] = None
+    chrgngRmnngTimeV: Optional[int] = None
+    chrgngSpdngTime: Optional[int] = None
+    chrgngSpdngTimeV: Optional[int] = None
+    clstrElecRngToEPT: Optional[int] = None
+    disChrgngRmnngTime: Optional[int] = None
+    disChrgngRmnngTimeV: Optional[int] = None
+    imcuChrgngEstdElecRng: Optional[int] = None
+    imcuChrgngEstdElecRngV: Optional[int] = None
+    imcuDschrgTrgtSOCDspCmd: Optional[int] = None
+    imcuDschrgTrgtSOCResp: Optional[int] = None
+    imcuDschrgngEstdElecRng: Optional[int] = None
+    imcuDschrgngEstdElecRngV: Optional[int] = None
+    imcuVehElecRng: Optional[int] = None
+    imcuVehElecRngV: Optional[int] = None
+    onBdChrgrAltrCrntInptCrnt: Optional[int] = None
+    onBdChrgrAltrCrntInptVol: Optional[int] = None
     rvcReqSts: Optional[str | int] = None
 
     @property
@@ -562,15 +565,15 @@ class ChargingControlResp:
 
 @dataclass
 class ScheduledBatteryHeatingRequest:
-    startTime: int = None
-    status: int = None
-    vin: str = None
+    startTime: Optional[int] = None
+    status: Optional[int] = None
+    vin: Optional[str] = None
 
 
 @dataclass
 class ScheduledBatteryHeatingResp:
-    startTime: int = None
-    status: int = None
+    startTime: Optional[int] = None
+    status: Optional[int] = None
 
     @property
     def is_enabled(self) -> bool:

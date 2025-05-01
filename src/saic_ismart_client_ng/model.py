@@ -1,10 +1,13 @@
+from typing import Optional
+
+
 class SaicApiConfiguration:
     def __init__(
             self,
             username: str,
             password: str,
             username_is_email: bool = True,
-            phone_country_code: str = None,
+            phone_country_code: Optional[str] = None,
             base_uri: str = "https://gateway-mg-eu.soimt.com/api.app/v1/",
             tenant_id: str = "459771",
             region: str = "eu",

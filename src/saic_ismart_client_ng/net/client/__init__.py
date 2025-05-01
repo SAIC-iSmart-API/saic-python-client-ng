@@ -7,13 +7,14 @@ from httpx import Request, Response
 from saic_ismart_client_ng.listener import SaicApiListener
 from saic_ismart_client_ng.model import SaicApiConfiguration
 from saic_ismart_client_ng.net.httpx import decrypt_httpx_response, encrypt_httpx_request
+from typing import Optional
 
 
 class SaicApiClient:
     def __init__(
             self,
             configuration: SaicApiConfiguration,
-            listener: SaicApiListener = None,
+            listener: Optional[SaicApiListener] = None,
             logger: logging.Logger = logging.getLogger(__name__)
     ):
         self.__configuration = configuration
@@ -67,15 +68,16 @@ class SaicApiClient:
             return
         try:
             body = await response.aread()
+            decoded_body = None
             if body:
                 try:
-                    body = body.decode("utf-8")
+                    decoded_body = body.decode("utf-8")
                 except Exception as e:
                     self.__logger.warning(f"Error decoding request content: {e}", exc_info=e)
 
             await self.__listener.on_response(
                 path=str(response.url).replace(self.__configuration.base_uri, "/"),
-                body=body,
+                body=decoded_body,
                 headers=dict(response.headers),
             )
         except Exception as e:

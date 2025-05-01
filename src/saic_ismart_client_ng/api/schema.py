@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -9,28 +10,28 @@ logger = logging.getLogger(__name__)
 class LoginResp():
     @dataclass
     class LoginRespDetail():
-        languageType: str = None,
+        languageType: Optional[str] = None
 
-    access_token: str = None,
-    account: str = None,
-    avatar: str = None
-    client_id: str = None,
-    dept_id: str = None,
-    detail: LoginRespDetail = None,
-    expires_in: int = None,
-    jti: str = None,
-    languageType: str = None,
-    license: str = None,
-    oauth_id: str = None,
-    post_id: str = None,
-    refresh_token: str = None,
-    role_id: str = None,
-    role_name: str = None,
-    scope: str = None,
-    tenant_id: str = None,
-    token_type: str = None,
-    user_id: str = None,
-    user_name: str = None,
+    access_token: Optional[str] = None
+    account: Optional[str] = None
+    avatar: Optional[str] = None
+    client_id: Optional[str] = None
+    dept_id: Optional[str] = None
+    detail: Optional[LoginRespDetail] = None
+    expires_in: Optional[int] = None
+    jti: Optional[str] = None
+    languageType: Optional[str] = None
+    license: Optional[str] = None
+    oauth_id: Optional[str] = None
+    post_id: Optional[str] = None
+    refresh_token: Optional[str] = None
+    role_id: Optional[str] = None
+    role_name: Optional[str] = None
+    scope: Optional[str] = None
+    tenant_id: Optional[str] = None
+    token_type: Optional[str] = None
+    user_id: Optional[str] = None
+    user_name: Optional[str] = None
 
 
 class GpsStatus(Enum):
@@ -46,22 +47,22 @@ class GpsPosition:
     class WayPoint:
         @dataclass
         class Position:
-            altitude: int = None
-            latitude: int = None
-            longitude: int = None
+            altitude: Optional[int] = None
+            latitude: Optional[int] = None
+            longitude: Optional[int] = None
 
-        hdop: int = None
-        heading: int = None
-        position: Position = None
-        satellites: int = None
-        speed: int = None
+        hdop: Optional[int] = None
+        heading: Optional[int] = None
+        position: Optional[Position] = None
+        satellites: Optional[int] = None
+        speed: Optional[int] = None
 
-    gpsStatus: int = None
-    timeStamp: int = None
-    wayPoint: WayPoint = None
+    gpsStatus: Optional[int] = None
+    timeStamp: Optional[int] = None
+    wayPoint: Optional[WayPoint] = None
 
     @property
-    def gps_status_decoded(self) -> GpsStatus | None:
+    def gps_status_decoded(self) -> Optional[GpsStatus]:
         value = self.gpsStatus
         if value is None:
             return None

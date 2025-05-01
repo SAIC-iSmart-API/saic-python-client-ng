@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 from saic_ismart_client_ng.api.base import AbstractSaicApi
 from saic_ismart_client_ng.api.vehicle_charging.schema import ChargeStatusResp, ChargingControlRequest, \
@@ -80,8 +80,8 @@ class SaicVehicleChargingApi(AbstractSaicApi):
             self,
             vin: str,
             *,
-            start_time: datetime.time,
-            end_time: datetime.time,
+            start_time: time,
+            end_time: time,
             mode: ScheduledChargingMode
     ) -> ScheduledChargingResp:
         start_hour = start_time.hour
@@ -136,7 +136,7 @@ class SaicVehicleChargingApi(AbstractSaicApi):
             self,
             vin: str,
             *,
-            start_time: datetime.time,
+            start_time: time,
     ) -> None:
         start_date = datetime.now().replace(
             hour=start_time.hour,

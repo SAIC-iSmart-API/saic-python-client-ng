@@ -1,3 +1,5 @@
+from typing import List
+
 from saic_ismart_client_ng import SaicVehicleApi
 from saic_ismart_client_ng.api.vehicle.schema import VehicleControlReq, VehicleControlResp, RvcParams, RvcReqType, \
     RvcParamsId
@@ -13,7 +15,7 @@ class SaicVehicleWindowsApi(SaicVehicleApi):
     async def close_driver_window(self, vin: str) -> VehicleControlResp:
         return await self.control_windows(vin, should_open=False, windows=[VehicleWindowId.DRIVER])
 
-    async def control_windows(self, vin: str, *, should_open: bool, windows: [VehicleWindowId]) -> VehicleControlResp:
+    async def control_windows(self, vin: str, *, should_open: bool, windows: List[VehicleWindowId]) -> VehicleControlResp:
         requested_windows = [w.value.value for w in windows]
         rcv_params = []
         for i in [

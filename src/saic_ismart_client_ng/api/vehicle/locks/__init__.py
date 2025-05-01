@@ -5,6 +5,7 @@ from saic_ismart_client_ng.api.vehicle.locks.schema import VehicleLockId
 from saic_ismart_client_ng.api.vehicle.schema import VehicleControlReq, VehicleControlResp, RvcParams, \
     RvcReqType, RvcParamsId
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
+from saic_ismart_client_ng.exceptions import SaicApiException
 
 
 class SaicVehicleLocksApi(SaicVehicleApi):
@@ -29,6 +30,8 @@ class SaicVehicleLocksApi(SaicVehicleApi):
             request_type = RvcReqType.CLOSE_LOCKS
             params = None
         else:
+            if lock_id is None:
+                raise SaicApiException("Can't unlock without lock_id")
             request_type = RvcReqType.OPEN_LOCKS
             params = [
                 RvcParams(RvcParamsId.UNK_4, b'\x00'),

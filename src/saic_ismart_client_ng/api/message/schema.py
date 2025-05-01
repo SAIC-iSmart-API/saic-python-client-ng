@@ -15,18 +15,18 @@ MESSAGE_DATE_TIME_FORMATS = [
 
 @dataclass
 class MessageEntity:
-    content: str = None
-    contentId: str = None
+    content: Optional[str] = None
+    contentId: Optional[str] = None
     contentIdList: list = field(default_factory=list)
-    createTime: int = None
-    messageId: Union[str, int] = None
-    messageTime: str = None
-    messageType: str = None
-    readStatus: int = None
-    sender: str = None
-    showCheckButton: bool = None
-    title: str = None
-    vin: str = None
+    createTime: Optional[int] = None
+    messageId: Union[str, int, None] = None
+    messageTime: Optional[str] = None
+    messageType: Optional[str] = None
+    readStatus: Optional[int] = None
+    sender: Optional[str] = None
+    showCheckButton: Optional[bool] = None
+    title: Optional[str] = None
+    vin: Optional[str] = None
 
     @property
     def message_time(self) -> datetime.datetime:
@@ -57,13 +57,13 @@ class MessageEntity:
 
 @dataclass
 class MessageResp:
-    alarmNumber: int = None
-    commandNumber: int = None
+    alarmNumber: Optional[int] = None
+    commandNumber: Optional[int] = None
     messages: List[MessageEntity] = field(default_factory=list)
-    newsNumber: int = None
+    newsNumber: Optional[int] = None
     # notifications: List[Any] = None
-    recordsNumber: int = None
-    totalNumber: int = None
+    recordsNumber: Optional[int] = None
+    totalNumber: Optional[int] = None
 
 
 @dataclass
