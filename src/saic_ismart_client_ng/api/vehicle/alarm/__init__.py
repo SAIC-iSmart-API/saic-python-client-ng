@@ -9,6 +9,13 @@ from saic_ismart_client_ng.api.vehicle.alarm.schema import (
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 
+__all__ = [
+    "AlarmSwitch",
+    "AlarmSwitchReq",
+    "AlarmSwitchResp",
+    "AlarmType",
+]
+
 
 class SaicVehicleAlarmApi(SaicVehicleApi):
     async def get_alarm_switch(self, vin: str) -> AlarmSwitchResp:

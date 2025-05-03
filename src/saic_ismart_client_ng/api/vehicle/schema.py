@@ -108,6 +108,14 @@ class BasicVehicleStatus:
     vehicleAlarmStatus: int | None = None
     wheelTyreMonitorStatus: int | None = None
 
+    @property
+    def is_parked(self) -> bool:
+        return self.engineStatus != 1 or self.handBrake == 1
+
+    @property
+    def is_engine_running(self) -> bool:
+        return self.engineStatus == 1
+
 
 @dataclass
 class ExtendedVehicleStatus:
@@ -123,16 +131,6 @@ class VehicleStatusResp:
     extendedVehicleStatus: ExtendedVehicleStatus | None = None
     gpsPosition: GpsPosition | None = None
     statusTime: int | None = None
-
-    @property
-    def is_parked(self) -> bool:
-        return (v := self.basicVehicleStatus) is not None and (
-            v.engineStatus != 1 or v.handBrake == 1
-        )
-
-    @property
-    def is_engine_running(self) -> bool:
-        return (v := self.basicVehicleStatus) is not None and v.engineStatus == 1
 
 
 class RvcParamsId(Enum):
