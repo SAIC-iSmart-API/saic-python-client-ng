@@ -5,7 +5,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import httpx
-from httpx import Request, Response
+from httpx import Request, Response, Timeout
 
 from saic_ismart_client_ng.net.httpx import (
     decrypt_httpx_response,
@@ -29,10 +29,11 @@ class SaicApiClient:
         self.__user_token: str = ""
         self.__class_name: str = ""
         self.__client = httpx.AsyncClient(
+            timeout=Timeout(timeout=configuration.read_timeout),
             event_hooks={
                 "request": [self.__invoke_request_listener, self.__encrypt_request],
                 "response": [decrypt_httpx_response, self.__invoke_response_listener],
-            }
+            },
         )
 
     async def send(self, request: Request) -> Response:

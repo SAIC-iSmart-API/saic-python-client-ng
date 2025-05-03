@@ -13,6 +13,7 @@ class SaicApiConfiguration:
         tenant_id: str = "459771",
         region: str = "eu",
         sms_delivery_delay: float = 3.0,
+        read_timeout: float = 5.0,
     ) -> None:
         self.__username = username
         self.__password = password
@@ -22,6 +23,7 @@ class SaicApiConfiguration:
         self.__tenant_id = tenant_id
         self.__region = region
         self.__sms_delivery_delay = sms_delivery_delay
+        self.__read_timeout = read_timeout
 
     @property
     def username(self) -> str:
@@ -54,3 +56,7 @@ class SaicApiConfiguration:
     @property
     def sms_delivery_delay(self) -> float:
         return self.__sms_delivery_delay
+
+    @property
+    def read_timeout(self) -> float:
+        return self.__read_timeout
