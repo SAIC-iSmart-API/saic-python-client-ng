@@ -106,7 +106,6 @@ class AbstractSaicApi:
             out_type: type[T],
             params: QueryParamTypes | None = None,
             headers: HeaderTypes | None = None,
-            allow_null_body: bool = False,
     ) -> T:
         result = await self.__execute_api_call(
             method,
@@ -116,12 +115,34 @@ class AbstractSaicApi:
             out_type=out_type,
             params=params,
             headers=headers,
-            allow_null_body=allow_null_body,
+            allow_null_body=False,
         )
         if result is None:
             msg = f"Failed to execute api call {method} {path}, was expecting a result of type {out_type} got None instead"
             raise SaicApiException(msg)
         return result
+
+    async def execute_api_call_with_optional_result(
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Any | None = None,
+            form_body: Any | None = None,
+            out_type: type[T],
+            params: QueryParamTypes | None = None,
+            headers: HeaderTypes | None = None,
+    ) -> T | None:
+        return await self.__execute_api_call(
+            method,
+            path,
+            body=body,
+            form_body=form_body,
+            out_type=out_type,
+            params=params,
+            headers=headers,
+            allow_null_body=True,
+        )
 
     async def execute_api_call_no_result(
             self,
@@ -132,7 +153,6 @@ class AbstractSaicApi:
             form_body: Any | None = None,
             params: QueryParamTypes | None = None,
             headers: HeaderTypes | None = None,
-            allow_null_body: bool = False,
     ) -> None:
         await self.__execute_api_call(
             method,
@@ -141,7 +161,7 @@ class AbstractSaicApi:
             form_body=form_body,
             params=params,
             headers=headers,
-            allow_null_body=allow_null_body,
+            allow_null_body=True,
         )
 
     async def __execute_api_call(
