@@ -39,7 +39,7 @@ class SaicMessageApi(AbstractSaicApi):
     async def get_message_list(
         self, *, page_num: int, page_size: int, message_group: str
     ) -> MessageResp | None:
-        return await self.execute_api_call(
+        return await self.execute_api_call_with_optional_result(
             "GET",
             "/message/list",
             params={
@@ -48,7 +48,6 @@ class SaicMessageApi(AbstractSaicApi):
                 "messageGroup": message_group,
             },
             out_type=MessageResp,
-            allow_null_body=True,
         )
 
     async def delete_all_alarms(self) -> None:
@@ -83,6 +82,6 @@ class SaicMessageApi(AbstractSaicApi):
         )
 
     async def get_unread_messages_count(self) -> MessageResp | None:
-        return await self.execute_api_call(
-            "GET", "/message/unreadCount", out_type=MessageResp, allow_null_body=True
+        return await self.execute_api_call_with_optional_result(
+            "GET", "/message/unreadCount", out_type=MessageResp
         )
