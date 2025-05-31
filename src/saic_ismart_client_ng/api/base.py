@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import asdict
 import datetime
 import logging
+from dataclasses import asdict
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -33,10 +33,12 @@ if TYPE_CHECKING:
     from saic_ismart_client_ng.listener import SaicApiListener
     from saic_ismart_client_ng.model import SaicApiConfiguration
 
+
     class IsDataclass(Protocol):
         # as already noted in comments, checking for this attribute is currently
         # the most reliable way to ascertain that something is a dataclass
         __dataclass_fields__: ClassVar[dict[str, Any]]
+
 
     T = TypeVar("T", bound=IsDataclass)
 
@@ -45,9 +47,9 @@ logger = logging.getLogger(__name__)
 
 class AbstractSaicApi:
     def __init__(
-        self,
-        configuration: SaicApiConfiguration,
-        listener: SaicApiListener | None = None,
+            self,
+            configuration: SaicApiConfiguration,
+            listener: SaicApiListener | None = None,
     ) -> None:
         self.__configuration = configuration
         self.__api_client = SaicApiClient(configuration, listener=listener)
@@ -59,16 +61,16 @@ class AbstractSaicApi:
             "Accept": "application/json",
             "Authorization": "Basic c3dvcmQ6c3dvcmRfc2VjcmV0",
         }
-        firebase_device_id = "cqSHOMG1SmK4k-fzAeK6hr:APA91bGtGihOG5SEQ9hPx3Dtr9o9mQguNiKZrQzboa-1C_UBlRZYdFcMmdfLvh9Q_xA8A0dGFIjkMhZbdIXOYnKfHCeWafAfLXOrxBS3N18T4Slr-x9qpV6FHLMhE9s7I6s89k9lU7DD"
+        firebase_device_id = "simulator*********************************************" + str(int(datetime.datetime.now().timestamp()))
         form_body = {
             "grant_type": "password",
             "username": self.__configuration.username,
             "password": sha1_hex_digest(self.__configuration.password),
             "scope": "all",
-            "deviceId": f"{firebase_device_id}###europecar",
-            "deviceType": "1",  # 2 for huawei
+            "deviceId": f"{firebase_device_id}###com.saicmotor.europecar",
+            "deviceType": "0",  # 2 for huawei
             "loginType": "2" if self.__configuration.username_is_email else "1",
-            "countryCode": ""
+            "language": "EN"
             if self.__configuration.username_is_email
             else self.__configuration.phone_country_code,
         }
@@ -82,7 +84,7 @@ class AbstractSaicApi:
         )
         # Update the user token
         if not (access_token := result.access_token) or not (
-            expiration := result.expires_in
+                expiration := result.expires_in
         ):
             raise SaicApiException(
                 "Failed to get an access token, please check your credentials"
@@ -95,16 +97,16 @@ class AbstractSaicApi:
         return result
 
     async def execute_api_call(
-        self,
-        method: str,
-        path: str,
-        *,
-        body: Any | None = None,
-        form_body: Any | None = None,
-        out_type: type[T],
-        params: QueryParamTypes | None = None,
-        headers: HeaderTypes | None = None,
-        allow_null_body: bool = False,
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Any | None = None,
+            form_body: Any | None = None,
+            out_type: type[T],
+            params: QueryParamTypes | None = None,
+            headers: HeaderTypes | None = None,
+            allow_null_body: bool = False,
     ) -> T:
         result = await self.__execute_api_call(
             method,
@@ -122,15 +124,15 @@ class AbstractSaicApi:
         return result
 
     async def execute_api_call_no_result(
-        self,
-        method: str,
-        path: str,
-        *,
-        body: Any | None = None,
-        form_body: Any | None = None,
-        params: QueryParamTypes | None = None,
-        headers: HeaderTypes | None = None,
-        allow_null_body: bool = False,
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Any | None = None,
+            form_body: Any | None = None,
+            params: QueryParamTypes | None = None,
+            headers: HeaderTypes | None = None,
+            allow_null_body: bool = False,
     ) -> None:
         await self.__execute_api_call(
             method,
@@ -143,16 +145,16 @@ class AbstractSaicApi:
         )
 
     async def __execute_api_call(
-        self,
-        method: str,
-        path: str,
-        *,
-        body: Any | None = None,
-        form_body: Any | None = None,
-        out_type: type[T] | None = None,
-        params: QueryParamTypes | None = None,
-        headers: HeaderTypes | None = None,
-        allow_null_body: bool = False,
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Any | None = None,
+            form_body: Any | None = None,
+            out_type: type[T] | None = None,
+            params: QueryParamTypes | None = None,
+            headers: HeaderTypes | None = None,
+            allow_null_body: bool = False,
     ) -> T | None:
         try:
             url = f"{self.__configuration.base_uri}{path.removeprefix('/')}"
@@ -174,15 +176,15 @@ class AbstractSaicApi:
             raise SaicApiException(msg, return_code=500) from e
 
     async def execute_api_call_with_event_id(
-        self,
-        method: str,
-        path: str,
-        *,
-        body: Any | None = None,
-        out_type: type[T],
-        params: QueryParamTypes | None = None,
-        headers: MutableMapping[str, str] | None = None,
-        delay: tenacity.wait.WaitBaseT | None = None,
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Any | None = None,
+            out_type: type[T],
+            params: QueryParamTypes | None = None,
+            headers: MutableMapping[str, str] | None = None,
+            delay: tenacity.wait.WaitBaseT | None = None,
     ) -> T:
         result = await self.__execute_api_call_with_event_id(
             method,
@@ -199,14 +201,14 @@ class AbstractSaicApi:
         return result
 
     async def execute_api_call_with_event_id_no_result(
-        self,
-        method: str,
-        path: str,
-        *,
-        body: Any | None = None,
-        params: QueryParamTypes | None = None,
-        headers: MutableMapping[str, str] | None = None,
-        delay: tenacity.wait.WaitBaseT | None = None,
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Any | None = None,
+            params: QueryParamTypes | None = None,
+            headers: MutableMapping[str, str] | None = None,
+            delay: tenacity.wait.WaitBaseT | None = None,
     ) -> None:
         await self.__execute_api_call_with_event_id(
             method,
@@ -218,15 +220,15 @@ class AbstractSaicApi:
         )
 
     async def __execute_api_call_with_event_id(
-        self,
-        method: str,
-        path: str,
-        *,
-        body: Any | None = None,
-        out_type: type[T] | None = None,
-        params: QueryParamTypes | None = None,
-        headers: MutableMapping[str, str] | None = None,
-        delay: tenacity.wait.WaitBaseT | None = None,
+            self,
+            method: str,
+            path: str,
+            *,
+            body: Any | None = None,
+            out_type: type[T] | None = None,
+            params: QueryParamTypes | None = None,
+            headers: MutableMapping[str, str] | None = None,
+            delay: tenacity.wait.WaitBaseT | None = None,
     ) -> T | None:
         @tenacity.retry(
             stop=tenacity.stop_after_delay(30),
@@ -251,11 +253,11 @@ class AbstractSaicApi:
 
     # pylint: disable=too-many-branches
     async def __deserialize(
-        self,
-        request: httpx.Request,
-        response: httpx.Response,
-        data_class: type[T] | None,
-        allow_null_body: bool,
+            self,
+            request: httpx.Request,
+            response: httpx.Response,
+            data_class: type[T] | None,
+            allow_null_body: bool,
     ) -> T | None:
         try:
             request_event_id = request.headers.get("event-id")
@@ -348,9 +350,9 @@ class AbstractSaicApi:
     @property
     def is_logged_in(self) -> bool:
         return (
-            self.__api_client.user_token is not None
-            and self.__token_expiration is not None
-            and self.__token_expiration > datetime.datetime.now()
+                self.__api_client.user_token is not None
+                and self.__token_expiration is not None
+                and self.__token_expiration > datetime.datetime.now()
         )
 
     @property
