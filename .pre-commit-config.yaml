@@ -1,0 +1,46 @@
+ci:
+  autofix_prs: false
+  skip:
+    # This steps run in the ci workflow. Keep in sync
+    - mypy
+    - pylint
+
+default_language_version:
+  python: python3.13
+
+repos:
+  - repo: https://github.com/python-poetry/poetry
+    rev: '2.1.3'
+    hooks:
+      - id: poetry-check
+      - id: poetry-lock
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.12
+    hooks:
+      - id: ruff
+        args:
+          - --fix
+          - --unsafe-fixes
+      - id: ruff-format
+  - repo: local
+    hooks:
+      - id: mypy
+        name: Check with mypy
+        entry: poetry run mypy src
+        language: system
+        types:
+          - python
+        require_serial: true
+      - id: pylint
+        name: Check with pylint
+        entry: poetry run pylint src/**/*.py
+        language: system
+        types:
+          - python
+        require_serial: true
+        exclude: ^tests/.+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-added-large-files

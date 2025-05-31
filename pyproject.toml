@@ -26,6 +26,10 @@ dependencies = [
 Homepage = "https://github.com/SAIC-iSmart-API/saic-python-client-ng"
 Issues = "https://github.com/SAIC-iSmart-API/saic-python-client-ng/issues"
 
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
 mock = "^5.1.0"
@@ -36,12 +40,7 @@ pytest-asyncio = "^0.24.0"
 pytest-mock = "^3.14.0"
 mypy = "^1.15.0"
 pylint = "^3.3.6"
-
-
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+pre-commit = "^4.2.0"
 
 [tool.pytest.ini_options]
 norecursedirs = ".git build dist"
@@ -85,6 +84,7 @@ include = [
     "tests/**/*.py",
     "**/pyproject.toml"
 ]
+
 [tool.ruff.lint]
 select = ["ALL"]
 
@@ -128,7 +128,6 @@ ignore = [
 
 [tool.ruff.lint.flake8-pytest-style]
 fixture-parentheses = false
-
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
