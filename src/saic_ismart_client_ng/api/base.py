@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 import datetime
 import logging
-from dataclasses import asdict
 from typing import (
     TYPE_CHECKING,
     Any,
