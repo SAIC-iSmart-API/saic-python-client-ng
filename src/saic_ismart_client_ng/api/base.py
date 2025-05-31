@@ -118,7 +118,7 @@ class AbstractSaicApi:
             headers=headers,
             allow_null_body=allow_null_body,
         )
-        if result is None:
+        if result is None and not allow_null_body:
             msg = f"Failed to execute api call {method} {path}, was expecting a result of type {out_type} got None instead"
             raise SaicApiException(msg)
         return result
