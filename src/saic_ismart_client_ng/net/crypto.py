@@ -111,7 +111,7 @@ def encrypt_request(
                     request_content, key_hex, iv_hex
                 ).encode("utf-8")
 
-    original_request_headers["User-Agent"] = "okhttp/3.14.9"
+    original_request_headers["User-Agent"] = "Europe/2.1.0 (iPad; iOS 18.5; Scale/2.00)"
     original_request_headers["Content-Type"] = f"{modified_content_type};charset=utf-8"
     original_request_headers["Accept"] = "application/json"
     original_request_headers["Accept-Encoding"] = "gzip"
