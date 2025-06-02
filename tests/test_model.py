@@ -11,7 +11,7 @@ class TestSaicApiConfiguration(unittest.TestCase):
             "test_username",
             "test_password",
             True,
-            "GB",
+            "39",
             "https://test-uri.com",
             "123456",
             "test_region",
@@ -28,7 +28,7 @@ class TestSaicApiConfiguration(unittest.TestCase):
         assert self.config.username_is_email
 
     def test_phone_country_code(self) -> None:
-        assert self.config.phone_country_code == "GB"
+        assert self.config.phone_country_code == "39"
 
     def test_base_uri(self) -> None:
         assert self.config.base_uri == "https://test-uri.com"
