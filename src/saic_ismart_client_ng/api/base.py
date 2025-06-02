@@ -69,11 +69,18 @@ class AbstractSaicApi:
             "scope": "all",
             "deviceId": f"{firebase_device_id}###com.saicmotor.europecar",
             "deviceType": "0",  # 2 for huawei
-            "loginType": "2" if self.__configuration.username_is_email else "1",
-            "language": "EN"
-            if self.__configuration.username_is_email
-            else self.__configuration.phone_country_code,
+            "language": "EN",
         }
+
+        if self.__configuration.username_is_email:
+            form_body.update({
+                "loginType": "2"
+            })
+        else:
+            form_body.update({
+                "loginType": "1",
+                "countryCode": self.__configuration.phone_country_code,
+            })
 
         result = await self.execute_api_call(
             "POST",
