@@ -201,7 +201,7 @@ class ChargingStatus:
 @dataclass
 class ChargeStatusResp:
     # pylint: disable=import-outside-toplevel
-    from saic_ismart_client_ng.api.schema import GpsPosition
+    from saic_ismart_client_ng.api.schema import GpsPosition  # noqa: PLC0415
 
     chargingStatus: ChargingStatus | None = None
     gpsPosition: GpsPosition | None = None
