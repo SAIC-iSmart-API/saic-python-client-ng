@@ -27,7 +27,6 @@ class SaicApiClient:
         self.__listener = listener
         self.__logger = logging.getLogger(__name__)
         self.__user_token: str = ""
-        self.__class_name: str = ""
         self.__client = httpx.AsyncClient(
             timeout=Timeout(timeout=configuration.read_timeout),
             event_hooks={

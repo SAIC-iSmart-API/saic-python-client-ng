@@ -283,7 +283,6 @@ class AbstractSaicApi:
 
         return await execute_api_call_with_event_id_inner(event_id="0")
 
-    # pylint: disable=too-many-branches
     async def __deserialize(
         self,
         request: httpx.Request,

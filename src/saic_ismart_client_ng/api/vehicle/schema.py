@@ -125,7 +125,7 @@ class ExtendedVehicleStatus:
 @dataclass
 class VehicleStatusResp:
     # pylint: disable=import-outside-toplevel
-    from saic_ismart_client_ng.api.schema import GpsPosition
+    from saic_ismart_client_ng.api.schema import GpsPosition  # noqa: PLC0415
 
     basicVehicleStatus: BasicVehicleStatus | None = None
     extendedVehicleStatus: ExtendedVehicleStatus | None = None
@@ -203,7 +203,7 @@ class VehicleControlReq:
 @dataclass
 class VehicleControlResp:
     # pylint: disable=import-outside-toplevel
-    from saic_ismart_client_ng.api.schema import GpsPosition
+    from saic_ismart_client_ng.api.schema import GpsPosition  # noqa: PLC0415
 
     basicVehicleStatus: BasicVehicleStatus | None = None
     failureType: int | None = None
