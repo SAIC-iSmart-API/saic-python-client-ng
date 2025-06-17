@@ -69,6 +69,7 @@ class BmsChargingStatusCode(Enum):
     CHARGING_10 = 10  # Potentially DC fast charging
     SUPER_OFFBOARD_CHARGING = 11
     CHARGING_12 = 12
+    V2X_DISCHARGING = 13
 
     @staticmethod
     def to_code(code: int) -> BmsChargingStatusCode | None:
