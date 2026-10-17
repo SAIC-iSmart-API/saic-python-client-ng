@@ -38,6 +38,9 @@ class SaicApiClient:
     async def send(self, request: Request) -> Response:
         return await self.__client.send(request)
 
+    async def close(self) -> None:
+        await self.__client.aclose()
+
     @property
     def user_token(self) -> str:
         return self.__user_token

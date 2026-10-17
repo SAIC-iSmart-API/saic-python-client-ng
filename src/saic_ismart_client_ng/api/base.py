@@ -53,6 +53,9 @@ class AbstractSaicApi:
         self.__api_client = SaicApiClient(configuration, listener=listener)
         self.__token_expiration: datetime.datetime | None = None
 
+    async def close(self) -> None:
+        await self.__api_client.close()
+
     async def login(self) -> LoginResp:
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
