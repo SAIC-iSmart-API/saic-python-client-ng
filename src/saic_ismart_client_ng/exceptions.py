@@ -16,6 +16,10 @@ class SaicLogoutException(SaicApiException):
     pass
 
 
+class SaicApiClosedException(SaicApiException):
+    pass
+
+
 class SaicApiRetryException(SaicApiException):
     def __init__(
         self, msg: str, *, event_id: str, return_code: int | None = None
