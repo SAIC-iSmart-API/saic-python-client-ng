@@ -8,7 +8,6 @@ from typing import (
     Any,
     ClassVar,
     Protocol,
-    TypeVar,
 )
 
 import dacite
@@ -38,7 +37,6 @@ if TYPE_CHECKING:
         # the most reliable way to ascertain that something is a dataclass
         __dataclass_fields__: ClassVar[dict[str, Any]]
 
-    T = TypeVar("T", bound=IsDataclass)
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +109,7 @@ class AbstractSaicApi:
         )
         return result
 
-    async def execute_api_call(
+    async def execute_api_call[T: IsDataclass](
         self,
         method: str,
         path: str,
@@ -137,7 +135,7 @@ class AbstractSaicApi:
             raise SaicApiException(msg)
         return result
 
-    async def execute_api_call_with_optional_result(
+    async def execute_api_call_with_optional_result[T: IsDataclass](
         self,
         method: str,
         path: str,
@@ -179,7 +177,7 @@ class AbstractSaicApi:
             allow_null_body=True,
         )
 
-    async def __execute_api_call(
+    async def __execute_api_call[T: IsDataclass](
         self,
         method: str,
         path: str,
@@ -210,7 +208,7 @@ class AbstractSaicApi:
             msg = f"API call {method} {path} failed unexpectedly"
             raise SaicApiException(msg, return_code=500) from e
 
-    async def execute_api_call_with_event_id(
+    async def execute_api_call_with_event_id[T: IsDataclass](
         self,
         method: str,
         path: str,
@@ -254,7 +252,7 @@ class AbstractSaicApi:
             delay=delay,
         )
 
-    async def __execute_api_call_with_event_id(
+    async def __execute_api_call_with_event_id[T: IsDataclass](
         self,
         method: str,
         path: str,
@@ -286,7 +284,7 @@ class AbstractSaicApi:
 
         return await execute_api_call_with_event_id_inner(event_id="0")
 
-    async def __deserialize(
+    async def __deserialize[T: IsDataclass](
         self,
         request: httpx.Request,
         response: httpx.Response,
