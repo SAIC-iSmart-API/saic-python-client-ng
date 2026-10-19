@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import httpx
 from httpx import Request, Response, Timeout
 
+from saic_ismart_client_ng.exceptions import SaicApiClosedException
 from saic_ismart_client_ng.net.httpx import (
     decrypt_httpx_response,
     encrypt_httpx_request,
@@ -27,6 +28,7 @@ class SaicApiClient:
         self.__listener = listener
         self.__logger = logging.getLogger(__name__)
         self.__user_token: str = ""
+        self.__closed = False
         self.__client = httpx.AsyncClient(
             timeout=Timeout(timeout=configuration.read_timeout),
             event_hooks={
@@ -36,7 +38,14 @@ class SaicApiClient:
         )
 
     async def send(self, request: Request) -> Response:
+        if self.__closed:
+            msg = "The API client has been closed and cannot be reused"
+            raise SaicApiClosedException(msg)
         return await self.__client.send(request)
+
+    async def close(self) -> None:
+        self.__closed = True
+        await self.__client.aclose()
 
     @property
     def user_token(self) -> str:
