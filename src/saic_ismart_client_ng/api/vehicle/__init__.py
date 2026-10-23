@@ -14,6 +14,7 @@ from saic_ismart_client_ng.api.vehicle.schema import (
     VehicleControlResp,
     VehicleListResp,
     VehicleModelConfiguration,
+    VehicleStatusCacheResp,
     VehicleStatusResp,
     VinInfo,
 )
@@ -30,6 +31,7 @@ __all__ = [
     "VehicleControlResp",
     "VehicleListResp",
     "VehicleModelConfiguration",
+    "VehicleStatusCacheResp",
     "VehicleStatusResp",
     "VinInfo",
 ]
@@ -50,6 +52,22 @@ class SaicVehicleApi(AbstractSaicApi):
                 "vehStatusReqType": "2",
             },
             out_type=VehicleStatusResp,
+        )
+
+    async def get_vehicle_status_cached(self, vin: str) -> VehicleStatusCacheResp:
+        """Read the last status stored by SAIC, without waking the car.
+
+        The reply is a reduced status. `statusTime` tells when SAIC last heard
+        from the car.
+        """
+        return await self.execute_api_call(
+            "GET",
+            "/vehicle/status/cache",
+            params={
+                "vin": sha256_hex_digest(vin),
+                "vehStatusReqType": "2",
+            },
+            out_type=VehicleStatusCacheResp,
         )
 
     async def send_vehicle_control_command(

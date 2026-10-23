@@ -12,6 +12,7 @@ Supported functionality (partial list, check the code for more)
 * set alarm switches
 * get message list
 * get vehicle status
+* get cached vehicle status (does not wake the car)
 * get charging status
 * lock vehicle
 * unlock vehicle
