@@ -133,6 +133,26 @@ class VehicleStatusResp:
     statusTime: int | None = None
 
 
+@dataclass
+class VehicleStatusCacheResp:
+    """Reply of /vehicle/status/cache: the last status SAIC stored for the car.
+
+    Only a subset of basicVehicleStatus is populated, there is no
+    extendedVehicleStatus and gpsPosition has no speed or heading.
+    """
+
+    # pylint: disable=import-outside-toplevel
+    from saic_ismart_client_ng.api.schema import GpsPosition  # noqa: PLC0415
+
+    basicVehicleStatus: BasicVehicleStatus | None = None
+    gpsPosition: GpsPosition | None = None
+    # When SAIC last heard from the car (epoch seconds)
+    statusTime: int | None = None
+    # SAIC's own flag. Reported to stay at 1 even while the car sleeps, so it
+    # does not tell whether the car is awake
+    onlineStatus: int | None = None
+
+
 class RvcParamsId(Enum):
     FIND_MY_CAR_ENABLE = 1
     FIND_MY_CAR_HORN = 2
