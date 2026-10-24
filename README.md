@@ -6,6 +6,9 @@ A Python package for interacting with the MG iSMART API.
 
 MG iSMART is the connectivity system in your MG car (MG5 MG4, ZS...).
 
+MAXUS Europe vehicles use the same API. Use `SaicApiConfiguration.maxus_eu(username, password)`.
+The app id (deviceId suffix) in this preset is unconfirmed by a traffic capture.
+
 Supported functionality (partial list, check the code for more)
 
 * login

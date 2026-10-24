@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from typing import Any
+
+MAXUS_EU_BASE_URI = "https://gateway-maxus-eu.soimt.com/api.app/v1/"
+MAXUS_EU_TENANT_ID = "459771"
+MAXUS_EU_DEVICE_APP_ID = "com.saicmaxus.ismarteu"
+
 
 class SaicApiConfiguration:
     # pylint: disable=too-many-positional-arguments
@@ -14,6 +20,7 @@ class SaicApiConfiguration:
         region: str = "eu",
         sms_delivery_delay: float = 3.0,
         read_timeout: float = 5.0,
+        device_app_id: str = "com.saicmotor.europecar",
     ) -> None:
         self.__username = username
         self.__password = password
@@ -24,6 +31,25 @@ class SaicApiConfiguration:
         self.__region = region
         self.__sms_delivery_delay = sms_delivery_delay
         self.__read_timeout = read_timeout
+        self.__device_app_id = device_app_id
+
+    @classmethod
+    def maxus_eu(
+        cls,
+        username: str,
+        password: str,
+        **kwargs: Any,
+    ) -> SaicApiConfiguration:
+        """Build the configuration for the MAXUS Europe app (com.saicmaxus.ismarteu).
+
+        base_uri and tenant_id are confirmed from the app binary. The app id
+        (the deviceId suffix) is the bundle id, but that is NOT confirmed by a
+        traffic capture. The region value is the MG EU default, also unconfirmed.
+        """
+        kwargs.setdefault("base_uri", MAXUS_EU_BASE_URI)
+        kwargs.setdefault("tenant_id", MAXUS_EU_TENANT_ID)
+        kwargs.setdefault("device_app_id", MAXUS_EU_DEVICE_APP_ID)
+        return cls(username, password, **kwargs)
 
     @property
     def username(self) -> str:
@@ -60,3 +86,7 @@ class SaicApiConfiguration:
     @property
     def read_timeout(self) -> float:
         return self.__read_timeout
+
+    @property
+    def device_app_id(self) -> str:
+        return self.__device_app_id
