@@ -6,7 +6,7 @@ MG_EU_BASE_URI = "https://gateway-mg-eu.soimt.com/api.app/v1/"
 MG_AU_BASE_URI = "https://gateway-mg-au.soimt.com/api.app/v1/"
 MG_TR_BASE_URI = "https://gateway-mg-tr.soimt.com/api.app/v1/"
 MAXUS_EU_BASE_URI = "https://gateway-maxus-eu.soimt.com/api.app/v1/"
-MAXUS_EU_TENANT_ID = "459771"
+MAXUS_EU_TENANT_ID = "590224"
 MAXUS_EU_DEVICE_APP_ID = "com.saicmaxus.ismarteu"
 
 
@@ -66,7 +66,7 @@ class SaicApiConfiguration:
     ) -> SaicApiConfiguration:
         """Build the configuration for the MAXUS Europe app (com.saicmaxus.ismarteu).
 
-        base_uri and tenant_id are confirmed from the app binary. The app id
+        base_uri and tenant_id are confirmed by a live traffic capture. The app id
         (the deviceId suffix) is the bundle id, but that is NOT confirmed by a
         traffic capture. The region value is the MG EU default, also unconfirmed.
         """

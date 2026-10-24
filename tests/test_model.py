@@ -52,7 +52,7 @@ class TestSaicApiConfiguration(unittest.TestCase):
     def test_maxus_eu_preset(self) -> None:
         config = SaicApiConfiguration.maxus_eu("u", "p", username_is_email=False)
         assert config.base_uri == "https://gateway-maxus-eu.soimt.com/api.app/v1/"
-        assert config.tenant_id == "459771"
+        assert config.tenant_id == "590224"
         assert config.device_app_id == "com.saicmaxus.ismarteu"
         assert config.region == "eu"
         assert not config.username_is_email
