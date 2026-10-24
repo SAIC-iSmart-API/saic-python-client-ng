@@ -69,7 +69,7 @@ class AbstractSaicApi:
             "username": self.__configuration.username,
             "password": sha1_hex_digest(self.__configuration.password),
             "scope": "all",
-            "deviceId": f"{firebase_device_id}###com.saicmotor.europecar",
+            "deviceId": f"{firebase_device_id}###{self.__configuration.device_app_id}",
             "deviceType": "0",  # 2 for huawei
             "language": "EN",
         }
