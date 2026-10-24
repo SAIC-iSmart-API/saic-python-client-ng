@@ -66,9 +66,9 @@ class SaicApiConfiguration:
     ) -> SaicApiConfiguration:
         """Build the configuration for the MAXUS Europe app (com.saicmaxus.ismarteu).
 
-        base_uri and tenant_id are confirmed by a live traffic capture. The app id
-        (the deviceId suffix) is the bundle id, but that is NOT confirmed by a
-        traffic capture. The region value is the MG EU default, also unconfirmed.
+        base_uri, tenant_id and the app id (the deviceId suffix) are confirmed by a
+        live traffic capture. The app does not send a REGION header on login, so
+        the region keeps the MG EU default.
         """
         kwargs.setdefault("base_uri", MAXUS_EU_BASE_URI)
         kwargs.setdefault("tenant_id", MAXUS_EU_TENANT_ID)

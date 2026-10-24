@@ -10,7 +10,7 @@ Presets: `SaicApiConfiguration.mg_eu()`, `mg_au()` (Australia and New Zealand), 
 Each takes `(username, password, **overrides)`.
 
 MAXUS Europe vehicles use the same API. Use `SaicApiConfiguration.maxus_eu(username, password)`.
-The app id (deviceId suffix) in this preset is unconfirmed by a traffic capture.
+The preset values were confirmed by a live traffic capture of the MAXUS app.
 
 Supported functionality (partial list, check the code for more)
 
