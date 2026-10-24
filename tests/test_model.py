@@ -61,6 +61,23 @@ class TestSaicApiConfiguration(unittest.TestCase):
         config = SaicApiConfiguration.maxus_eu("u", "p", device_app_id="x.y")
         assert config.device_app_id == "x.y"
 
+    def test_mg_presets(self) -> None:
+        for factory, host, region in (
+            (SaicApiConfiguration.mg_eu, "gateway-mg-eu", "eu"),
+            (SaicApiConfiguration.mg_au, "gateway-mg-au", "au"),
+            (SaicApiConfiguration.mg_tr, "gateway-mg-tr", "tr"),
+        ):
+            config = factory("u", "p")
+            assert config.base_uri == f"https://{host}.soimt.com/api.app/v1/"
+            assert config.region == region
+            assert config.tenant_id == "459771"
+            assert config.device_app_id == "com.saicmotor.europecar"
+
+    def test_mg_preset_overrides(self) -> None:
+        config = SaicApiConfiguration.mg_au("u", "p", tenant_id="1", region="x")
+        assert config.tenant_id == "1"
+        assert config.region == "x"
+
 
 if __name__ == "__main__":
     unittest.main()

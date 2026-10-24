@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
+MG_EU_BASE_URI = "https://gateway-mg-eu.soimt.com/api.app/v1/"
+MG_AU_BASE_URI = "https://gateway-mg-au.soimt.com/api.app/v1/"
+MG_TR_BASE_URI = "https://gateway-mg-tr.soimt.com/api.app/v1/"
 MAXUS_EU_BASE_URI = "https://gateway-maxus-eu.soimt.com/api.app/v1/"
 MAXUS_EU_TENANT_ID = "459771"
 MAXUS_EU_DEVICE_APP_ID = "com.saicmaxus.ismarteu"
@@ -15,7 +18,7 @@ class SaicApiConfiguration:
         password: str,
         username_is_email: bool = True,
         phone_country_code: str | None = None,
-        base_uri: str = "https://gateway-mg-eu.soimt.com/api.app/v1/",
+        base_uri: str = MG_EU_BASE_URI,
         tenant_id: str = "459771",
         region: str = "eu",
         sms_delivery_delay: float = 3.0,
@@ -32,6 +35,27 @@ class SaicApiConfiguration:
         self.__sms_delivery_delay = sms_delivery_delay
         self.__read_timeout = read_timeout
         self.__device_app_id = device_app_id
+
+    @classmethod
+    def mg_eu(cls, username: str, password: str, **kwargs: Any) -> SaicApiConfiguration:
+        """Build the configuration for MG iSMART in Europe (the defaults)."""
+        kwargs.setdefault("base_uri", MG_EU_BASE_URI)
+        kwargs.setdefault("region", "eu")
+        return cls(username, password, **kwargs)
+
+    @classmethod
+    def mg_au(cls, username: str, password: str, **kwargs: Any) -> SaicApiConfiguration:
+        """Build the configuration for MG iSMART in Australia and New Zealand."""
+        kwargs.setdefault("base_uri", MG_AU_BASE_URI)
+        kwargs.setdefault("region", "au")
+        return cls(username, password, **kwargs)
+
+    @classmethod
+    def mg_tr(cls, username: str, password: str, **kwargs: Any) -> SaicApiConfiguration:
+        """Build the configuration for MG iSMART in Türkiye."""
+        kwargs.setdefault("base_uri", MG_TR_BASE_URI)
+        kwargs.setdefault("region", "tr")
+        return cls(username, password, **kwargs)
 
     @classmethod
     def maxus_eu(
