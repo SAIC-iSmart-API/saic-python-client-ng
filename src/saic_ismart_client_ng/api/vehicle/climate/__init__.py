@@ -81,10 +81,10 @@ class SaicVehicleClimateApi(SaicVehicleApi):
     ) -> VehicleControlResp:
         rcv_params = [
             RvcParams(
-                RvcParamsId.HEATED_SEAT_DRIVER, left_side_level.to_bytes(1, "big")
+                RvcParamsId.HEATED_SEAT_FRONT_LEFT, left_side_level.to_bytes(1, "big")
             ),
             RvcParams(
-                RvcParamsId.HEATED_SEAT_PASSENGER, right_side_level.to_bytes(1, "big")
+                RvcParamsId.HEATED_SEAT_FRONT_RIGHT, right_side_level.to_bytes(1, "big")
             ),
             RvcParams(RvcParamsId.PARAMS_MAX, b"\x00\x00\x00\x00"),
         ]
