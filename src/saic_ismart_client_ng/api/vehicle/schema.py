@@ -172,8 +172,15 @@ class RvcParamsId(Enum):
     WINDOW_3 = 11
     WINDOW_4 = 12
     WINDOW_OPEN_CLOSE = 13
-    HEATED_SEAT_DRIVER = 17
-    HEATED_SEAT_PASSENGER = 18
+    # Heated seats are addressed by PHYSICAL side, not driver/passenger:
+    # 17 is the front-left seat and 18 the front-right on both left- and
+    # right-hand drive cars (confirmed on a right-hand drive MG S6 EV, where
+    # the app's front-left seat sends 17). The DRIVER/PASSENGER names are the
+    # original ones, kept as aliases; they're only right for left-hand drive.
+    HEATED_SEAT_FRONT_LEFT = 17
+    HEATED_SEAT_FRONT_RIGHT = 18
+    HEATED_SEAT_DRIVER = 17  # noqa: PIE796 - alias of HEATED_SEAT_FRONT_LEFT
+    HEATED_SEAT_PASSENGER = 18  # noqa: PIE796 - alias of HEATED_SEAT_FRONT_RIGHT
     FAN_SPEED = 19
     TEMPERATURE = 20
     AC_ON_OFF = 22
