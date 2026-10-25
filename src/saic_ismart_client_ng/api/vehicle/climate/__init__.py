@@ -94,11 +94,12 @@ class SaicVehicleClimateApi(SaicVehicleApi):
     ) -> VehicleControlResp:
         """Turn the heated steering wheel on or off.
 
-        Matches what the iSmart app sends (decrypted MG S6 EV traffic):
+        Matches the traffic captured from the iSmart app on an MG S6 EV:
         request type 8 with a single parameter, 24 = 1 (on) or 0 (off), and
-        no end-of-parameters marker. The car turns the heater off by itself
-        after about 10 minutes. Its state is reported back in
-        ``BasicVehicleStatus.steeringHeatLevel``.
+        no end-of-parameters marker. Other app builds or models may send
+        more than this; only the S6 EV has been checked. The car turns the
+        heater off by itself after about 10 minutes. Its state is reported
+        back in ``BasicVehicleStatus.steeringHeatLevel``.
         """
         rvc_params = [
             RvcParams(
