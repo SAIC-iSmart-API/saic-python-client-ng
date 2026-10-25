@@ -31,6 +31,7 @@ Supported functionality (partial list, check the code for more)
 * stop rear window heating
 * remote climate
 * heated seats
+* heated steering wheel
 
 
 ## Prerequisites

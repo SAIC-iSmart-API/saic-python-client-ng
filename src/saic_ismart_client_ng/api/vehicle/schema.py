@@ -173,6 +173,7 @@ class RvcParamsId(Enum):
     TEMPERATURE = 20
     AC_ON_OFF = 22
     REMOTE_HEAT_REAR_WINDOW = 23
+    HEATED_STEERING_WHEEL = 24
     PARAMS_MAX = 0xFF
 
 
@@ -195,6 +196,7 @@ class RvcReqType(Enum):
     HEATED_SEATS = "5"
     CLIMATE = "6"
     AIR_CLEAN = "7"
+    HEATED_STEERING_WHEEL = "8"
     ENGINE_CONTROL = "17"
     REMOTE_REFRESH = "18"
     REMOTE_IMMOBILIZER = "19"

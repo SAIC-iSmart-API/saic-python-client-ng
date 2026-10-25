@@ -89,6 +89,29 @@ class SaicVehicleClimateApi(SaicVehicleApi):
         )
         return await self.send_vehicle_control_command(body, vin)
 
+    async def control_heated_steering_wheel(
+        self, vin: str, *, enable: bool
+    ) -> VehicleControlResp:
+        """Turn the heated steering wheel on or off.
+
+        Matches what the iSmart app sends (decrypted MG S6 EV traffic):
+        request type 8 with a single parameter, 24 = 1 (on) or 0 (off), and
+        no end-of-parameters marker. The car turns the heater off by itself
+        after about 10 minutes. Its state is reported back in
+        ``BasicVehicleStatus.steeringHeatLevel``.
+        """
+        rvc_params = [
+            RvcParams(
+                RvcParamsId.HEATED_STEERING_WHEEL, b"\x01" if enable else b"\x00"
+            ),
+        ]
+        body = VehicleControlReq(
+            rvc_req_type=RvcReqType.HEATED_STEERING_WHEEL,
+            rvc_params=rvc_params,
+            vin=sha256_hex_digest(vin),
+        )
+        return await self.send_vehicle_control_command(body, vin)
+
     async def control_rear_window_heat(
         self, vin: str, *, enable: bool
     ) -> VehicleControlResp:
