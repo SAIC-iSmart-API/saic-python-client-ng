@@ -8,7 +8,13 @@ from saic_ismart_client_ng.api.vehicle import (
     VehicleControlReq,
     VehicleControlResp,
 )
+from saic_ismart_client_ng.api.vehicle.climate.schema import (
+    REAR_HEATED_SEAT_ON_LEVEL,
+    HeatedSeat,
+)
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
+
+__all__ = ["REAR_HEATED_SEAT_ON_LEVEL", "HeatedSeat"]
 
 
 class SaicVehicleClimateApi(SaicVehicleApi):
@@ -85,6 +91,32 @@ class SaicVehicleClimateApi(SaicVehicleApi):
         body = VehicleControlReq(
             rvc_req_type=RvcReqType.HEATED_SEATS,
             rvc_params=rcv_params,
+            vin=sha256_hex_digest(vin),
+        )
+        return await self.send_vehicle_control_command(body, vin)
+
+    async def control_heated_seat(
+        self, vin: str, *, seat: HeatedSeat, level: int
+    ) -> VehicleControlResp:
+        """Set one heated seat, leaving the others alone.
+
+        Matches what the iSmart app sends (decrypted MG S6 EV traffic): request
+        type 5 with a single parameter for the chosen seat (17 front left,
+        18 front right, 25 rear left, 26 rear right) and no end-of-parameters
+        marker. Unlike ``control_heated_seats`` it doesn't have to re-send the
+        other front seat's level, and it can reach the rear seats.
+
+        Front seats: 0 off, 1 low, 2 medium, 3 high. Rear seats are on/off
+        only (in the app and in the car): send ``REAR_HEATED_SEAT_ON_LEVEL``
+        (3, what the app sends) for on and 0 for off.
+        """
+        if not 0 <= level <= 3:
+            msg = f"Heated seat level must be 0-3, got {level}"
+            raise ValueError(msg)
+        rvc_params = [RvcParams(seat.value, level.to_bytes(1, "big"))]
+        body = VehicleControlReq(
+            rvc_req_type=RvcReqType.HEATED_SEATS,
+            rvc_params=rvc_params,
             vin=sha256_hex_digest(vin),
         )
         return await self.send_vehicle_control_command(body, vin)

@@ -99,6 +99,11 @@ class BasicVehicleStatus:
     rearRightWindow: int | None = None
     remoteClimateStatus: int | None = None
     rmtHtdRrWndSt: int | None = None
+    # Rear (second row) heated seats. Reported by the car whatever turned them
+    # on (app, remote command or the in-car buttons). The iSmart app and the
+    # car only offer on/off for the rear: 0 = off, non-zero = on.
+    secondRowLeftSeatHeatLevel: int | None = None
+    secondRowRightSeatHeatLevel: int | None = None
     sideLightStatus: int | None = None
     steeringHeatLevel: int | None = None
     steeringWheelHeatFailureReason: int | None = None
@@ -174,6 +179,8 @@ class RvcParamsId(Enum):
     AC_ON_OFF = 22
     REMOTE_HEAT_REAR_WINDOW = 23
     HEATED_STEERING_WHEEL = 24
+    HEATED_SEAT_REAR_LEFT = 25
+    HEATED_SEAT_REAR_RIGHT = 26
     PARAMS_MAX = 0xFF
 
 
