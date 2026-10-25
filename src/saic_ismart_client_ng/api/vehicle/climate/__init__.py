@@ -9,12 +9,19 @@ from saic_ismart_client_ng.api.vehicle import (
     VehicleControlResp,
 )
 from saic_ismart_client_ng.api.vehicle.climate.schema import (
+    ONE_LEVEL_VENTILATED_SEAT_ON_LEVEL,
     REAR_HEATED_SEAT_ON_LEVEL,
     HeatedSeat,
+    VentilatedSeat,
 )
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 
-__all__ = ["REAR_HEATED_SEAT_ON_LEVEL", "HeatedSeat"]
+__all__ = [
+    "ONE_LEVEL_VENTILATED_SEAT_ON_LEVEL",
+    "REAR_HEATED_SEAT_ON_LEVEL",
+    "HeatedSeat",
+    "VentilatedSeat",
+]
 
 
 class SaicVehicleClimateApi(SaicVehicleApi):
@@ -119,6 +126,36 @@ class SaicVehicleClimateApi(SaicVehicleApi):
         ]
         body = VehicleControlReq(
             rvc_req_type=RvcReqType.HEATED_SEATS,
+            rvc_params=rvc_params,
+            vin=sha256_hex_digest(vin),
+        )
+        return await self.send_vehicle_control_command(body, vin)
+
+    async def control_ventilated_seat(
+        self, vin: str, *, seat: VentilatedSeat, level: int
+    ) -> VehicleControlResp:
+        """Set one ventilated seat, leaving the others alone.
+
+        Sends request type 22 with a single parameter for the chosen seat (27
+        front left, 28 front right, 29 rear left, 30 rear right), followed by
+        the end-of-parameters marker (255) like the other control commands.
+        Not every car has ventilated seats, and the rear ones are rarer than
+        the front ones: check the car's capabilities first.
+
+        0 is off. Seats with several levels take 1, 2 or 3. Seats with a
+        single level (on/off only) take ``ONE_LEVEL_VENTILATED_SEAT_ON_LEVEL``
+        (3) for on. This is based on the iSmart app's logic and has not been
+        checked on a car.
+        """
+        if not 0 <= level <= 3:
+            msg = f"Ventilated seat level must be 0-3, got {level}"
+            raise ValueError(msg)
+        rvc_params = [
+            RvcParams(seat.value, level.to_bytes(1, "big")),
+            RvcParams(RvcParamsId.PARAMS_MAX, b"\x00\x00\x00\x00"),
+        ]
+        body = VehicleControlReq(
+            rvc_req_type=RvcReqType.VENTILATED_SEATS,
             rvc_params=rvc_params,
             vin=sha256_hex_digest(vin),
         )
