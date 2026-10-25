@@ -21,3 +21,22 @@ class HeatedSeat(Enum):
 
 # Rear seats are on/off only; the iSmart app sends this level for "on".
 REAR_HEATED_SEAT_ON_LEVEL = 3
+
+
+class VentilatedSeat(Enum):
+    """A single ventilated seat, by the parameter the iSmart app uses for it.
+
+    Left and right are the physical sides of the car. They match
+    ``frontLeftSeatVentLevel`` / ``frontRightSeatVentLevel`` and
+    ``secondRowLeftSeatVentLevel`` / ``secondRowRightSeatVentLevel`` in the
+    vehicle status.
+    """
+
+    FRONT_LEFT = RvcParamsId.SEAT_VENTILATION_FRONT_LEFT
+    FRONT_RIGHT = RvcParamsId.SEAT_VENTILATION_FRONT_RIGHT
+    REAR_LEFT = RvcParamsId.SEAT_VENTILATION_REAR_LEFT
+    REAR_RIGHT = RvcParamsId.SEAT_VENTILATION_REAR_RIGHT
+
+
+# Seats with a single ventilation level (on/off only) take this level for "on".
+ONE_LEVEL_VENTILATED_SEAT_ON_LEVEL = 3
