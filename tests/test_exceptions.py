@@ -97,6 +97,25 @@ def test_unexpected_failure() -> None:
 def test_picklable() -> None:
     e = pickle.loads(pickle.dumps(SaicApiException("x", return_code=8)))  # noqa: S301
     assert str(e) == "return code: 8, message: x"
+    assert e.return_code == 8
+    assert e.saic_message == "x"
+
+
+def test_retry_exception_picklable() -> None:
+    e = pickle.loads(  # noqa: S301
+        pickle.dumps(SaicApiRetryException("x", event_id="9", return_code=4))
+    )
+    assert isinstance(e, SaicApiRetryException)
+    assert str(e) == "return code: 4, message: x, event_id: 9"
+    assert e.return_code == 4
+    assert e.saic_message == "x"
+    assert e.event_id == "9"
+
+
+def test_logout_exception_picklable() -> None:
+    e = pickle.loads(pickle.dumps(SaicLogoutException("bye", 401)))  # noqa: S301
+    assert isinstance(e, SaicLogoutException)
+    assert e.return_code == 401
 
 
 # -- Through the real response handling --------------------------------------

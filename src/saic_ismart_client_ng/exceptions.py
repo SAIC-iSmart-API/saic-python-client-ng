@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from functools import partial
+from typing import Any
 
 
 class SaicReturnCode(IntEnum):
@@ -48,6 +50,11 @@ class SaicApiException(Exception):
 
     def __str__(self) -> str:
         return self.message
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        # ``args`` holds the formatted text, so the default would rebuild the
+        # exception with ``return_code=None`` and the text as its message.
+        return self.__class__, (self.saic_message, self.return_code)
 
     @property
     def is_vehicle_unreachable(self) -> bool:
@@ -98,6 +105,15 @@ class SaicApiRetryException(SaicApiException):
     @property
     def event_id(self) -> str:
         return self.__event_id
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        # ``event_id`` is keyword-only, so it can't be passed positionally.
+        return (
+            partial(
+                self.__class__, event_id=self.event_id, return_code=self.return_code
+            ),
+            (self.saic_message,),
+        )
 
     def __str__(self) -> str:
         return f"{self.message}, event_id: {self.event_id}"
