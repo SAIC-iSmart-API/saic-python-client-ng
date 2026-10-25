@@ -27,6 +27,7 @@ Supported functionality (partial list, check the code for more)
 * get charging status
 * lock vehicle
 * unlock vehicle
+* door windows: close, ventilate (open a few centimetres) or fully open
 * start rear window heating
 * stop rear window heating
 * remote climate
