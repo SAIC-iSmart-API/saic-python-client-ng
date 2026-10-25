@@ -1,8 +1,7 @@
 """Heated steering wheel control (#33).
 
-Checks the request body against what the iSmart app sends (decrypted MG S6 EV
-traffic): request type 8, a single parameter 24 = 1 (on) or 0 (off), and no
-end-of-parameters marker.
+Checks the request body: request type 8, parameter 24 = 1 (on) or 0 (off),
+then the end-of-parameters marker (255).
 """
 
 from __future__ import annotations
@@ -39,11 +38,14 @@ class TestHeatedSteeringWheel(unittest.IsolatedAsyncioTestCase):
         assert body.rvcReqType == RvcReqType.HEATED_STEERING_WHEEL.value
         assert body.rvcReqType == "8"
         params = [(p.paramId, base64.b64decode(p.paramValue)) for p in body.rvcParams]
-        assert params == [(RvcParamsId.HEATED_STEERING_WHEEL.value, b"\x01")]
+        assert params == [
+            (RvcParamsId.HEATED_STEERING_WHEEL.value, b"\x01"),
+            (255, b"\x00\x00\x00\x00"),
+        ]
         assert params[0][0] == 24
         assert body.vin == sha256_hex_digest(VIN)
 
     async def test_off(self) -> None:
         body = await self._sent(enable=False)
         params = [(p.paramId, base64.b64decode(p.paramValue)) for p in body.rvcParams]
-        assert params == [(24, b"\x00")]
+        assert params == [(24, b"\x00"), (255, b"\x00\x00\x00\x00")]

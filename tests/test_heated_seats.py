@@ -1,9 +1,9 @@
 """Per-seat heated seat control, front and rear (#34).
 
-Checks the request body against what the iSmart app sends (decrypted MG S6 EV
-traffic): request type 5, a single parameter for the chosen seat (17 front
-left, 18 front right, 25 rear left, 26 rear right) and no end-of-parameters
-marker. Rear seats are on/off only; the app sends 3 for "on".
+Checks the request body: request type 5, a single parameter for the chosen seat
+(17 front left, 18 front right, 25 rear left, 26 rear right), then the
+end-of-parameters marker (255). Rear seats are on/off only; the app sends 3 for
+"on".
 """
 
 from __future__ import annotations
@@ -58,7 +58,10 @@ class TestHeatedSeat(unittest.IsolatedAsyncioTestCase):
                         (p.paramId, base64.b64decode(p.paramValue))
                         for p in body.rvcParams
                     ]
-                    assert params == [(param_id, bytes([level]))]
+                    assert params == [
+                        (param_id, bytes([level])),
+                        (255, b"\x00\x00\x00\x00"),
+                    ]
                     assert body.vin == sha256_hex_digest(VIN)
 
     async def test_rear_seat_on_is_the_apps_level(self) -> None:
@@ -67,7 +70,7 @@ class TestHeatedSeat(unittest.IsolatedAsyncioTestCase):
             seat=HeatedSeat.REAR_LEFT, level=REAR_HEATED_SEAT_ON_LEVEL
         )
         params = [(p.paramId, base64.b64decode(p.paramValue)) for p in body.rvcParams]
-        assert params == [(25, b"\x03")]
+        assert params == [(25, b"\x03"), (255, b"\x00\x00\x00\x00")]
 
     async def test_out_of_range_levels_are_rejected(self) -> None:
         for level in (-1, 4):
