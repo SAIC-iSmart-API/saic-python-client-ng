@@ -8,9 +8,13 @@ from saic_ismart_client_ng.api.vehicle import RvcParamsId
 class VehicleWindowId(Enum):
     SUNROOF = RvcParamsId.WINDOW_SUNROOF
     DRIVER = RvcParamsId.WINDOW_DRIVER
-    WINDOW_2 = RvcParamsId.WINDOW_2
-    WINDOW_3 = RvcParamsId.WINDOW_3
-    WINDOW_4 = RvcParamsId.WINDOW_4
+    PASSENGER = RvcParamsId.WINDOW_PASSENGER
+    REAR_LEFT = RvcParamsId.WINDOW_REAR_LEFT
+    REAR_RIGHT = RvcParamsId.WINDOW_REAR_RIGHT
+    # The original names, kept as aliases.
+    WINDOW_2 = RvcParamsId.WINDOW_2  # alias of PASSENGER
+    WINDOW_3 = RvcParamsId.WINDOW_3  # alias of REAR_LEFT
+    WINDOW_4 = RvcParamsId.WINDOW_4  # alias of REAR_RIGHT
 
 
 class DoorWindowsAction(Enum):
