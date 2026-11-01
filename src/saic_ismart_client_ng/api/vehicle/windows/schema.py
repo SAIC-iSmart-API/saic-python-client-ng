@@ -11,3 +11,18 @@ class VehicleWindowId(Enum):
     WINDOW_2 = RvcParamsId.WINDOW_2
     WINDOW_3 = RvcParamsId.WINDOW_3
     WINDOW_4 = RvcParamsId.WINDOW_4
+
+
+class DoorWindowsAction(Enum):
+    """What to do with all four door windows at once.
+
+    The values are what the iSmart app sends (decrypted MG S6 EV traffic).
+    The value for a full open differs between models and markets:
+    ``control_windows`` sends 3, the MG S6 EV uses 2. Only the MG S6 EV has
+    been checked. The car reports ventilated and fully open windows the same
+    way in its status, so the two can't be told apart afterwards.
+    """
+
+    CLOSE = 0
+    VENTILATE = 1  # open a few centimetres
+    OPEN = 2  # fully open (the MG S6 EV value, other models may differ)
