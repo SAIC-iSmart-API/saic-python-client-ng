@@ -38,9 +38,9 @@ class SaicVehicleWindowsApi(SaicVehicleApi):
         for i in [
             VehicleWindowId.SUNROOF,
             VehicleWindowId.DRIVER,
-            VehicleWindowId.WINDOW_2,
-            VehicleWindowId.WINDOW_3,
-            VehicleWindowId.WINDOW_4,
+            VehicleWindowId.PASSENGER,
+            VehicleWindowId.REAR_LEFT,
+            VehicleWindowId.REAR_RIGHT,
         ]:
             if i.value.value in requested_windows:
                 rcv_params.append(RvcParams(i.value, b"\x01"))
@@ -78,9 +78,9 @@ class SaicVehicleWindowsApi(SaicVehicleApi):
         rvc_params = [
             RvcParams(RvcParamsId.WINDOW_SUNROOF, b"\x00"),
             RvcParams(RvcParamsId.WINDOW_DRIVER, b"\x01"),
-            RvcParams(RvcParamsId.WINDOW_2, b"\x01"),
-            RvcParams(RvcParamsId.WINDOW_3, b"\x01"),
-            RvcParams(RvcParamsId.WINDOW_4, b"\x01"),
+            RvcParams(RvcParamsId.WINDOW_PASSENGER, b"\x01"),
+            RvcParams(RvcParamsId.WINDOW_REAR_LEFT, b"\x01"),
+            RvcParams(RvcParamsId.WINDOW_REAR_RIGHT, b"\x01"),
             RvcParams(RvcParamsId.WINDOW_OPEN_CLOSE, action.value.to_bytes(1, "big")),
         ]
         request = VehicleControlReq(
