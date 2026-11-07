@@ -76,8 +76,10 @@ class BasicVehicleStatus:
     extendedData2: int | None = None
     exteriorTemperature: int | None = None
     frontLeftSeatHeatLevel: int | None = None
+    frontLeftSeatVentLevel: int | None = None
     frontLeftTyrePressure: int | None = None
     frontRightSeatHeatLevel: int | None = None
+    frontRightSeatVentLevel: int | None = None
     frontRightTyrePressure: int | None = None
     fuelLevelPrc: int | None = None
     fuelRange: int | None = None
@@ -103,7 +105,9 @@ class BasicVehicleStatus:
     # on (app, remote command or the in-car buttons). The iSmart app and the
     # car only offer on/off for the rear: 0 = off, non-zero = on.
     secondRowLeftSeatHeatLevel: int | None = None
+    secondRowLeftSeatVentLevel: int | None = None
     secondRowRightSeatHeatLevel: int | None = None
+    secondRowRightSeatVentLevel: int | None = None
     sideLightStatus: int | None = None
     steeringHeatLevel: int | None = None
     steeringWheelHeatFailureReason: int | None = None
@@ -188,6 +192,11 @@ class RvcParamsId(Enum):
     HEATED_STEERING_WHEEL = 24
     HEATED_SEAT_REAR_LEFT = 25
     HEATED_SEAT_REAR_RIGHT = 26
+    # Ventilated seats, addressed by physical side like the heated seats.
+    SEAT_VENTILATION_FRONT_LEFT = 27
+    SEAT_VENTILATION_FRONT_RIGHT = 28
+    SEAT_VENTILATION_REAR_LEFT = 29
+    SEAT_VENTILATION_REAR_RIGHT = 30
     PARAMS_MAX = 0xFF
 
 
@@ -214,6 +223,7 @@ class RvcReqType(Enum):
     ENGINE_CONTROL = "17"
     REMOTE_REFRESH = "18"
     REMOTE_IMMOBILIZER = "19"
+    VENTILATED_SEATS = "22"
     REMOTE_HEAT_REAR_WINDOW = "32"
     MAX_VALUE = "597"
 

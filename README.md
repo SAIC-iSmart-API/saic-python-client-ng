@@ -33,6 +33,7 @@ Supported functionality (partial list, check the code for more)
 * remote climate
 * heated seats: each seat on its own, front and rear, plus rear seat status
 * heated steering wheel
+* ventilated seats: each seat on its own, front and rear (untested on a car)
 
 
 ## Prerequisites
