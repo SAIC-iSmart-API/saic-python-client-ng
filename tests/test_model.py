@@ -66,6 +66,7 @@ class TestSaicApiConfiguration(unittest.TestCase):
             (SaicApiConfiguration.mg_eu, "gateway-mg-eu", "eu"),
             (SaicApiConfiguration.mg_au, "gateway-mg-au", "au"),
             (SaicApiConfiguration.mg_tr, "gateway-mg-tr", "tr"),
+            (SaicApiConfiguration.mg_br, "gateway-mg-br", "br"),
         ):
             config = factory("u", "p")
             assert config.base_uri == f"https://{host}.soimt.com/api.app/v1/"

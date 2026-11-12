@@ -5,6 +5,7 @@ from typing import Any
 MG_EU_BASE_URI = "https://gateway-mg-eu.soimt.com/api.app/v1/"
 MG_AU_BASE_URI = "https://gateway-mg-au.soimt.com/api.app/v1/"
 MG_TR_BASE_URI = "https://gateway-mg-tr.soimt.com/api.app/v1/"
+MG_BR_BASE_URI = "https://gateway-mg-br.soimt.com/api.app/v1/"
 MAXUS_EU_BASE_URI = "https://gateway-maxus-eu.soimt.com/api.app/v1/"
 MAXUS_EU_TENANT_ID = "590224"
 MAXUS_EU_DEVICE_APP_ID = "com.saicmaxus.ismarteu"
@@ -55,6 +56,13 @@ class SaicApiConfiguration:
         """Build the configuration for MG iSMART in Türkiye."""
         kwargs.setdefault("base_uri", MG_TR_BASE_URI)
         kwargs.setdefault("region", "tr")
+        return cls(username, password, **kwargs)
+
+    @classmethod
+    def mg_br(cls, username: str, password: str, **kwargs: Any) -> SaicApiConfiguration:
+        """Build the configuration for MG iSMART in Brazil (the "MG i-SMART LATAM" app)."""
+        kwargs.setdefault("base_uri", MG_BR_BASE_URI)
+        kwargs.setdefault("region", "br")
         return cls(username, password, **kwargs)
 
     @classmethod
