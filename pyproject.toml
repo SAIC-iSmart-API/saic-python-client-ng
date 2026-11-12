@@ -1,6 +1,6 @@
 [project]
 name = "saic_ismart_client_ng"
-version = "0.13.1"
+version = "0.14.0"
 description = "SAIC next gen client library (MG iSMART)"
 authors = [
     { name = "Giovanni Condello", email = "saic-python-client@nanomad.net" },
@@ -31,14 +31,14 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
-pytest = ">=9.0.3,<10.0.0"
+pytest = ">=9.2.0,<10.0.0"
 mock = "^5.1.0"
-coverage = ">=7.16.0,<8.0.0"
-ruff = ">=0.17.1,<0.18.0"
+coverage = ">=7.17.0,<8.0.0"
+ruff = ">=0.17.3,<0.18.0"
 pytest-cov = ">=7.1.0,<8.0.0"
-pytest-asyncio = ">=1.4.0,<2.0.0"
+pytest-asyncio = ">=1.4.1,<2.0.0"
 pytest-mock = ">=3.17.0,<4.0.0"
-mypy = ">=2.4.0,<3.0.0"
+mypy = ">=2.4.1,<3.0.0"
 pylint = ">=4.1.3,<5.0.0"
 pre-commit = ">=4.7.0,<5.0.0"
 
