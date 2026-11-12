@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from saic_ismart_client_ng.api.vehicle import SaicVehicleApi
-from saic_ismart_client_ng.api.vehicle.locks.schema import VehicleLockId
+from saic_ismart_client_ng.api.vehicle.locks.schema import (
+    TailgateAction,
+    VehicleLockId,
+)
 from saic_ismart_client_ng.api.vehicle.schema import (
     RvcParams,
     RvcParamsId,
@@ -12,7 +15,7 @@ from saic_ismart_client_ng.api.vehicle.schema import (
 from saic_ismart_client_ng.crypto_utils import sha256_hex_digest
 from saic_ismart_client_ng.exceptions import SaicApiException
 
-__all__ = ["VehicleLockId"]
+__all__ = ["TailgateAction", "VehicleLockId"]
 
 
 class SaicVehicleLocksApi(SaicVehicleApi):
@@ -25,9 +28,37 @@ class SaicVehicleLocksApi(SaicVehicleApi):
         )
 
     async def open_tailgate(self, vin: str) -> VehicleControlResp:
+        """Unlock the tailgate (lock 2), which releases its latch.
+
+        The iSmart app calls this "Unlock Tailgate". On a car with a power
+        tailgate, ``control_tailgate`` opens and closes it instead.
+        """
         return await self.control_vehicle_locks(
             vin, should_lock=False, lock_id=VehicleLockId.TAILGATE
         )
+
+    async def control_tailgate(
+        self, vin: str, *, action: TailgateAction
+    ) -> VehicleControlResp:
+        """Open or close a power tailgate.
+
+        Matches what the iSmart app sends (decrypted MG S6 EV traffic, UK):
+        request type 9 with a single parameter, 31 = 1 (open) or 2 (close),
+        and no end-of-parameters marker. On that car both were accepted, the
+        tailgate moved, and ``BasicVehicleStatus.bootStatus`` then read 1
+        (open) and 0 (closed). Only the S6 EV has been checked; cars without a
+        power tailgate are expected to refuse it.
+        """
+        command = VehicleControlReq(
+            rvc_req_type=RvcReqType.TAILGATE,
+            rvc_params=[
+                RvcParams(
+                    RvcParamsId.TAILGATE, action.value.to_bytes(1, byteorder="big")
+                )
+            ],
+            vin=sha256_hex_digest(vin),
+        )
+        return await self.send_vehicle_control_command(command, vin)
 
     async def control_vehicle_locks(
         self,
