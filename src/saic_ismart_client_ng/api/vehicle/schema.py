@@ -167,10 +167,17 @@ class RvcParamsId(Enum):
     UNK_6 = 6
     LOCK_ID = 7
     WINDOW_SUNROOF = 8
+    # The door windows follow the status model (driverWindow, passengerWindow,
+    # rearLeftWindow, rearRightWindow). The front pair is named by role, the
+    # rear pair by side. The WINDOW_2/3/4 names are the original ones, kept as
+    # aliases.
     WINDOW_DRIVER = 9
-    WINDOW_2 = 10
-    WINDOW_3 = 11
-    WINDOW_4 = 12
+    WINDOW_PASSENGER = 10
+    WINDOW_REAR_LEFT = 11
+    WINDOW_REAR_RIGHT = 12
+    WINDOW_2 = 10  # noqa: PIE796 - alias of WINDOW_PASSENGER
+    WINDOW_3 = 11  # noqa: PIE796 - alias of WINDOW_REAR_LEFT
+    WINDOW_4 = 12  # noqa: PIE796 - alias of WINDOW_REAR_RIGHT
     WINDOW_OPEN_CLOSE = 13
     # Heated seats are addressed by PHYSICAL side, not driver/passenger:
     # 17 is the front-left seat and 18 the front-right on both left- and
@@ -188,6 +195,7 @@ class RvcParamsId(Enum):
     HEATED_STEERING_WHEEL = 24
     HEATED_SEAT_REAR_LEFT = 25
     HEATED_SEAT_REAR_RIGHT = 26
+    TAILGATE = 31
     PARAMS_MAX = 0xFF
 
 
@@ -211,6 +219,7 @@ class RvcReqType(Enum):
     CLIMATE = "6"
     AIR_CLEAN = "7"
     HEATED_STEERING_WHEEL = "8"
+    TAILGATE = "9"
     ENGINE_CONTROL = "17"
     REMOTE_REFRESH = "18"
     REMOTE_IMMOBILIZER = "19"
