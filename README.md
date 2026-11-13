@@ -13,6 +13,7 @@ Presets are classmethods on `SaicApiConfiguration`. Each takes `(username, passw
 | `mg_eu()` | `https://gateway-mg-eu.soimt.com/api.app/v1/` | `eu` | `459771` | `com.saicmotor.europecar` |
 | `mg_au()` | `https://gateway-mg-au.soimt.com/api.app/v1/` | `au` | `459771` | `com.saicmotor.europecar` |
 | `mg_tr()` | `https://gateway-mg-tr.soimt.com/api.app/v1/` | `tr` | `459771` | `com.saicmotor.europecar` |
+| `mg_br()` | `https://gateway-mg-br.soimt.com/api.app/v1/` | `br` | `459771` | `com.saicmotor.europecar` |
 | `maxus_eu()` | `https://gateway-maxus-eu.soimt.com/api.app/v1/` | `eu` | `590224` | `com.saicmaxus.ismarteu` |
 
 MAXUS Europe vehicles use the same API. The `maxus_eu()` values were confirmed by a live traffic capture of the MAXUS app.
