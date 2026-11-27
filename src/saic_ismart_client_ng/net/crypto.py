@@ -122,7 +122,9 @@ def encrypt_request(
     original_request_headers["APP-CONTENT-ENCRYPTED"] = "1"
     original_request_headers["tenant-id"] = tenant_id
     original_request_headers["User-Type"] = "app"
-    original_request_headers["APP-LANGUAGE-TYPE"] = "en"
+    original_request_headers["APP-LANGUAGE-TYPE"] = (
+        "th" if region.lower() == "th" else "en"
+    )
     if user_token:
         original_request_headers["blade-auth"] = user_token
     app_verification_string = get_app_verification_string(

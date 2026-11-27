@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+import binascii
 from dataclasses import asdict
 import datetime
 import logging
@@ -55,10 +57,32 @@ class AbstractSaicApi:
         await self.__api_client.close()
 
     async def login(self) -> LoginResp:
+        is_thai = self.__configuration.region.lower() == "th"
+        authorization = "Basic c3dvcmQ6c3dvcmRfc2VjcmV0"
+        if is_thai:
+            thai_authorization = self.__configuration.login_authorization
+            if not thai_authorization:
+                raise SaicApiException(
+                    "Thai login requires login_authorization with the app's Basic authorization header."
+                )
+            scheme, separator, credentials = thai_authorization.partition(" ")
+            try:
+                decoded_credentials = base64.b64decode(credentials, validate=True)
+            except (binascii.Error, ValueError):
+                decoded_credentials = b""
+            if (
+                scheme.lower() != "basic"
+                or not separator
+                or b":" not in decoded_credentials
+            ):
+                raise SaicApiException(
+                    "login_authorization must be a valid Basic authorization header."
+                )
+            authorization = thai_authorization
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json",
-            "Authorization": "Basic c3dvcmQ6c3dvcmRfc2VjcmV0",
+            "Authorization": authorization,
         }
         firebase_device_id = (
             "simulator*********************************************"
@@ -67,11 +91,17 @@ class AbstractSaicApi:
         form_body = {
             "grant_type": "password",
             "username": self.__configuration.username,
-            "password": sha1_hex_digest(self.__configuration.password),
+            "password": (
+                base64.b64encode(self.__configuration.password.encode("utf-8")).decode(
+                    "ascii"
+                )
+                if is_thai
+                else sha1_hex_digest(self.__configuration.password)
+            ),
             "scope": "all",
             "deviceId": f"{firebase_device_id}###{self.__configuration.device_app_id}",
             "deviceType": "0",  # 2 for huawei
-            "language": "EN",
+            "language": "TH" if is_thai else "EN",
         }
 
         if self.__configuration.username_is_email:

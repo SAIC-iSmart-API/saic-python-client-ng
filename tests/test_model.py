@@ -79,6 +79,14 @@ class TestSaicApiConfiguration(unittest.TestCase):
         assert config.tenant_id == "1"
         assert config.region == "x"
 
+    def test_mg_th_preset(self) -> None:
+        config = SaicApiConfiguration.mg_th("u", "p", login_authorization="example")
+        assert config.base_uri == "https://gateway-mg-th.soimt.com/api.app/v1/"
+        assert config.region == "th"
+        assert config.tenant_id == "459771"
+        assert config.device_app_id == "com.saicmotor.ismartthai"
+        assert config.login_authorization == "example"
+
 
 if __name__ == "__main__":
     unittest.main()
