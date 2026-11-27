@@ -13,10 +13,43 @@ Presets are classmethods on `SaicApiConfiguration`. Each takes `(username, passw
 | `mg_eu()` | `https://gateway-mg-eu.soimt.com/api.app/v1/` | `eu` | `459771` | `com.saicmotor.europecar` |
 | `mg_au()` | `https://gateway-mg-au.soimt.com/api.app/v1/` | `au` | `459771` | `com.saicmotor.europecar` |
 | `mg_tr()` | `https://gateway-mg-tr.soimt.com/api.app/v1/` | `tr` | `459771` | `com.saicmotor.europecar` |
+| `mg_th()` | `https://gateway-mg-th.soimt.com/api.app/v1/` | `th` | `459771` | `com.saicmotor.ismartthai` |
 | `mg_br()` | `https://gateway-mg-br.soimt.com/api.app/v1/` | `br` | `459771` | `com.saicmotor.europecar` |
 | `maxus_eu()` | `https://gateway-maxus-eu.soimt.com/api.app/v1/` | `eu` | `590224` | `com.saicmaxus.ismarteu` |
 
 MAXUS Europe vehicles use the same API. The `maxus_eu()` values were confirmed by a live traffic capture of the MAXUS app.
+
+For Thailand, supply `login_authorization` as the complete `Authorization` header
+(`Basic ...`) from the app's login request. Keep it secret; do not commit it or the
+traffic capture. For phone login, also set `username_is_email=False` and
+`phone_country_code="66"`. For example:
+
+```python
+import os
+
+from saic_ismart_client_ng.model import SaicApiConfiguration
+
+config = SaicApiConfiguration.mg_th(
+    os.environ["SAIC_USERNAME"],
+    os.environ["SAIC_PASSWORD"],
+    username_is_email=False,
+    phone_country_code="66",
+    login_authorization=os.environ["SAIC_LOGIN_AUTHORIZATION"],
+)
+```
+
+For the Thailand example, copy `examples/.env.example` to `examples/.env` and
+set the complete authorization header there:
+
+```dotenv
+SAIC_LOGIN_AUTHORIZATION="Basic ..."
+```
+
+Existing environment variables take precedence over `.env`. The example's
+username and password are configured separately in `examples/main.py`.
+The example requests both vehicle status and charging management data for each
+vehicle. If SAIC reports that vehicle access has been revoked, restore the
+account's authorization to that vehicle in the app before retrying.
 
 Supported functionality (partial list, check the code for more)
 
